@@ -21,11 +21,12 @@
       - [Chapter 1 - Part 3.6: SQL Operators](#chapter1part3.6)
       - [Chapter 1 - Part 3.7: SQL Functions](#chapter1part3.7)
       - [Chapter 1 - Part 3.8: Different categories of SQL commands: DDL, DML, DCL, TCL, and DQL](#chapter1part3.8)
-    - [Chapter 1 - Part 4: Setting Up Your SQL Environment (e.g., SQLite, MySQL)](#chapter1part4)
+    - [Chapter 1 - Part 4: Setting Up Your SQL Environment (e.g., SQLite, MySQL, PostgreSQL)](#chapter1part4)
       - [Chapter 1 - Part 4.1: Choosing a Database Management System (DBMS)](#chapter1part4.1)
       - [Chapter 1 - Part 4.2: Setting Up SQLite](#chapter1part4.2)
       - [Chapter 1 - Part 4.3: Setting Up MySQL](#chapter1part4.3)
-      - [Chapter 1 - Part 4.4: Connecting to a Database from a Programming Language](#chapter1part4.4)
+      - [Chapter 1 - Part 4.4: Setting Up PostgreSQL](#chapter1part4.4)
+      - [Chapter 1 - Part 4.5: Connecting to a Database from a Programming Language](#chapter1part4.5)
     - [Chapter 1 - Part 5: Connecting to a Database and Running Basic Commands](#chapter1part5)
       - [Chapter 1 - Part 5.1: Establishing a Database Connection](#chapter1part5.1)
       - [Chapter 1 - Part 5.2: Running Basic SQL Commands](#chapter1part5.2)
@@ -193,6 +194,8 @@
       - [Chapter 11 - Part 6.1: Creating Views](#chapter11part6.1)
       - [Chapter 11 - Part 6.2: Using Views](#chapter11part6.2)
       - [Chapter 11 - Part 6.3: Advantages and Disadvantages of Using Views](#chapter11part6.3)
+12. [Chapter 12: CTE (Common Table Expression)](#chapter12)
+13. [Chapter 13: Subqueries and Views](#chapter11)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
