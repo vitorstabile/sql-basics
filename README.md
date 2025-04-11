@@ -398,6 +398,31 @@ CREATE DATABASE bookstore;
 
 #### <a name="chapter1part4.5"></a>Chapter 1 - Part 4.5: Setting Up DuckDB
 
+setting up DuckDB is remarkably simple compared to other SQL environments like MySQL or PostgreSQL. DuckDB is an in-process SQL OLAP database management system. This means it runs directly within your application's process and doesn't require a separate server. It stores data in a single file (or in memory), making it very easy to set up and use.
+
+Here's how to set up a DuckDB environment:
+
+**1. Download and Install DuckDB CLI:**
+
+- **Windows:**
+  - Download the CLI from the DuckDB Repoitory (https://github.com/duckdb/duckdb/releases/download/v1.2.2/duckdb_cli-windows-amd64.zip).
+  - Extract the content of the zip file
+  - Run the .exe file
+ 
+- **macOS**
+  - In your terminal, try:
+
+```
+curl https://install.duckdb.org | sh
+```
+
+- **Linux:**
+  -  In your terminal, try:
+ 
+```
+curl https://install.duckdb.org | sh
+```
+
 #### <a name="chapter1part4.6"></a>Chapter 1 - Part 4.6: Connecting to a Database from a Programming Language
 
 #### <a name="chapter1part5"></a>Chapter 1 - Part 5: Connecting to a Database and Running Basic Commands
