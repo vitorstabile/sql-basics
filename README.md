@@ -41,6 +41,7 @@
       - [Chapter 2 - Part 1.2: Selecting Specific Columns](#chapter2part1.2)
       - [Chapter 2 - Part 1.3: Selecting All Columns Using the Asterisk (*) Wildcard](#chapter2part1.3)
       - [Chapter 2 - Part 1.4: Column Order in the SELECT Statement](#chapter2part1.4)
+      - [Chapter 2 - Part 1.5: Retrieve only the unique values](#chapter2part1.5)
     - [Chapter 2 - Part 2: Filtering Data with WHERE Clauses: Conditions and Operators](#chapter2part2)
       - [Chapter 2 - Part 2.1: Understanding the WHERE Clause](#chapter2part2.1)
       - [Chapter 2 - Part 2.2: Comparison Operators](#chapter2part2.2)
@@ -451,6 +452,44 @@ curl https://install.duckdb.org | sh
 #### <a name="chapter2part1.3"></a>Chapter 2 - Part 1.3: Selecting All Columns Using the Asterisk (*) Wildcard
 
 #### <a name="chapter2part1.4"></a>Chapter 2 - Part 1.4: Column Order in the SELECT Statement
+
+#### <a name="chapter2part1.5"></a>Chapter 2 - Part 1.5: Retrieve only the unique values
+
+The ```DISTINCT``` keyword is used to retrieve only the unique values from a specified column (or columns) in a table. It eliminates duplicate rows from the result set.
+
+Let's say in our "Online Bookstore" database, we have a books table with the following data:
+
+
+| book_id | title                    | author          | genre        |
+| :-----: | :----------------------: | :-------------: | :----------: |
+| 1       | "The Great Novel"        |  "Jane Doe"     | "Fiction"    |
+| 2       | "Data Science Handbook"  |  "John Smith"   | "Technical"  |
+| 3       | "The Great Novel"        |  "Jane Doe"     | "Fiction"    |
+| 4       | "SQL for Beginners"      |  "Alice Brown"  | "Technical"  |
+| 5       | "The Great Novel"        | "Jane Doe"      | "Fiction"    |
+| 6       | "Advanced SQL"           | "Michael Davis" | "Technical"  |
+
+If we want to find out the unique genres in our ```books``` table, we can use the following query:
+
+```sql
+SELECT DISTINCT genre
+FROM books;
+```
+
+| genre        |
+| :----------: |
+| "Fiction"    |
+| "Technical"  |
+
+As you can see, even though "Fiction" appears three times and "Technical" appears three times in the ```books``` table, the ```DISTINCT``` keyword ensures that each genre is listed only once in the result set.
+
+**Important Notes:**
+
+- ```DISTINCT``` applies to all the columns listed in the ```SELECT``` statement. If you have ```SELECT DISTINCT column1, column2```, the result will show unique combinations of ```column1v and ```column2```.
+
+- ```DISTINCT``` is case-sensitive. For example, "Fiction" and "fiction" would be considered different values.
+
+- ```DISTINCT``` can impact performance, especially on large tables. The database needs to sort the data to identify unique rows.
 
 #### <a name="chapter2part2"></a>Chapter 2 - Part 2: Filtering Data with WHERE Clauses: Conditions and Operators
 
