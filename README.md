@@ -274,7 +274,9 @@
 
 #### <a name="chapter1part3.8"></a>Chapter 1 - Part 3.8: Different categories of SQL commands: DDL, DML, DCL, TCL, and DQL
 
-#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Setting Up Your SQL Environment (e.g., SQLite, MySQL, PostgreSQL)
+<div align="center"><img src="img/sqlcommands-w984-h1104.jpg" width=984 height=1104><br><sub>SQL commands - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Setting Up Your SQL Environment (e.g., SQLite, MySQL, PostgreSQL, DuckDB)
 
 #### <a name="chapter1part4.1"></a>Chapter 1 - Part 4.1: Choosing a Database Management System (DBMS)
 
@@ -284,7 +286,9 @@
 
 #### <a name="chapter1part4.4"></a>Chapter 1 - Part 4.4: Setting Up PostgreSQL
 
-#### <a name="chapter1part4.5"></a>Chapter 1 - Part 4.5: Connecting to a Database from a Programming Language
+#### <a name="chapter1part4.5"></a>Chapter 1 - Part 4.5: Setting Up DuckDB
+
+#### <a name="chapter1part4.6"></a>Chapter 1 - Part 4.6: Connecting to a Database from a Programming Language
 
 #### <a name="chapter1part5"></a>Chapter 1 - Part 5: Connecting to a Database and Running Basic Commands
 
