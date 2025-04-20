@@ -13,13 +13,12 @@
       - [Chapter 1 - Part 2.3: Data Integrity](#chapter1part2.3)
       - [Chapter 1 - Part 2.4: The "Online Bookstore" Database](#chapter1part2.4)
     - [Chapter 1 - Part 3: Introduction to SQL: The Language of Databases](#chapter1part3)
-      - [Chapter 1 - Part 3.1: Core Principles of Relational Databases](#chapter1part3.1)
-      - [Chapter 1 - Part 3.2: What is SQL?](#chapter1part3.2)
-      - [Chapter 1 - Part 3.3: SQL vs. Other Programming Languages](#chapter1part3.3)
-      - [Chapter 1 - Part 3.4: SQL Statements and Syntax](#chapter1part3.4)
-      - [Chapter 1 - Part 3.5: Data Types in SQL](#chapter1part3.5)
-      - [Chapter 1 - Part 3.6: SQL Operators](#chapter1part3.6)
-      - [Chapter 1 - Part 3.7: SQL Functions](#chapter1part3.7)
+      - [Chapter 1 - Part 3.1: What is SQL?](#chapter1part3.1)
+      - [Chapter 1 - Part 3.2: SQL vs. Other Programming Languages](#chapter1part3.2)
+      - [Chapter 1 - Part 3.3: SQL Statements and Syntax](#chapter1part3.3)
+      - [Chapter 1 - Part 3.4: Data Types in SQL](#chapter1part3.4)
+      - [Chapter 1 - Part 3.5: SQL Operators](#chapter1part3.5)
+      - [Chapter 1 - Part 3.6: SQL Functions](#chapter1part3.6)
       - [Chapter 1 - Part 3.8: Different categories of SQL commands: DDL, DML, DCL, TCL, and DQL](#chapter1part3.8)
     - [Chapter 1 - Part 4: Setting Up Your SQL Environment (e.g., SQLite, MySQL, PostgreSQL)](#chapter1part4)
       - [Chapter 1 - Part 4.1: Choosing a Database Management System (DBMS)](#chapter1part4.1)
@@ -544,21 +543,290 @@ This database structure allows us to efficiently store and retrieve information 
 
 #### <a name="chapter1part3"></a>Chapter 1 - Part 3: Introduction to SQL: The Language of Databases
 
-#### <a name="chapter1part3.1"></a>Chapter 1 - Part 3.1: Core Principles of Relational Databases
+SQL (Structured Query Language): The Language of Databases
 
-#### <a name="chapter1part3.2"></a>Chapter 1 - Part 3.2: What is SQL?
+SQL is the standard language for interacting with relational database management systems (RDBMS). It allows you to retrieve, manipulate, and manage data stored in databases. Understanding SQL is crucial for anyone working with data, from data analysts and scientists to software developers and database administrators. This lesson will provide a comprehensive introduction to SQL, covering its history, key concepts, and basic syntax. We'll explore how SQL is used to communicate with databases and perform essential operations.
 
-#### <a name="chapter1part3.3"></a>Chapter 1 - Part 3.3: SQL vs. Other Programming Languages
+#### <a name="chapter1part3.1"></a>Chapter 1 - Part 3.1: What is SQL?
 
-#### <a name="chapter1part3.4"></a>Chapter 1 - Part 3.4: SQL Statements and Syntax
+SQL (Structured Query Language) is a domain-specific language used in programming and designed for managing data held in a relational database management system (RDBMS), or for stream data management system (SDS). It's the standard language for database communication.
 
-#### <a name="chapter1part3.5"></a>Chapter 1 - Part 3.5: Data Types in SQL
+**Key Characteristics of SQL**
 
-#### <a name="chapter1part3.6"></a>Chapter 1 - Part 3.6: SQL Operators
+- **Declarative Language:** SQL is declarative, meaning you specify what data you want, not how to retrieve it. The database system optimizes the query execution.
 
-#### <a name="chapter1part3.7"></a>Chapter 1 - Part 3.7: SQL Functions
+- **Standardized:** SQL is standardized by ANSI (American National Standards Institute) and ISO (International Organization for Standardization), ensuring a degree of portability across different database systems. However, most database systems have their own extensions to the standard.
 
-#### <a name="chapter1part3.8"></a>Chapter 1 - Part 3.8: Different categories of SQL commands: DDL, DML, DCL, TCL, and DQL
+- **Data Definition Language (DDL):** SQL includes commands for defining the database schema, such as creating, altering, and dropping tables.
+
+- **Data Manipulation Language (DML):** SQL includes commands for manipulating data, such as inserting, updating, deleting, and retrieving data.
+
+- **Data Control Language (DCL):** SQL includes commands for controlling access to data, such as granting and revoking permissions.
+
+**A Brief History of SQL**
+
+SQL was initially developed at IBM in the early 1970s by Donald D. Chamberlin and Raymond F. Boyce. It was initially called SEQUEL (Structured English Query Language). Later, the name was changed to SQL due to trademark issues.
+
+- **1970s:** IBM developed the first prototype of SQL, called System R.
+
+- **1980s:** SQL became a standard language for relational databases. ANSI and ISO published the first SQL standard in 1986.
+
+- **1990s - Present:** SQL has evolved with new features and extensions, such as object-relational features, XML support, and window functions. Modern databases continue to support and extend SQL.
+
+#### <a name="chapter1part3.2"></a>Chapter 1 - Part 3.2: SQL vs. Other Programming Languages
+
+SQL is different from general-purpose programming languages like Python, Java, or C++.
+
+| Feature           | SQL                                              | General-Purpose Languages (e.g., Python)     |
+| :---------------: | :----------------------------------------------: | :------------------------------------------: |
+| Purpose           | Managing and querying databases                  | General-purpose programming                  |
+| Paradigm          | Declarative                                      | Imperative/Object-Oriented                   |
+| Data Handling     | Optimized for relational data	                   | Flexible, handles various data types         |
+| Execution         | Database server                                  | Application server/Interpreter               |
+| Primary Use Case  | Data retrieval, manipulation, schema definition  | Application logic, system programming, etc.  |
+
+**Example:**
+
+Imagine you want to find all books in the "Online Bookstore" database with a price greater than $25.
+
+- **SQL:** You would write an SQL query that specifies the condition (price > $25) and the table to search. The database system would then efficiently retrieve the matching rows.
+
+- **Python:** You would need to connect to the database, retrieve all rows from the table, iterate through each row, and check if the price is greater than $25.
+
+#### <a name="chapter1part3.3"></a>Chapter 1 - Part 3.3: SQL Statements and Syntax
+
+SQL statements are instructions that you send to the database to perform specific actions. All SQL statements begin with a keyword that identifies the type of statement.
+
+**Basic SQL Statement Structure**
+
+Most SQL statements follow a general structure:
+
+```sql
+-- SQL statement
+KEYWORD column1, column2, ...
+FROM table_name
+WHERE condition;
+```
+
+- **KEYWORD:** Specifies the action to be performed (e.g., ```SELECT```, ```INSERT```, ```UPDATE```, ```DELETE```).
+column1, column2, ...: Specifies the columns to be affected by the statement.
+
+- **table_name:** Specifies the table to which the statement applies.
+
+- **WHERE condition:** Specifies a condition that filters the rows affected by the statement (optional).
+
+**Common SQL Statements**
+
+Here are some of the most common SQL statements:
+
+- **SELECT:** Retrieves data from one or more tables.
+- **INSERT:** Inserts new data into a table.
+- **UPDATE:** Modifies existing data in a table.
+- **DELETE:** Deletes data from a table.
+- **CREATE TABLE:** Creates a new table in the database.
+- **ALTER TABLE:** Modifies an existing table.
+- **DROP TABLE:** Deletes a table from the database.
+
+**Case Sensitivity**
+
+SQL is generally not case-sensitive for keywords. However, it is often case-sensitive for data, depending on the database system and its configuration.
+
+Example:
+
+```sql
+SELECT * FROM Books WHERE title = 'The Lord of the Rings'; -- Case-sensitive comparison
+SELECT * FROM Books WHERE title = 'the lord of the rings'; -- May not return any results
+```
+
+**Comments**
+
+Comments are used to add explanatory notes to your SQL code. They are ignored by the database system.
+
+- **Single-line comments:** Use ```--``` to start a single-line comment.
+
+- **Multi-line comments:** Use ```/*``` to start a multi-line comment and ```*/``` to end it.
+
+Example:
+
+```sql
+-- This is a single-line comment
+SELECT * FROM Books;
+
+/*
+This is a
+multi-line comment
+*/
+SELECT * FROM Authors;
+```
+
+#### <a name="chapter1part3.4"></a>Chapter 1 - Part 3.4: Data Types in SQL
+
+Data types specify the type of data that can be stored in a column. Choosing the correct data type is important for data integrity and efficiency.
+
+**Common Data Types**
+
+- **INTEGER:** Stores whole numbers (e.g., 1, 100, -50).
+
+- **REAL/FLOAT:** Stores floating-point numbers (e.g., 3.14, 2.71).
+
+- **TEXT/VARCHAR:** Stores strings of characters (e.g., "Hello", "SQL"). VARCHAR typically requires specifying a maximum length.
+
+- **DATE:** Stores dates (e.g., "2023-10-27").
+
+- **BOOLEAN:** Stores boolean values (e.g., TRUE, FALSE).
+
+Example:
+
+When creating the ```Books``` table in the "Online Bookstore" database, you would need to specify the data type for each column:
+
+```sql
+CREATE TABLE Books (
+    book_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    author_id INTEGER,
+    price REAL,
+    publication_date DATE
+);
+```
+
+In this example:
+
+- ```book_id``` is an integer and the primary key.
+
+- ```title``` is text and cannot be empty (```NOT NULL```).
+
+- ```author_id``` is an integer representing the author's ID.
+
+- ```price``` is a real number representing the book's price.
+
+- ```publication_date``` is a date.
+
+**Choosing the Right Data Type**
+
+Consider the following factors when choosing a data type:
+
+- **Type of data:** What kind of data will be stored in the column (e.g., numbers, text, dates)?
+
+- **Range of values:** What is the minimum and maximum value that the column will store?
+
+- **Storage space:** How much storage space is required for the data type?
+
+- **Performance:** How will the data type affect query performance?
+
+#### <a name="chapter1part3.5"></a>Chapter 1 - Part 3.5: SQL Operators
+
+SQL operators are symbols or keywords used to perform operations on data.
+
+**Types of Operators**
+
+- **Arithmetic Operators:** Used for performing mathematical calculations (+, -, *, /).
+
+- **Comparison Operators:** Used for comparing values (=, >, <, >=, <=, != or <>).
+
+- **Logical Operators:** Used for combining conditions (AND, OR, NOT).
+
+**Arithmetic Operators**
+
+| Operator      | Description       | Example                 |
+| :-----------: | :---------------: | :-------------------:   |
+| +             | Addition          | ```price + 5```         |
+| -             | Subtraction       | ```price - discount```  |
+| *             | Multiplication    | ```price * 1.05```      |
+| /             | Division          | ```price / 2```         |
+
+**Comparison Operators**
+
+| Operator       | Description                      | Example                               |
+| :-----------:  | :------------------------------: | :-------------------:                 |
+| =              | Equal to                         | ```price = 25.00```                   |
+| >              | Greater than                     | ```price > 25.00```                   |
+| <              | Less than                        | ```price < 25.00```                   |
+| >=             | Greater than or equal to         | ```price >= 25.00```                  |
+| <=             | Less than or equal to            | ```price <= 25.00```                  |
+| != or <>       | Not equal to                     | ```price != 25.00```                  |
+| BETWEEN        | Between a specified range        | ```price BETWEEN 20.00 AND 30.00```   |
+| LIKE           | Pattern matching                 | ```title LIKE 'The%'```               |
+| IN             | Equal to one of a set of values  | ```author_id IN (1, 2, 3)```          |
+| IS NULL        | Equal to NULL                    | ```publication_date IS NULL```        |
+| IS NOT NULL    | Not equal to NULL                | ```publication_date IS NOT NULL```    |
+
+**Logical Operators**
+
+| Operator       | Description                               | Example                                                 |
+| :-----------:  | :---------------------------------------: | :------------------------------------:                  |
+| AND            | Returns true if both conditions are true  | ```price > 20.00 AND publication_date < '2023-01-01'``` |
+| OR             | Returns true if either condition is true  | ```price < 10.00 OR price > 50.00```                    |
+| NOT            | Returns true if the condition is false    | ```NOT author_id = 1```                                 |
+
+Example:
+
+To find all books in the "Online Bookstore" database that were published after January 1, 2023, and have a price between $20 and $30, you would use the following query:
+
+```sql
+SELECT *
+FROM Books
+WHERE publication_date > '2023-01-01'
+  AND price BETWEEN 20.00 AND 30.00;
+```
+
+#### <a name="chapter1part3.6"></a>Chapter 1 - Part 3.6: SQL Functions
+
+SQL functions are pre-defined routines that perform specific tasks. They can be used to manipulate data, perform calculations, and format output.
+
+**Types of Functions**
+
+- **Aggregate Functions:** Calculate a single value from a set of values (e.g., ```COUNT```, ```SUM```, ```AVG```, ```MIN```, ```MAX```).
+
+- **Scalar Functions:** Operate on a single value and return a single value (e.g., ```UPPER```, ```LOWER```, ```LENGTH```, ```ROUND```).
+
+- **Date Functions:** Operate on date values (e.g., ```NOW```, ```DATE```, ```YEAR```, ```MONTH```, ```DAY```).
+
+**Aggregate Functions**
+
+| Operator       | Description                               | Example                                                 |
+| :-----------:  | :---------------------------------------: | :------------------------------------:                  |
+| COUNT          | Returns the number of rows                | ```SELECT COUNT(*) FROM Books;'```                      |
+| SUM            | Returns the sum of values                 | ```SELECT SUM(price) FROM Books;```                     |
+| AVG            | Returns the average of values             | ```SELECT AVG(price) FROM Books;```                     |
+| MIN            | Returns the minimum value                 | ```SELECT MIN(price) FROM Books;```                     |
+| MAX            | Returns the maximum value                 | ```SELECT MAX(price) FROM Books;```                     |
+
+**Scalar Functions**
+
+| Operator       | Description                                             | Example                                    |
+| :-----------:  | :-----------------------------------------------------: | :------------------------------------:     |
+| UPPER          | Converts a string to uppercase                          | ```SELECT UPPER(title) FROM Books;'```     |
+| LOWER          | Converts a string to lowercase                          | ```SELECT LOWER(title) FROM Books;```      |
+| LENGTH         | Returns the length of a string                          | ```SELECT LENGTH(title) FROM Books;```     |
+| ROUND          | Rounds a number to a specified number of decimal places | ```SELECT ROUND(price, 2) FROM Books;```   |
+
+**Date Functions**
+
+| Operator       | Description                                   | Example                                                 |
+| :-----------:  | :-------------------------------------------: | :------------------------------------:                  |
+| NOW            | Returns the current date and time             | ```SELECT NOW();'```                                    |
+| DATE           | Extracts the date part from a datetime value  | ```SELECT DATE(publication_date) FROM Books;```         |
+| YEAR           | Extracts the year from a date value           | ```SELECT YEAR(publication_date) FROM Books;```         |
+| MONTH          | Extracts the month from a date value          | ```SELECT MONTH(publication_date) FROM Books;```        |
+| DAY            | Extracts the day from a date value            | ```SELECT DAY(publication_date) FROM Books;```          |
+
+Example:
+
+To find the average price of all books in the "Online Bookstore" database, you would use the following query:
+
+```sql
+SELECT AVG(price)
+FROM Books;
+```
+
+To find the title of all books in uppercase, you would use the following query:
+
+```sql
+SELECT UPPER(title)
+FROM Books;
+```
+
+#### <a name="chapter1part3.7"></a>Chapter 1 - Part 3.7: Different categories of SQL commands: DDL, DML, DCL, TCL, and DQL
 
 <div align="center"><img src="img/sqlcommands-w984-h1104.jpg" width=984 height=1104><br><sub>SQL commands - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
