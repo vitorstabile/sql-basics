@@ -1527,18 +1527,35 @@ This connection string tells Excel to use the SQL Server driver, connect to the 
 
 #### <a name="chapter1part6"></a>Chapter 1 - Part 6: Case Study Introduction: The "Online Bookstore" Database
 
- |  |  |  |  |  |  |  | 
-Column Name | Data Type | Description | Example Value |  |  |  |  | 
-order_id | INTEGER | Primary key, unique identifier for each order | 201 |  |  |  |  | 
-customer_id | INTEGER | Foreign key referencing the Customers table | 101 |  |  |  |  | 
-order_date | DATE | Date the order was placed | 2024-01-20 |  |  |  |  | 
-total_amount | DECIMAL(10, 2) | Total amount of the order | 59.98 |  |  |  |  | 
-shipping_address | VARCHAR(255) | Shipping address for the order | 123 Main St, Anytown, USA |  |  |  |  | 
-order_status | VARCHAR(50) | Status of the order | Shipped |  |  |  |  | 
+The "Online Bookstore" database will serve as a practical, real-world example throughout this course. By using a consistent case study, you'll be able to apply the SQL concepts you learn in each module to a familiar scenario, reinforcing your understanding and making the learning process more engaging. This lesson introduces the structure and purpose of this database, setting the stage for hands-on exercises in subsequent modules.
 
 #### <a name="chapter1part6.1"></a>Chapter 1 - Part 6.1: Introducing the Online Bookstore Database
 
+The Online Bookstore database is designed to store information about books, authors, customers, orders, and other relevant data for an online bookstore. It's a relational database, meaning data is organized into tables with relationships between them. This structure allows us to efficiently store, retrieve, and manipulate data using SQL.
+
+**Key Tables in the Database**
+
+Here's an overview of the main tables you'll be working with:
+
+- **Books:** This table stores information about each book, such as its title, ISBN, publication date, price, and author.
+- **Authors:** This table stores information about the authors, such as their name, biography, and contact information.
+- **Customers:** This table stores information about the bookstore's customers, such as their name, address, email, and phone number.
+- **Orders:** This table stores information about customer orders, such as the order date, customer ID, and total amount.
+- **Order_Items:** This table stores the individual items included in each order, linking orders to specific books and quantities.
+
+**Relationships Between Tables**
+
+The tables in the database are related to each other through primary and foreign keys. Understanding these relationships is crucial for querying data across multiple tables, which you'll learn about in Module 3.
+
+- **One-to-Many Relationship between Authors and Books:** One author can write multiple books. The ```Books``` table will have a foreign key referencing the ```Authors``` table (typically ```author_id```).
+
+- **One-to-Many Relationship between Customers and Orders:** One customer can place multiple orders. The ```Orders``` table will have a foreign key referencing the ```Customers``` table (typically ```customer_id```).
+
+- **Many-to-Many Relationship between Orders and Books:** One order can contain multiple books, and one book can be included in multiple orders. This relationship is implemented using the ```Order_Items``` table, which acts as a linking table between ```Orders``` and ```Books```. It contains foreign keys referencing both tables (```order_id``` and ```book_id```).
+
 #### <a name="chapter1part6.2"></a>Chapter 1 - Part 6.2: Detailed Table Schemas
+
+Let's examine the structure of each table in more detail, including the columns and data types they contain. This will give you a clear understanding of the data you'll be working with.
 
 #### <a name="chapter1part6.3"></a>Chapter 1 - Part 6.3: Example Scenarios and Queries
 
