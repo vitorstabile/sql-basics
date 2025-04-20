@@ -466,7 +466,7 @@ In this example:
 
 #### <a name="chapter1part2.2"></a>Chapter 1 - Part 2.2: Normalization
 
-- Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity. It involves dividing large tables into smaller, more manageable tables and defining relationships between them. There are several normal forms, each with its own set of rules. The most common normal forms are:
+Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity. It involves dividing large tables into smaller, more manageable tables and defining relationships between them. There are several normal forms, each with its own set of rules. The most common normal forms are:
 
 - **First Normal Form (1NF):** Eliminates repeating groups of data. Each column should contain only atomic values (i.e., values that cannot be further subdivided).
 
@@ -527,11 +527,20 @@ In the ```Customers``` table, we can add constraints to ensure data integrity:
 
 Let's consider the "Online Bookstore" database introduced earlier. This database might consist of the following tables:
 
-- Books: Stores information about books (e.g., BookID, Title, Author, Price, ISBN).
-- Authors: Stores information about authors (e.g., AuthorID, FirstName, LastName).
-- Customers: Stores information about customers (e.g., CustomerID, FirstName, LastName, Email, Address).
-- Orders: Stores information about orders (e.g., OrderID, CustomerID, OrderDate, TotalAmount).
-- OrderItems: Stores information about the items in each order (e.g., OrderItemID, OrderID, BookID, Quantity, Price).
+- ```Books```: Stores information about books (e.g., ```BookID```, ```Title```, ```Author```, ```Price```, ```ISBN```).
+- ```Authors```: Stores information about authors (e.g., ```AuthorID```, ```FirstName```, ```LastName```).
+- ```Customers```: Stores information about customers (e.g., ```CustomerID```, ```FirstName```, ```LastName```, ```Email```, ```Address```).
+- ```Orders```: Stores information about orders (e.g., ```OrderID```, ```CustomerID```, ```OrderDate```, ```TotalAmount```).
+- ```OrderItems```: Stores information about the items in each order (e.g., ```OrderItemID```, ```OrderID```, ```BookID```, ```Quantity```, ```Price```).
+
+The relationships between these tables would be:
+
+- One-to-Many: One author can write many books (between ```Authors``` and ```Books```).
+- One-to-Many: One customer can place many orders (between ```Customers``` and ```Orders```).
+- One-to-Many: One order can have many order items (between ```Orders``` and ```OrderItems```).
+- One-to-Many: One book can be included in many order items (between ```Books``` and ```OrderItems```).
+
+This database structure allows us to efficiently store and retrieve information about books, authors, customers, and orders.
 
 #### <a name="chapter1part3"></a>Chapter 1 - Part 3: Introduction to SQL: The Language of Databases
 
