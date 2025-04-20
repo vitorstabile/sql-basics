@@ -1269,6 +1269,183 @@ curl https://install.duckdb.org | sh
 
 #### <a name="chapter1part4.6"></a>Chapter 1 - Part 4.6: Connecting to a Database from a Programming Language
 
+While the command-line tools and GUI tools are useful for interacting with databases directly, you'll often want to connect to a database from a programming language like Python. This allows you to build applications that interact with and manipulate data stored in the database.
+
+**Python and SQLite**
+
+Python has built-in support for SQLite through the ```sqlite3``` module.
+
+```py
+import sqlite3
+
+# Connect to the database (or create it if it doesn't exist)
+conn = sqlite3.connect('bookstore.db')
+
+# Create a cursor object to execute SQL queries
+cursor = conn.cursor()
+
+# Execute a SQL query to create a table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS books (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        author TEXT,
+        price REAL
+    )
+''')
+
+# Insert some data into the table
+cursor.execute("INSERT INTO books (title, author, price) VALUES ('The Lord of the Rings', 'J.R.R. Tolkien', 29.99)")
+
+# Commit the changes
+conn.commit()
+
+# Execute a SQL query to retrieve data
+cursor.execute("SELECT * FROM books")
+
+# Fetch all the results
+rows = cursor.fetchall()
+
+# Print the results
+for row in rows:
+    print(row)
+
+# Close the connection
+conn.close()
+```
+
+**Python and MySQL**
+
+To connect to a MySQL database from Python, you'll need to install a MySQL connector library, such as ```mysql-connector-python```.
+
+```
+pip install mysql-connector-python
+```
+
+```py
+import mysql.connector
+
+# Connect to the MySQL database
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="bookstore_user",
+  password="password",
+  database="bookstore"
+)
+
+# Create a cursor object
+mycursor = mydb.cursor()
+
+# Execute a SQL query to insert data
+sql = "INSERT INTO books (title, author, price) VALUES (%s, %s, %s)"
+val = ("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", 12.99)
+mycursor.execute(sql, val)
+
+# Commit the changes
+mydb.commit()
+
+print(mycursor.rowcount, "record inserted.")
+
+# Execute a SQL query to retrieve data
+mycursor.execute("SELECT * FROM books")
+
+# Fetch all the results
+myresult = mycursor.fetchall()
+
+# Print the results
+for row in myresult:
+  print(row)
+
+# Close the connection
+mydb.close()
+```
+
+These examples demonstrate how to connect to SQLite and MySQL databases from Python, execute SQL queries, and retrieve data. You can adapt these examples to other programming languages by using the appropriate database connector library.
+
+**Python and PostgreSQL**
+
+```
+pip install psycopg2-binary
+```
+
+```py
+import psycopg2
+
+# Connect to the PostgreSQL database
+conn = psycopg2.connect(
+  host="localhost",
+  user="bookstore_user",
+  password="password",
+  dbname="bookstore"
+)
+
+# Create a cursor object
+cur = conn.cursor()
+
+# Execute a SQL query to insert data
+sql = "INSERT INTO books (title, author, price) VALUES (%s, %s, %s)"
+val = ("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", 12.99)
+cur.execute(sql, val)
+
+# Commit the changes
+conn.commit()
+
+print(cur.rowcount, "record inserted.")
+
+# Execute a SQL query to retrieve data
+cur.execute("SELECT * FROM books")
+
+# Fetch all the results
+rows = cur.fetchall()
+
+# Print the results
+for row in rows:
+  print(row)
+
+# Close the connection
+cur.close()
+conn.close()
+```
+
+**Python with DuckDB**
+
+```
+pip install duckdb
+```
+
+```py
+import duckdb
+
+# Connect to the DuckDB database (file-based or in-memory)
+conn = duckdb.connect('bookstore.duckdb')
+
+# Create the table if it doesn't exist
+conn.execute('''
+CREATE TABLE IF NOT EXISTS books (
+    title TEXT,
+    author TEXT,
+    price DOUBLE
+)
+''')
+
+# Insert data into the table
+sql = "INSERT INTO books (title, author, price) VALUES (?, ?, ?)"
+val = ("The Hitchhiker's Guide to the Galaxy", "Douglas Adams", 12.99)
+conn.execute(sql, val)
+
+print("1 record inserted.")
+
+# Query data from the table
+result = conn.execute("SELECT * FROM books").fetchall()
+
+# Print the results
+for row in result:
+    print(row)
+
+# Close the connection
+conn.close()
+```
+
 #### <a name="chapter1part5"></a>Chapter 1 - Part 5: Connecting to a Database and Running Basic Commands
 
 #### <a name="chapter1part5.1"></a>Chapter 1 - Part 5.1: Establishing a Database Connection
