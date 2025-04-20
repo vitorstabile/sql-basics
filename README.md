@@ -1583,23 +1583,23 @@ Let's examine the structure of each table in more detail, including the columns 
 
 | Column Name         | Data Type      | Description       | Example Value     |
 | :-----------------: | :-------------: | :-------------: | :-------------: |
-| order_id             | INTEGER               | Primary key, unique identifier for each order      | 201          |
-| customer_id                | INTEGER               | Foreign key referencing the Customers table      | 101           |
-| order_date               | DATE               | Date the order was placed      | 2024-01-20          |
-| total_amount           | DECIMAL(10, 2)                | Total amount of the order	      | 59.98           |
-| shipping_address    | VARCHAR(255)               | Shipping address for the order      | 123 Main St, Anytown, USA          |
-| order_status    | VARCHAR(50)               | Status of the order      | Shipped          |
-
-**Orders Table**
-
-| Column Name         | Data Type      | Description       | Example Value     |
-| :-----------------: | :-------------: | :-------------: | :-------------: |
 | customer_id             | INTEGER               | Primary key, unique identifier for each customer      | 101          |
 | first_name                | VARCHAR(100)               | First name of the customer      | Alice           |
 | last_name               | VARCHAR(100)               | Last name of the customer      | Smith          |
 | email           | VARCHAR(255)                | Email address of the customer	      | alice.smith@example.com           |
 | phone_number    | VARCHAR(20)               | Phone number of the customer      | 555-123-4567          |
 | shipping_address    | VARCHAR(255)               | Shipping address of the customer      | 123 Main St, Anytown, USA          |
+
+**Orders Table**
+
+| Column Name         | Data Type      | Description       | Example Value     |
+| :-----------------: | :-------------: | :-------------: | :-------------: |
+| order_id             | INTEGER               | Primary key, unique identifier for each order      | 201          |
+| customer_id                | INTEGER               | Foreign key referencing the Customers table      | 101           |
+| order_date               | DATE               | Date the order was placed      | 2024-01-20          |
+| total_amount           | DECIMAL(10, 2)                | Total amount of the order	      | 59.98           |
+| shipping_address    | VARCHAR(255)               | Shipping address for the order      | 123 Main St, Anytown, USA          |
+| order_status    | VARCHAR(50)               | Status of the order      | Shipped          |
 
 **Order_Items Table**
 
