@@ -1557,7 +1557,73 @@ The tables in the database are related to each other through primary and foreign
 
 Let's examine the structure of each table in more detail, including the columns and data types they contain. This will give you a clear understanding of the data you'll be working with.
 
+**Books Table**
+
+| Column Name         | Data Type           | Description                                        | Example Value           |
+| :-----------------: | :-----------------: | :------------------------------------------------: | :---------------------: |
+| book_id             | INTEGER             | Primary key, unique identifier for each book       | 1                       |
+| isbn                | VARCHAR(20)         | International Standard Book Number                 | 978-0321765723          |
+| title               | VARCHAR(255)        | Title of the book                                  | The Lord of the Rings   |
+| author_id           | INTEGER             | Foreign key referencing the Authors table          | 12                      |
+| publication_date    | DATE                | Date the book was published                        | 2023-03-15              |
+| price               | DECIMAL(10, 2)      | Price of the book                                  | 29.99                   |
+| genre               | VARCHAR(50)         | Genre of the book                                  | Fantasy                 |
+
+**Authors Table**
+
+| Column Name         | Data Type      | Description       | Example Value     |
+| :-----------------: | :-------------: | :-------------: | :-------------: |
+| author_id             | INTEGER               | Primary key, unique identifier for each author      | 12          |
+| first_name                | VARCHAR(100)               | First name of the author      | J.R.R.           |
+| last_name               | VARCHAR(100)               | Last name of the author      | Tolkien          |
+| biography           | TEXT               | Short biography of the author      | British author and philologist           |
+| publisher    | VARCHAR(100)               | Author's publisher      | Allen & Unwin          |
+
+**Customers Table**
+
+| Column Name         | Data Type      | Description       | Example Value     |
+| :-----------------: | :-------------: | :-------------: | :-------------: |
+| order_id             | INTEGER               | Primary key, unique identifier for each order      | 201          |
+| customer_id                | INTEGER               | Foreign key referencing the Customers table      | 101           |
+| order_date               | DATE               | Date the order was placed      | 2024-01-20          |
+| total_amount           | DECIMAL(10, 2)                | Total amount of the order	      | 59.98           |
+| shipping_address    | VARCHAR(255)               | Shipping address for the order      | 123 Main St, Anytown, USA          |
+| order_status    | VARCHAR(50)               | Status of the order      | Shipped          |
+
+**Orders Table**
+
+| Column Name         | Data Type      | Description       | Example Value     |
+| :-----------------: | :-------------: | :-------------: | :-------------: |
+| customer_id             | INTEGER               | Primary key, unique identifier for each customer      | 101          |
+| first_name                | VARCHAR(100)               | First name of the customer      | Alice           |
+| last_name               | VARCHAR(100)               | Last name of the customer      | Smith          |
+| email           | VARCHAR(255)                | Email address of the customer	      | alice.smith@example.com           |
+| phone_number    | VARCHAR(20)               | Phone number of the customer      | 555-123-4567          |
+| shipping_address    | VARCHAR(255)               | Shipping address of the customer      | 123 Main St, Anytown, USA          |
+
+**Order_Items Table**
+
+| Column Name         | Data Type      | Description       | Example Value     |
+| :-----------------: | :-------------: | :-------------: | :-------------: |
+| order_item_id             | INTEGER               | Primary key, unique identifier for each order item      | 301          |
+| order_id                | INTEGER               | Foreign key referencing the Orders table      | 201           |
+| book_id               | INTEGER               | Foreign key referencing the Books table      | 1          |
+| quantity           | INTEGER                | Quantity of the book in the order	      | 2           |
+| price    | DECIMAL(10, 2)               | Price of the book at the time of the order      | 29.99          |
+
 #### <a name="chapter1part6.3"></a>Chapter 1 - Part 6.3: Example Scenarios and Queries
+
+To illustrate how this database can be used, let's consider a few example scenarios and the types of queries you might run to retrieve information. Note that the actual SQL syntax will be covered in later modules.
+
+- **Scenario 1: Finding all books by a specific author.** You would query the ```Books``` table, filtering by the ```author_id``` to match the author you're interested in.
+
+- **Scenario 2: Finding all orders placed by a specific customer.** You would query the ```Orders``` table, filtering by the ```customer_id```.
+
+- **Scenario 3: Finding the books included in a specific order.** You would query the ```Order_Items``` table, filtering by the ```order_id```, and then use the ```book_id``` to retrieve the book details from the ```Books``` table.
+
+- **Scenario 4: Calculating the total revenue generated by a specific book.** You would query the ```Order_Items``` table, filtering by the ```book_id```, and then sum the ```price``` multiplied by the ```quantity``` for each order item.
+
+These are just a few examples of the types of queries you can run against the Online Bookstore database. As you progress through the course, you'll learn how to write the SQL code to perform these and many other more complex queries.
 
 ## <a name="chapter2"></a>Chapter 2: Retriving Data with SELECT Statements
 
