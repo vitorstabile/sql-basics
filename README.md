@@ -1527,6 +1527,15 @@ This connection string tells Excel to use the SQL Server driver, connect to the 
 
 #### <a name="chapter1part6"></a>Chapter 1 - Part 6: Case Study Introduction: The "Online Bookstore" Database
 
+ |  |  |  |  |  |  |  | 
+Column Name | Data Type | Description | Example Value |  |  |  |  | 
+order_id | INTEGER | Primary key, unique identifier for each order | 201 |  |  |  |  | 
+customer_id | INTEGER | Foreign key referencing the Customers table | 101 |  |  |  |  | 
+order_date | DATE | Date the order was placed | 2024-01-20 |  |  |  |  | 
+total_amount | DECIMAL(10, 2) | Total amount of the order | 59.98 |  |  |  |  | 
+shipping_address | VARCHAR(255) | Shipping address for the order | 123 Main St, Anytown, USA |  |  |  |  | 
+order_status | VARCHAR(50) | Status of the order | Shipped |  |  |  |  | 
+
 #### <a name="chapter1part6.1"></a>Chapter 1 - Part 6.1: Introducing the Online Bookstore Database
 
 #### <a name="chapter1part6.2"></a>Chapter 1 - Part 6.2: Detailed Table Schemas
