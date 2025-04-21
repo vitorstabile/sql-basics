@@ -1629,13 +1629,125 @@ These are just a few examples of the types of queries you can run against the On
 
 #### <a name="chapter2part1"></a>Chapter 2 - Part 1: Basic SELECT Statements: Choosing Columns
 
+The ```SELECT``` statement is the foundation of data retrieval in SQL. It allows you to specify which columns you want to see in your results, providing a way to focus on the specific information you need from your database tables. Mastering the art of choosing the right columns is crucial for efficient data analysis and reporting. This lesson will cover the fundamental syntax of the ```SELECT``` statement, how to select specific columns, and how to retrieve all columns using the asterisk (*) wildcard. We'll also explore practical examples using our online bookstore database.
+
 #### <a name="chapter2part1.1"></a>Chapter 2 - Part 1.1: Basic Syntax of the SELECT Statement
+
+The ```SELECT``` statement is used to retrieve data from one or more tables in a database. The basic syntax is as follows:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name;
+```
+
+- ```SELECT```: This keyword indicates that you want to retrieve data.
+
+- ```column1, column2, ...```: This is a comma-separated list of the columns you want to retrieve.
+
+- ```FROM```: This keyword specifies the table from which you want to retrieve the data.
+
+- ```table_name```: This is the name of the table.
+
+For example, to retrieve the ```title``` and ```author``` columns from the books table in our online bookstore database, you would use the following statement:
+
+```sql
+SELECT title, author
+FROM books;
+```
+
+This query will return a result set containing only the ```title``` and ```author``` columns for all rows in the ```books``` table.
 
 #### <a name="chapter2part1.2"></a>Chapter 2 - Part 1.2: Selecting Specific Columns
 
+The power of the SELECT statement lies in its ability to retrieve only the columns you need. This is important for several reasons:
+
+- **Efficiency**: Retrieving only the necessary columns reduces the amount of data transferred from the database server to your application, improving performance.
+
+- **Readability**: Selecting specific columns makes the result set easier to understand and work with.
+
+- **Security**: You can restrict access to sensitive data by only selecting the columns that a user is authorized to view.
+
+Let's consider our online bookstore database. Suppose you want to retrieve the ```title```, ```author```, and ```price``` of all books. You would use the following query:
+
+```sql
+SELECT title, author, price
+FROM books;
+```
+
+This query will return a result set with three columns: ```title```, ```author```, and ```price```. Each row in the result set will represent a book, with its corresponding title, author, and price.
+
+**Example**:
+
+Assume the books table has the following data:
+
+| book_id       | title                     | author            | price           | genre        |
+| :-----------: | :-----------------------: | :---------------: | :-------------: | :----------: |
+| 1             | The Lord of the Rings     | J.R.R. Tolkien    | 25.00           | Fantasy      |
+| 2             | Pride and Prejudice       | Jane Austen       | 12.50           | Romance      |
+| 3             | 1984                      | George Orwell     | 18.00           | Dystopian    |
+| 4             | The Hitchhiker's Guide... | Douglas Adams     | 15.00           | Science Fic  |
+
+The query ```SELECT title, author, price FROM books;``` would return:
+
+| title                     | author            | price           |
+| :-----------------------: | :---------------: | :-------------: |
+| The Lord of the Rings     | J.R.R. Tolkien    | 25.00           |
+| Pride and Prejudice       | Jane Austen       | 12.50           |
+| 1984                      | George Orwell     | 18.00           |
+| The Hitchhiker's Guide... | Douglas Adams     | 15.00           |
+
 #### <a name="chapter2part1.3"></a>Chapter 2 - Part 1.3: Selecting All Columns Using the Asterisk (*) Wildcard
 
+In some cases, you may want to retrieve all columns from a table. You can do this using the asterisk (*) wildcard. The syntax is as follows:
+
+```sql
+SELECT *
+FROM table_name;
+```
+
+The asterisk (*) represents all columns in the table. For example, to retrieve all columns from the ```books``` table, you would use the following statement:
+
+```sql
+SELECT *
+FROM books;
+```
+
+This query will return a result set containing all columns in the ```books``` table, in the order they are defined in the table schema.
+
+Caution: While using ```SELECT *``` is convenient, it's generally recommended to explicitly list the columns you need. This is because:
+
+- It's more efficient, as the database doesn't have to retrieve unnecessary data.
+
+- It makes your queries more readable and easier to understand.
+
+- It protects your application from unexpected changes to the table schema. If a new column is added to the table, ```SELECT *``` will automatically include it in the result set, which may break your application if it's not expecting that column.
+
+**Example:**
+
+Using the same ```books``` table data as before, the query ```SELECT * FROM books;``` would return:
+
+| book_id       | title                     | author            | price           | genre        |
+| :-----------: | :-----------------------: | :---------------: | :-------------: | :----------: |
+| 1             | The Lord of the Rings     | J.R.R. Tolkien    | 25.00           | Fantasy      |
+| 2             | Pride and Prejudice       | Jane Austen       | 12.50           | Romance      |
+| 3             | 1984                      | George Orwell     | 18.00           | Dystopian    |
+| 4             | The Hitchhiker's Guide... | Douglas Adams     | 15.00           | Science Fic  |
+
 #### <a name="chapter2part1.4"></a>Chapter 2 - Part 1.4: Column Order in the SELECT Statement
+
+The order in which you list the columns in the ```SELECT``` statement determines the order in which they appear in the result set. For example, the following two queries will return the same data, but in different column orders:
+
+```sql
+SELECT author, title
+FROM books;
+
+SELECT title, author
+FROM books;
+```
+
+The first query will return a result set with the ```author``` column first, followed by the ```title``` column. The second query will return a result set with the ```title``` column first, followed by the ```author``` column.
+
+This can be useful for presenting data in a specific order that is more readable or easier to work with.
 
 #### <a name="chapter2part1.5"></a>Chapter 2 - Part 1.5: Retrieve only the unique values
 
