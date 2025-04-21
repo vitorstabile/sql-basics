@@ -2224,7 +2224,153 @@ ORDER BY rating DESC, review_date DESC;
 
 #### <a name="chapter2part4"></a>Chapter 2 - Part 4: Limiting Results with LIMIT: Retrieving Top N Rows
 
+The ability to limit the number of rows returned by a SQL query is a fundamental skill for database management. The ```LIMIT``` clause allows you to control the size of your result sets, which is crucial for performance, especially when dealing with large tables. It's also essential for tasks like pagination, retrieving top N records, and sampling data. Understanding how to use ```LIMIT``` effectively will enable you to write more efficient and targeted queries.
+
 #### <a name="chapter2part4.1"></a>Chapter 2 - Part 4.1: Understanding the LIMIT Clause
+
+The ```LIMIT``` clause in SQL is used to restrict the number of rows returned by a ```SELECT``` statement. It's typically placed at the end of the query, after any ```WHERE``` or ```ORDER BY``` clauses. The basic syntax is:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition
+ORDER BY column1
+LIMIT number_of_rows;
+```
+
+- ```SELECT column1, column2, ...```: Specifies the columns you want to retrieve.
+
+- ```FROM table_name```: Specifies the table you want to retrieve data from.
+
+- ```WHERE condition``` (optional): Filters the rows based on a specified condition.
+
+- ```ORDER BY column1``` (optional): Sorts the rows based on a specified column.
+
+- ```LIMIT number_of_rows```: Specifies the maximum number of rows to return.
+
+**Basic Usage**
+
+The simplest use of ```LIMIT``` is to specify the maximum number of rows you want to retrieve. For example, to retrieve the first 5 books from the ```books``` table in our online bookstore database, you would use the following query:
+
+```sql
+SELECT book_id, title, price
+FROM books
+LIMIT 5;
+```
+
+This query will return a maximum of 5 rows from the ```books``` table, regardless of how many rows the table actually contains. The order in which the rows are returned is not guaranteed unless you use an ```ORDER BY``` clause.
+
+**Using LIMIT with ORDER BY**
+
+To retrieve the "top N" records based on a specific criteria, you typically combine ```LIMIT``` with ```ORDER BY```. For example, to retrieve the 3 most expensive books from the ```books``` table, you would use the following query:
+
+```sql
+SELECT book_id, title, price
+FROM books
+ORDER BY price DESC
+LIMIT 3;
+```
+
+In this query:
+
+- ```ORDER BY price DESC``` sorts the books in descending order of price, so the most expensive books come first.
+
+- ```LIMIT 3``` then restricts the result set to the first 3 rows, which are the 3 most expensive books.
+
+**Using LIMIT with an Offset**
+
+The ```LIMIT``` clause can also be used with an offset to retrieve a specific range of rows. The offset specifies the starting row (0-based index) from which to begin retrieving rows. The syntax is:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+LIMIT number_of_rows OFFSET offset_value;
+```
+
+Alternatively, some SQL dialects support a more concise syntax:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+LIMIT offset_value, number_of_rows;
+```
+
+- ```offset_value```: The number of rows to skip before starting to return rows.
+
+- ```number_of_rows```: The maximum number of rows to return.
+
+For example, to retrieve rows 6 through 10 from the ```books``` table (assuming the rows are ordered in some way, such as by ```book_id```), you would use the following query:
+
+```sql
+SELECT book_id, title, price
+FROM books
+ORDER BY book_id
+LIMIT 5 OFFSET 5;
+```
+
+Or, using the alternative syntax:
+
+```sql
+SELECT book_id, title, price
+FROM books
+ORDER BY book_id
+LIMIT 5, 5;
+```
+
+This query skips the first 5 rows and then returns the next 5 rows, effectively retrieving rows 6 through 10. This is commonly used for pagination in web applications.
+
+**Practical Examples**
+
+Let's consider some more practical examples using our online bookstore database.
+
+- **Retrieve the 5 newest books**:
+
+```sql
+SELECT book_id, title, publication_date
+FROM books
+ORDER BY publication_date DESC
+LIMIT 5;
+```
+
+This query retrieves the 5 most recently published books.
+
+- **Retrieve the books with the lowest prices (for a promotion)**:
+
+```sql
+SELECT book_id, title, price
+FROM books
+ORDER BY price ASC
+LIMIT 10;
+```
+
+This query retrieves the 10 cheapest books, which could be used for a promotional display on the bookstore's website.
+
+- **Implement pagination for a search results page**:
+
+Suppose you have a search results page that displays 20 books per page. To retrieve the books for the third page, you would use the following query:
+
+```sql
+SELECT book_id, title, price
+FROM books
+WHERE title LIKE '%SQL%'  -- Example search condition
+ORDER BY title
+LIMIT 20 OFFSET 40;
+```
+
+This query retrieves 20 books, starting from the 41st book (offset 40), which corresponds to the third page of results (assuming each page displays 20 books).
+
+**Edge Cases and Considerations**
+
+- **No ORDER BY**: If you use ```LIMIT``` without an ```ORDER BY``` clause, the order of the returned rows is not guaranteed. The database is free to return the rows in any order it chooses.
+
+- **LIMIT value greater than the number of rows**: If the ```LIMIT``` value is greater than the number of rows in the table, the query will simply return all rows in the table.
+
+- **Negative LIMIT or OFFSET values**: Most SQL databases do not allow negative values for ```LIMIT``` or ```OFFSET```. Using negative values may result in an error.
+
+- **Performance**: Using ```LIMIT``` can significantly improve query performance, especially when dealing with large tables. By restricting the number of rows returned, you reduce the amount of data that the database needs to process and transmit. However, the performance benefit is maximized when combined with appropriate indexing and filtering. We will discuss indexes in a later module.
+
+- **SQL Dialect Differences**: While the basic syntax of ```LIMIT``` is generally consistent across different SQL dialects (e.g., MySQL, PostgreSQL, SQLite), there might be slight variations in the syntax for specifying the offset. Always consult the documentation for your specific database system.
+
 
 #### <a name="chapter2part5"></a>Chapter 2 - Part 5: Using Aliases for Columns and Tables: Improving Readability
 
