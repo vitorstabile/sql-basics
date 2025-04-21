@@ -2188,6 +2188,40 @@ This query sorts the books by ```price``` in descending order, with ```NULL``` v
 
 #### <a name="chapter2part3.2"></a>Chapter 2 - Part 3.2: Practical Examples and Demonstrations
 
+Let's consider some more practical examples using the "Online Bookstore" database.
+
+- **Sorting Customers by Registration Date**: Suppose you want to retrieve a list of customers from the customers table, sorted by their registration date in descending order (i.e., the most recently registered customers first).
+
+```sql
+SELECT customer_id, first_name, last_name, email, registration_date
+FROM customers
+ORDER BY registration_date DESC;
+```
+
+- **Sorting Orders by Total Amount**: Suppose you want to retrieve a list of orders from the orders table, sorted by their total amount in descending order. Assume you have a total_amount column in the orders table.
+
+```sql
+SELECT order_id, customer_id, order_date, total_amount
+FROM orders
+ORDER BY total_amount DESC;
+```
+
+- **Sorting Books by Author and Title**: Suppose you want to retrieve a list of books, sorted first by author in ascending order and then by title in ascending order within each author.
+
+```sql
+SELECT book_id, title, author, price
+FROM books
+ORDER BY author ASC, title ASC;
+```
+
+- **Sorting Reviews by Rating and Date**: Suppose you want to retrieve a list of reviews from a reviews table, sorted first by rating in descending order (highest rating first) and then by review date in descending order (most recent review first) within each rating.
+
+```sql
+SELECT review_id, book_id, customer_id, rating, review_date, comment
+FROM reviews
+ORDER BY rating DESC, review_date DESC;
+```
+
 #### <a name="chapter2part4"></a>Chapter 2 - Part 4: Limiting Results with LIMIT: Retrieving Top N Rows
 
 #### <a name="chapter2part4.1"></a>Chapter 2 - Part 4.1: Understanding the LIMIT Clause
