@@ -1789,21 +1789,280 @@ As you can see, even though "Fiction" appears three times and "Technical" appear
 
 #### <a name="chapter2part2"></a>Chapter 2 - Part 2: Filtering Data with WHERE Clauses: Conditions and Operators
 
+The ```WHERE``` clause is the cornerstone of targeted data retrieval in SQL. It allows you to specify conditions that filter rows from a table, ensuring you only get the data you need. Without the ```WHERE``` clause, your ```SELECT``` statements would return every single row in a table, which is often inefficient and impractical. This lesson will delve into the syntax, operators, and best practices for using ```WHERE``` clauses effectively.
+
 #### <a name="chapter2part2.1"></a>Chapter 2 - Part 2.1: Understanding the WHERE Clause
+
+The ```WHERE``` clause is used to filter records based on specified conditions. It's placed after the ```FROM``` clause in a ```SELECT``` statement. The basic syntax is as follows:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+```
+
+The ```condition``` is a Boolean expression that evaluates to either TRUE, FALSE, or UNKNOWN (NULL). Only rows for which the condition evaluates to TRUE are included in the result set.
+
+**Basic Example**
+
+Let's revisit our "Online Bookstore" database. Suppose we want to find all books with a price greater than $25. We can use the following query:
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > 25;
+```
+
+This query will return only the title and price of books where the price column is greater than 25.
 
 #### <a name="chapter2part2.2"></a>Chapter 2 - Part 2.2: Comparison Operators
 
+Comparison operators are fundamental to constructing conditions in the ```WHERE``` clause. Here's a breakdown of common comparison operators:
+
+- ```=```: Equal to
+- ```>```: Greater than
+- ```<```: Less than
+- ```>=```: Greater than or equal to
+- ```<=```: Less than or equal to
+- ```<> or !=```: Not equal to
+
+**Examples Using Comparison Operators**
+
+- **Equal To (=)**: Find all books with the author "Jane Austen":
+
+```sql
+SELECT title, author
+FROM books
+WHERE author = 'Jane Austen';
+```
+
+- **Greater Than (>)**: Find all books published after the year 2010:
+
+```sql
+SELECT title, publication_year
+FROM books
+WHERE publication_year > 2010;
+```
+
+- **Less Than (<)**: Find all books with a rating less than 4:
+
+```sql
+SELECT title, rating
+FROM books
+WHERE rating < 4;
+```
+
+- **Greater Than or Equal To (>=)**: Find all books with a price of $20 or more:
+
+```sql
+SELECT title, price
+FROM books
+WHERE price >= 20;
+```
+
+- **Less Than or Equal To (<=)**: Find all books with a rating of 3.5 or less:
+
+```sql
+SELECT title, rating
+FROM books
+WHERE rating <= 3.5;
+```
+
+- **Not Equal To (<> or !=)**: Find all books that are not written by "Jane Austen":
+
+```sql
+SELECT title, author
+FROM books
+WHERE author <> 'Jane Austen'; -- Or WHERE author != 'Jane Austen';
+```
+
 #### <a name="chapter2part2.3"></a>Chapter 2 - Part 2.3: Logical Operators
+
+Logical operators allow you to combine multiple conditions in a ```WHERE``` clause. The primary logical operators are ```AND```, ```OR```, and ```NOT```.
+
+- ```AND```: Returns TRUE if both conditions are TRUE.
+
+- ```OR```: Returns TRUE if at least one condition is TRUE.
+
+- ```NOT```: Negates a condition.
+
+**Examples Using Logical Operators**
+
+- **AND**: Find all books written by "Jane Austen" published after 1815:
+
+```sql
+SELECT title, author, publication_year
+FROM books
+WHERE author = 'Jane Austen' AND publication_year > 1815;
+```
+
+- **OR**: Find all books written by "Jane Austen" or with a price greater than $30:
+
+```sql
+SELECT title, author, price
+FROM books
+WHERE author = 'Jane Austen' OR price > 30;
+```
+
+- **NOT**: Find all books that are not in the "Fiction" genre:
+
+```sql
+SELECT title, genre
+FROM books
+WHERE NOT genre = 'Fiction';
+```
+
+**Combining Logical Operators**
+
+You can combine multiple logical operators to create complex conditions. Use parentheses to control the order of evaluation.
+
+Example: Find all books that are either (written by "Jane Austen" and published after 1815) or have a rating greater than 4.5:
+
+```sql
+SELECT title, author, publication_year, rating
+FROM books
+WHERE (author = 'Jane Austen' AND publication_year > 1815) OR rating > 4.5;
+```
+
+Without parentheses, the ```AND``` operator would be evaluated before the ```OR``` operator, leading to a different result.
 
 #### <a name="chapter2part2.4"></a>Chapter 2 - Part 2.4: Special Operators
 
+SQL provides several special operators that simplify common filtering tasks.
+
+**BETWEEN**
+
+The ```BETWEEN``` operator is used to select values within a given range. The syntax is:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE column_name BETWEEN value1 AND value2;
+```
+
+This is equivalent to ```column_name >= value1 AND column_name <= value2```.
+
+Example: Find all books published between 2000 and 2010 (inclusive):
+
+```sql
+SELECT title, publication_year
+FROM books
+WHERE publication_year BETWEEN 2000 AND 2010;
+```
+
+**LIKE**
+
+The ```LIKE``` operator is used for pattern matching. It's often used with wildcard characters:
+
+- ```%```: Represents zero or more characters.
+
+- ```_```: Represents a single character.
+
+Example: Find all books with titles starting with "The":
+
+```sql
+SELECT title
+FROM books
+WHERE title LIKE 'The%';
+```
+
+Example: Find all books with an author whose last name is five characters long and starts with "S":
+
+```sql
+SELECT title, author
+FROM books
+WHERE author LIKE 'S____';
+```
+
+**IN**
+
+The ```IN``` operator allows you to specify a list of values to match. The syntax is:
+
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE column_name IN (value1, value2, value3, ...);
+```
+
+This is equivalent to ```column_name = value1 OR column_name = value2 OR column_name = value3 ....```
+
+Example: Find all books in the "Fiction", "Mystery", or "Thriller" genres:
+
+```sql
+SELECT title, genre
+FROM books
+WHERE genre IN ('Fiction', 'Mystery', 'Thriller');
+```
+
+**IS NULL**
+
+The ```IS NULL``` operator is used to check for NULL values. You cannot use ```=``` to compare a column to NULL.
+
+Example: Find all books where the rating is NULL:
+
+```sql
+SELECT title, rating
+FROM books
+WHERE rating IS NULL;
+```
+
+**IS NOT NULL**
+
+The ```IS NOT NULL``` operator is used to check for non-NULL values.
+
+Example: Find all books where the rating is not NULL:
+
+```sql
+SELECT title, rating
+FROM books
+WHERE rating IS NOT NULL;
+```
+
 #### <a name="chapter2part2.5"></a>Chapter 2 - Part 2.5: Operator Precedence
 
+When combining multiple operators in a WHERE clause, it's important to understand operator precedence. SQL evaluates operators in the following order (highest to lowest):
+
+- Parentheses ```()```
+
+- ```NOT```
+
+- ```AND```
+
+- ```OR```
+
+Use parentheses to explicitly control the order of evaluation and avoid ambiguity.
+
 #### <a name="chapter2part2.6"></a>Chapter 2 - Part 2.6: Case Sensitivity
+
+The case sensitivity of comparisons in the WHERE clause depends on the database system and the column's collation. Some databases are case-sensitive by default, while others are not.
+
+- **Case-Sensitive**: In a case-sensitive database, ```'Jane Austen'``` is different from ```'jane austen'```.
+
+- **Case-Insensitive**: In a case-insensitive database, ```'Jane Austen'``` is treated the same as ```'jane austen'```.
+
+If you need to perform a case-insensitive comparison in a case-sensitive database, you can use functions like ```LOWER()``` or ```UPPER()``` to convert both the column value and the comparison value to the same case.
+
+Example (for case-insensitive comparison):
+
+```sql
+SELECT title, author
+FROM books
+WHERE LOWER(author) = LOWER('Jane Austen');
+```
 
 #### <a name="chapter2part2.7"></a>Chapter 2 - Part 2.7: Case() Functions
 
 #### <a name="chapter2part2.8"></a>Chapter 2 - Part 2.8: Performance Considerations
+
+Using the ```WHERE``` clause effectively is crucial for query performance. Here are some tips:
+
+- **Use Indexes**: Ensure that columns used in ```WHERE``` clause conditions are indexed. Indexes can significantly speed up query execution. We will cover indexes in more detail in Module 7.
+
+- **Avoid Functions in WHERE Clause**: Using functions in the ```WHERE``` clause can prevent the database from using indexes. For example, ```WHERE YEAR(date_column) = 2023``` is less efficient than ```WHERE date_column BETWEEN '2023-01-01' AND '2023-12-31'```.
+
+- **Optimize Complex Conditions**: Break down complex conditions into simpler ones, and use parentheses to control the order of evaluation.
+
+- **Use the Most Selective Conditions First**: Place the most selective conditions (those that filter out the most rows) earlier in the ```WHERE``` clause.
 
 #### <a name="chapter2part3"></a>Chapter 2 - Part 3: Sorting Data with ORDER BY: Ascending and Descending
 
