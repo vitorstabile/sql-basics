@@ -2052,6 +2052,18 @@ WHERE LOWER(author) = LOWER('Jane Austen');
 
 #### <a name="chapter2part2.7"></a>Chapter 2 - Part 2.7: Case() Functions
 
+The way to implement the if-then-else logic in SQL. This function sequentially checks the provided conditions in the WHEN clauses and returns the value from the corresponding THEN clause when the first condition is satisfied. If none of the conditions is satisfied, the function returns the value from the ELSE clause in case it's provided, otherwise, it returns NULL. The syntax is:
+
+```sql
+CASE
+    WHEN condition_1 THEN value_1
+    WHEN condition_2 THEN value_2
+    WHEN condition_3 THEN value_3
+    ...
+    ELSE value
+END;
+```
+
 #### <a name="chapter2part2.8"></a>Chapter 2 - Part 2.8: Performance Considerations
 
 Using the ```WHERE``` clause effectively is crucial for query performance. Here are some tips:
