@@ -2556,9 +2556,174 @@ While this example doesn't explicitly alias the subquery itself, it demonstrates
 
 #### <a name="chapter2part6"></a>Chapter 2 - Part 6: Practical Exercise: Querying the Bookstore Database
 
+In this lesson, we'll put everything you've learned so far about ```SELECT``` statements into practice. We'll be working with our "Online Bookstore" database, querying its tables to retrieve specific information. This exercise will solidify your understanding of ```SELECT```, ```WHERE```, ```ORDER BY```, ```LIMIT```, and aliases, and prepare you for more complex queries involving joins in the next module.
+
 #### <a name="chapter2part6.1"></a>Chapter 2 - Part 6.1: Bookstore Database Schema
 
+Before we dive into the exercises, let's quickly recap the schema of our "Online Bookstore" database. This will help you understand the queries and the data we're working with.
+
+We have the following tables:
+
+- books: Contains information about each book.
+  - book_id (INTEGER, PRIMARY KEY): Unique identifier for the book.
+  - title (TEXT): Title of the book.
+  - author_id (INTEGER, FOREIGN KEY referencing authors): ID of the author.
+  - genre (TEXT): Genre of the book.
+  - price (REAL): Price of the book.
+  - publication_year (INTEGER): Year the book was published.
+  - quantity_in_stock (INTEGER): Number of copies currently in stock.
+
+- authors: Contains information about the authors.
+  - author_id (INTEGER, PRIMARY KEY): Unique identifier for the author.
+  - first_name (TEXT): First name of the author.
+  - last_name (TEXT): Last name of the author.
+
+- customers: Contains information about the customers.
+  - customer_id (INTEGER, PRIMARY KEY): Unique identifier for the customer.
+  - first_name (TEXT): First name of the customer.
+  - last_name (TEXT): Last name of the customer.
+  - email (TEXT): Email address of the customer.
+  - registration_date (TEXT): Date the customer registered.
+
+- orders: Contains information about the orders.
+  - order_id (INTEGER, PRIMARY KEY): Unique identifier for the order.
+  - customer_id (INTEGER, FOREIGN KEY referencing customers): ID of the customer who placed the order.
+  - order_date (TEXT): Date the order was placed.
+  - total_amount (REAL): Total amount of the order.
+
+- order_items: Contains information about the items in each order.
+  - order_item_id (INTEGER, PRIMARY KEY): Unique identifier for the order item.
+  - order_id (INTEGER, FOREIGN KEY referencing orders): ID of the order.
+  - book_id (INTEGER, FOREIGN KEY referencing books): ID of the book.
+  - quantity (INTEGER): Quantity of the book ordered.
+  - unit_price (REAL): Price of the book at the time of the order.
+
 #### <a name="chapter2part6.2"></a>Chapter 2 - Part 6.2: Practical Exercises
+
+Now, let's work through some practical exercises to query the bookstore database. We'll start with simple queries and gradually increase the complexity.
+
+**Exercise 1: Retrieving All Books**
+
+Write a query to retrieve the title, author_id, genre, and price of all books in the books table.
+
+```sql
+SELECT title, author_id, genre, price
+FROM books;
+```
+
+This query selects the specified columns from the books table without any filtering or sorting. It will return all rows in the table.
+
+**Exercise 2: Filtering Books by Genre**
+
+Write a query to retrieve the title and price of all books in the "Fiction" genre.
+
+```sql
+SELECT title, price
+FROM books
+WHERE genre = 'Fiction';
+```
+
+This query uses the WHERE clause to filter the results, only returning books where the genre column is equal to "Fiction".
+
+**Exercise 3: Sorting Books by Price**
+
+Write a query to retrieve the title, author_id, and price of all books, sorted in descending order by price.
+
+```sql
+SELECT title, author_id, price
+FROM books
+ORDER BY price DESC;
+```
+
+This query uses the ORDER BY clause to sort the results by the price column. The DESC keyword specifies that the sorting should be in descending order (highest price first).
+
+**Exercise 4: Limiting the Number of Results**
+
+Write a query to retrieve the top 5 most expensive books (title and price).
+
+```sql
+SELECT title, price
+FROM books
+ORDER BY price DESC
+LIMIT 5;
+```
+
+This query combines the ORDER BY clause with the LIMIT clause to retrieve only the top 5 most expensive books.
+
+**Exercise 5: Using Aliases**
+
+Write a query to retrieve the title, author_id, and price of all books, but rename the columns to "Book Title", "Author ID", and "Book Price" respectively.
+
+```sql
+SELECT title AS "Book Title",
+       author_id AS "Author ID",
+       price AS "Book Price"
+FROM books;
+```
+
+This query uses aliases to rename the columns in the result set. This can improve readability, especially when dealing with complex queries or column names that are not very descriptive.
+
+**Exercise 6: Combining WHERE, ORDER BY, and LIMIT**
+
+Write a query to retrieve the 3 most recently published "Science Fiction" books (title and publication year).
+
+```sql
+SELECT title, publication_year
+FROM books
+WHERE genre = 'Science Fiction'
+ORDER BY publication_year DESC
+LIMIT 3;
+```
+
+This query combines the WHERE, ORDER BY, and LIMIT clauses to filter, sort, and limit the results. It first filters the books to only include those in the "Science Fiction" genre, then sorts them by publication year in descending order, and finally limits the results to the top 3.
+
+**Exercise 7: Filtering with Multiple Conditions**
+
+Write a query to retrieve the title and price of books that are either in the "Mystery" genre or have a price greater than $15.
+
+```sql
+SELECT title, price
+FROM books
+WHERE genre = 'Mystery' OR price > 15;
+```
+
+This query uses the OR operator in the WHERE clause to specify multiple conditions. It will return books that satisfy either condition.
+
+**Exercise 8: Filtering with AND Operator**
+
+Write a query to retrieve the title and price of books that are in the "Fantasy" genre and published before the year 2010.
+
+```sql
+SELECT title, price
+FROM books
+WHERE genre = 'Fantasy' AND publication_year < 2010;
+```
+
+This query uses the AND operator in the WHERE clause to specify multiple conditions. It will return books that satisfy both conditions.
+
+**Exercise 9: Using BETWEEN Operator**
+
+Write a query to retrieve the title and publication year of books published between 2005 and 2015 (inclusive).
+
+```sql
+SELECT title, publication_year
+FROM books
+WHERE publication_year BETWEEN 2005 AND 2015;
+```
+
+This query uses the BETWEEN operator to specify a range of values for the publication_year column.
+
+**Exercise 10: Using IN Operator**
+
+Write a query to retrieve the title and genre of books that are in the "Fiction", "Mystery", or "Thriller" genres.
+
+```sql
+SELECT title, genre
+FROM books
+WHERE genre IN ('Fiction', 'Mystery', 'Thriller');
+```
+
+This query uses the IN operator to specify a list of values for the genre column.
 
 ## <a name="chapter3"></a>Chapter 3: Working with Multiple Tables: Join
 
