@@ -81,7 +81,6 @@
     - [Chapter 3 - Part 6: FULL OUTER JOIN: Retrieving All Rows from Both Tables](#chapter3part6)
       - [Chapter 3 - Part 6.1: Understanding FULL OUTER JOIN](#chapter3part6.1)
       - [Chapter 3 - Part 6.2: Practical Examples](#chapter3part6.2)
-      - [Chapter 3 - Part 6.3: Real-World Application](#chapter3part6.3)
     - [Chapter 3 - Part 7: Practical Exercise: Joining Tables in the Bookstore Database](#chapter3part7)
       - [Chapter 3 - Part 7.1: Setting Up the Bookstore Database (Reminder)](#chapter3part7.1)
       - [Chapter 3 - Part 7.2: Exercise 1: Retrieving Book Titles and Author Names](#chapter3part7.2)
@@ -3654,25 +3653,299 @@ The HR department is included, even though there are no employees in that depart
 
 #### <a name="chapter3part6"></a>Chapter 3 - Part 6: FULL OUTER JOIN: Retrieving All Rows from Both Tables
 
+FULL OUTER JOINs are essential for scenarios where you need a complete picture of data across multiple tables, regardless of whether there are matching entries. Unlike INNER, LEFT, or RIGHT JOINs, a FULL OUTER JOIN ensures that every row from both tables is included in the result set. This is particularly useful when identifying discrepancies, gaps, or comprehensive relationships between datasets.
+
 #### <a name="chapter3part6.1"></a>Chapter 3 - Part 6.1: Understanding FULL OUTER JOIN
+
+A FULL OUTER JOIN combines the results of both LEFT and RIGHT JOINs. It returns all rows from the left table and all rows from the right table. When there is a match between the tables based on the specified join condition, the corresponding columns are populated. If there is no match, the columns from the table without a match will contain NULL values.
+
+**Syntax**
+
+The basic syntax for a FULL OUTER JOIN is as follows:
+
+```sql
+SELECT column_name(s)
+FROM table1
+FULL OUTER JOIN table2
+ON table1.column_name = table2.column_name;
+```
+
+- table1: The left table in the join.
+
+- table2: The right table in the join.
+
+- column_name(s): The columns you want to retrieve from the tables.
+
+- ON table1.column_name = table2.column_name: The join condition, specifying how the tables are related.
+
+**How it Works**
+
+- The database starts by selecting all rows from the left table (table1).
+- It then selects all rows from the right table (table2).
+- For each row in table1, it checks if there is a matching row in table2 based on the ON condition.
+  - If a match is found, the columns from both tables are combined into a single row in the result set.
+  - If no match is found, the columns from table2 are filled with NULL values.
+- For each row in table2 that did not have a match in table1, the columns from table1 are filled with NULL values.
+- The final result set contains all rows from both tables, with NULL values where there are no matches.
 
 #### <a name="chapter3part6.2"></a>Chapter 3 - Part 6.2: Practical Examples
 
-#### <a name="chapter3part6.3"></a>Chapter 3 - Part 6.3: Real-World Application
+Let's consider two tables in our online bookstore database: Customers and Orders.
+
+**Customers Table:**
+
+
+|customer_id|	customer_name|	email|
+| :--------: | :--------: | :--------: |
+|1	|John Smith	|john.smith@email.com|
+|2|	Alice Johnson|	alice.j@email.com|
+|3|	Bob Williams|	bob.w@email.com|
+|4	|Emily Davis|	emily.d@email.com|
+
+**Orders Table:**
+
+|order_id	|customer_id|	order_date|	total_amount|
+| :--------: | :--------: | :--------: | :--------: |
+|101|	1|	2023-01-15|	50.00
+|102|	2|	2023-02-20	|120.00
+|103|	1|	2023-03-10|	75.00
+|104|	5|	2023-04-05	|90.00
+
+**Example 1: Retrieving All Customers and Orders**
+
+Suppose we want to retrieve a list of all customers and their corresponding orders. If a customer has not placed any orders, we still want to see their information. Similarly, if there are orders from a customer_id that doesn't exist in the Customers table (perhaps due to data entry errors or deleted customer records), we want to see those orders as well.
+
+```sql
+SELECT
+    Customers.customer_id,
+    Customers.customer_name,
+    Orders.order_id,
+    Orders.order_date,
+    Orders.total_amount
+FROM
+    Customers
+FULL OUTER JOIN
+    Orders ON Customers.customer_id = Orders.customer_id;
+```
+
+**Result:**
+
+|customer_id	|customer_name	|order_id	|order_date	|total_amount|
+| :--------: | :--------: | :--------: | :--------: |:--------: |
+|1	|John Smith|	101	|2023-01-15|	50.00|
+|1|	John Smith|	103|	2023-03-10	|75.00|
+|2	|Alice Johnson|	102|	2023-02-20|	120.00|
+|3	|Bob Williams|	NULL|	NULL|	NULL|
+|4|	Emily Davis|	NULL|	NULL|	NULL|
+|5	|NULL|	104|	2023-04-05|	90.00|
+
+In this result:
+
+- Customers John Smith and Alice Johnson have their orders listed.
+
+- Bob Williams and Emily Davis have NULL values for order_id, order_date, and total_amount because they have not placed any orders.
+
+- Order 104 is associated with customer_id 5, but there is no corresponding customer in the Customers table, so customer_name is NULL.
+
+**Example 2: Identifying Customers Without Orders**
+
+We can use a FULL OUTER JOIN to identify customers who have not placed any orders.
+
+```sql
+SELECT
+    Customers.customer_id,
+    Customers.customer_name
+FROM
+    Customers
+FULL OUTER JOIN
+    Orders ON Customers.customer_id = Orders.customer_id
+WHERE
+    Orders.customer_id IS NULL;
+```
+
+Result:
+
+|customer_id|	customer_name|
+| :--------: | :--------: |
+|3	|Bob Williams|
+|4|Emily Davis|
+
+This query returns only the customers who do not have any corresponding entries in the Orders table.
+
+**Example 3: Identifying Orders Without Corresponding Customers**
+
+Similarly, we can identify orders that do not have a corresponding customer in the Customers table.
+
+```sql
+SELECT
+    Orders.order_id,
+    Orders.order_date
+FROM
+    Customers
+FULL OUTER JOIN
+    Orders ON Customers.customer_id = Orders.customer_id
+WHERE
+    Customers.customer_id IS NULL;
+```
+
+Result:
+
+
+|order_id	|order_date|
+| :--------: | :--------: |
+|104|	2023-04-05|
+
+This query returns only the orders for which there is no matching customer in the Customers table.
 
 #### <a name="chapter3part7"></a>Chapter 3 - Part 7: Practical Exercise: Joining Tables in the Bookstore Database
 
+Joining tables is a fundamental operation in relational databases, allowing you to combine data from multiple tables based on related columns. This is crucial for retrieving meaningful information that spans across different parts of your database. In the context of our online bookstore, joining tables enables us to answer questions like "Which books has a particular author written?" or "Which customers have ordered a specific book?". This lesson will provide practical exercises to solidify your understanding of JOIN operations using the bookstore database.
+
 #### <a name="chapter3part7.1"></a>Chapter 3 - Part 7.1: Setting Up the Bookstore Database (Reminder)
+
+Before we dive into the exercises, let's quickly recap the structure of our bookstore database. We have (at least) the following tables:
+
+- books: Contains information about each book (book_id, title, author_id, genre, price, etc.).
+
+- authors: Contains information about each author (author_id, first_name, last_name, etc.).
+
+- customers: Contains information about customers (customer_id, first_name, last_name, email, etc.).
+
+- orders: Contains information about orders (order_id, customer_id, order_date, etc.).
+
+- order_items: Contains information about the items in each order (order_id, book_id, quantity, etc.).
+
+The relationships between these tables are defined through primary and foreign keys. For example, the author_id column in the books table is a foreign key that references the author_id column in the authors table. Similarly, customer_id in the orders table references customer_id in the customers table, and the order_id and book_id in order_items reference orders and books respectively.
 
 #### <a name="chapter3part7.2"></a>Chapter 3 - Part 7.2: Exercise 1: Retrieving Book Titles and Author Names
 
+Let's start with a simple exercise: Retrieve the titles of all books along with the first and last names of their authors. This requires joining the books and authors tables.
+
+```sql
+SELECT
+    books.title,
+    authors.first_name,
+    authors.last_name
+FROM
+    books
+INNER JOIN
+    authors ON books.author_id = authors.author_id;
+```
+
+- We use an INNER JOIN because we only want to retrieve books that have a corresponding author in the authors table.
+
+- The ON clause specifies the join condition: books.author_id = authors.author_id. This tells the database to match rows where the author_id in the books table is equal to the author_id in the authors table.
+
+- We select the title column from the books table and the first_name and last_name columns from the authors table.
+
+- Using table aliases (e.g., b for books, a for authors) can make the query more readable, especially when dealing with multiple joins. The query would then look like this:
+
+```sql
+SELECT
+    b.title,
+    a.first_name,
+    a.last_name
+FROM
+    books AS b
+INNER JOIN
+    authors AS a ON b.author_id = a.author_id;
+```
+
 #### <a name="chapter3part7.3"></a>Chapter 3 - Part 7.3: Exercise 2: Finding Customers and Their Orders
+
+Now, let's find all customers and the dates of their orders. This involves joining the customers and orders tables.
+
+```sql
+SELECT
+    customers.first_name,
+    customers.last_name,
+    orders.order_date
+FROM
+    customers
+INNER JOIN
+    orders ON customers.customer_id = orders.customer_id;
+```
+
+- Again, we use an INNER JOIN to retrieve only customers who have placed orders.
+
+- The join condition is customers.customer_id = orders.customer_id.
+
+- We select the customer's first name, last name, and the order date.
 
 #### <a name="chapter3part7.4"></a>Chapter 3 - Part 7.4: Exercise 3: Retrieving Book Titles and Order Information
 
+Let's combine information from the books, order_items, and orders tables to retrieve the titles of books that were ordered and the corresponding order dates.
+
+```sql
+SELECT
+    books.title,
+    orders.order_date
+FROM
+    books
+INNER JOIN
+    order_items ON books.book_id = order_items.book_id
+INNER JOIN
+    orders ON order_items.order_id = orders.order_id;
+```
+
+- This query involves two INNER JOIN operations.
+
+- First, we join books and order_items on books.book_id = order_items.book_id to link books to the items in orders.
+
+- Then, we join order_items and orders on order_items.order_id = orders.order_id to link the order items to the order dates.
+
+- We select the book title and the order date.
+
 #### <a name="chapter3part7.5"></a>Chapter 3 - Part 7.5: Exercise 4: Using LEFT JOIN to Find Authors Without Books
 
+Now, let's use a LEFT JOIN to find all authors who have not written any books in our bookstore database.
+
+```sql
+SELECT
+    authors.first_name,
+    authors.last_name
+FROM
+    authors
+LEFT JOIN
+    books ON authors.author_id = books.author_id
+WHERE
+    books.book_id IS NULL;
+```
+
+- We use a LEFT JOIN to retrieve all authors, even those who don't have any corresponding books in the books table.
+
+- The WHERE books.book_id IS NULL clause filters the results to include only authors for whom the book_id is NULL in the joined table. This indicates that there is no matching book for that author.
+
 #### <a name="chapter3part7.6"></a>Chapter 3 - Part 7.6: Exercise 5: Combining Different JOIN Types
+
+Let's consider a scenario where we want to list all customers and their orders, including customers who haven't placed any orders, and also list any orders that might not be associated with a customer (although this shouldn't happen in a well-designed database). While FULL OUTER JOIN is the ideal solution, some databases like MySQL don't directly support it. We can simulate it using UNION ALL with LEFT JOIN and RIGHT JOIN.
+
+```sql
+SELECT
+    customers.first_name,
+    customers.last_name,
+    orders.order_date
+FROM
+    customers
+LEFT JOIN
+    orders ON customers.customer_id = orders.customer_id
+UNION ALL
+SELECT
+    customers.first_name,
+    customers.last_name,
+    orders.order_date
+FROM
+    customers
+RIGHT JOIN
+    orders ON customers.customer_id = orders.customer_id
+WHERE customers.customer_id IS NULL;
+```
+
+- The first SELECT statement uses a LEFT JOIN to retrieve all customers and their orders. If a customer has no orders, the order_date will be NULL.
+
+- The second SELECT statement uses a RIGHT JOIN to retrieve all orders and their customers. The WHERE customers.customer_id IS NULL clause filters the results to include only orders that don't have a corresponding customer.
+
+- The UNION ALL operator combines the results of the two SELECT statements. UNION ALL includes all rows from both result sets, including duplicates. If you want to remove duplicates, you can use UNION instead, but it's generally slower.
 
 ## <a name="chapter4"></a>Chapter 4: Data Manipulation: INSERT; UPDATE, and DELETE
 
