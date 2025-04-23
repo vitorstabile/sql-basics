@@ -3052,12 +3052,14 @@ JOIN books AS b ON oi.book_id = b.book_id;
 
 This query joins four tables: customers, orders, order_items, and books, to retrieve the desired information.
 
+#### <a name="chapter3part2.3"></a>Chapter 3 - Part 2.3: Practical Examples and Demonstrations
+
 Let's consider a simplified version of our "Online Bookstore" database with the following tables:
 
 customers table:
 
 | customer_id | customer_name    | 	customer_email        |
-| :---------: | :--------------: | :----------------------|
+| :---------: | :--------------: | :---------------------:|
 | 1           | John Smith       |  john.smith@email.com  |
 | 2           | Alice Johnson    | 	alice.j@example.com   |
 | 3           | Bob Williams     |  bob.williams@test.org |
@@ -3065,7 +3067,7 @@ customers table:
 orders table:
 
 | order_id      | customer_id  |  order_date     |
-| :-----------: | :----------: | :---------------|
+| :-----------: | :----------: | :--------------:|
 | 101           | 1            |  2023-01-15     |
 | 102           | 2            |  2023-02-20     |
 | 103           | 3            |  2023-03-10     |
@@ -3102,13 +3104,180 @@ JOIN orders AS o ON c.customer_id = o.customer_id
 WHERE o.order_date LIKE '2023-01%';
 ```
 
-#### <a name="chapter3part2.3"></a>Chapter 3 - Part 2.3: Practical Examples and Demonstrations
-
 #### <a name="chapter3part3"></a>Chapter 3 - Part 3: INNER JOIN: Retrieving Matching Rows
+
+The INNER JOIN is a fundamental operation in SQL that allows you to combine data from two or more tables based on a related column between them. It's crucial for querying relational databases where information is spread across multiple tables to maintain data integrity and reduce redundancy. Understanding INNER JOIN is essential for retrieving meaningful and coherent datasets.
 
 #### <a name="chapter3part3.1"></a>Chapter 3 - Part 3.1: Understanding INNER JOIN
 
+An INNER JOIN returns only the rows where there is a match in both tables based on the specified join condition. If there's no match, the row is excluded from the result set. The join condition is typically defined using the ON keyword, which specifies the columns to compare between the tables.
+
+**Basic Syntax**
+
+The basic syntax for an INNER JOIN is as follows:
+
+```sql
+SELECT column1, column2, ...
+FROM table1
+INNER JOIN table2
+ON table1.column_name = table2.column_name;
+```
+
+- SELECT column1, column2, ...: Specifies the columns you want to retrieve from the tables.
+
+- FROM table1: Specifies the first table you want to join.
+
+- INNER JOIN table2: Specifies the second table you want to join with the first table.
+
+- ON table1.column_name = table2.column_name: Specifies the join condition, indicating which columns from the two tables should be compared for matching rows.
+
+**Example: Joining Customers and Orders Tables**
+
+Let's consider two tables: Customers and Orders. The Customers table contains information about customers, and the Orders table contains information about orders placed by those customers. The tables share a common column, CustomerID, which is a foreign key in the Orders table referencing the primary key in the Customers table.
+
+**Customers Table:**
+
+| CustomerID  | FirstName  | LastName   | City        |
+| :---------: | :--------: | :---------:| :----------:|
+| 1           | John       |  Doe       | New York    |
+| 2           | Jane       |  Smith     | Los Angeles |
+| 3           | David      |  Johnson   | Chicago     |
+| 4           | Emily      |  Brown     | Houston     |
+
+**Orders Table:**
+
+| OrderID  | CustomerID | OrderDate    | TotalAmount  |
+| :------: | :--------: | :-----------:| :-----------:|
+| 101      | 1          |  2023-01-15  | 100.00       |
+| 102      | 2          |  2023-02-20  | 200.00       |
+| 103      | 1          |  2023-03-10  | 150.00       |
+| 104      | 3          |  2023-04-05  | 300.00       |
+
+To retrieve the first name of each customer along with their order details, you can use an INNER JOIN:
+
+```sql
+SELECT Customers.FirstName, Orders.OrderID, Orders.OrderDate, Orders.TotalAmount
+FROM Customers
+INNER JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;
+```
+
+Notice that Emily Brown is not included in the result because she has not placed any orders in the Orders table. This is the key characteristic of an INNER JOIN: only matching rows are returned.
+
+**Using Aliases for Clarity**
+
+When working with multiple tables, especially when column names are the same across tables, using aliases can make your queries more readable and less ambiguous. You can assign aliases to both tables and columns.
+
+```sql
+SELECT c.FirstName, o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers AS c
+INNER JOIN Orders AS o
+ON c.CustomerID = o.CustomerID;
+```
+
+In this example, c is an alias for the Customers table, and o is an alias for the Orders table. This makes the query shorter and easier to understand.
+
+**Joining Multiple Tables**
+
+You can also join more than two tables using multiple INNER JOIN clauses. Suppose you have a third table called OrderItems that contains information about the items included in each order.
+
+**OrderItems Table:**
+
+| OrderItemID  | OrderID | ProductID    | Quantity  |
+| :------: | :--------: | :-----------:| :-----------:|
+| 1      | 101          |  1  | 2       |
+| 2      | 101          |  2  | 1       |
+| 3      | 102          |  3  | 3       |
+| 4      | 103          |  1  | 1       |
+| 5      | 104          |  2  | 2       |
+
+To retrieve the customer's first name, order ID, and the quantity of each item in the order, you can join all three tables:
+
+```sql
+SELECT c.FirstName, o.OrderID, oi.Quantity
+FROM Customers AS c
+INNER JOIN Orders AS o ON c.CustomerID = o.CustomerID
+INNER JOIN OrderItems AS oi ON o.OrderID = oi.OrderID;
+```
+
+**Filtering Joined Data**
+
+You can combine INNER JOIN with WHERE clauses to filter the joined data based on specific conditions. For example, to retrieve only the orders placed by customers in New York:
+
+```sql
+SELECT c.FirstName, o.OrderID, o.OrderDate, o.TotalAmount
+FROM Customers AS c
+INNER JOIN Orders AS o ON c.CustomerID = o.CustomerID
+WHERE c.City = 'New York';
+```
+
+**INNER JOIN with different data types**
+
+While it's most common to join on integer-based primary and foreign keys, INNER JOIN can also be used with other data types, such as strings or dates, as long as the data types are compatible for comparison.
+
+For example, consider a Products table and a ProductCategories table, where both have a CategoryName column of type VARCHAR.
+
+**Products Table:**
+
+| ProductID  | ProductName | CategoryName    | Price  |
+| :------: | :--------: | :-----------:| :-----------:|
+| 1      | Laptop          |  Electronics  | 1200       |
+| 2      | Mouse          |  Electronics  | 25       |
+| 3      | T-shirt          |  Apparel  | 30       |
+| 4      | Jeans          |  Apparel  | 75       |
+
+**ProductCategories Table:**
+
+| CategoryID  | CategoryName | Description    |
+| :------: | :--------: | :-----------:|
+| 1      | Electronics          |  Electronic devices  |
+| 2      | Apparel          |  Clothing items  |
+
+You can join these tables using the CategoryName column:
+
+```sql
+SELECT p.ProductName, pc.Description
+FROM Products AS p
+INNER JOIN ProductCategories AS pc ON p.CategoryName = pc.CategoryName;
+```
+
+This query will return:
+
+| ProductName  | Description |
+| :------: | :--------: |
+| Laptop      | Electronic devices          |
+| Mouse      | Electronic devices          |
+| T-shirt      | Clothing items          |
+| Jeans      | Clothing items          |
+
 #### <a name="chapter3part3.2"></a>Chapter 3 - Part 3.2: Practical Examples and Demonstrations
+
+Let's revisit the "Online Bookstore" database introduced in Module 1 and build upon it. Assume we have the following tables: Books, Authors, and Book_Authors (a linking table to handle the many-to-many relationship between books and authors).
+
+**Books Table:**
+
+
+|BookID	|Title|ISBN	|PublicationYear|
+| :--------: | :--------: | :--------: | :--------: |
+|1	|The Great Gatsby|	978-0743273565|	1925|
+|2|	To Kill a Mockingbird	|978-0446310789	|1960|
+|3	|1984|	978-0451524935|	1949|
+
+**Authors Table:**
+
+|AuthorID	|FirstName|	LastName|
+| :--------: | :--------: | :--------: |
+|1	|F. Scott|	Fitzgerald|
+|2	|Harper|	Lee|
+|3	|George	|Orwell|
+
+**Book_Authors Table:**
+
+|BookID	|AuthorID|
+| :--------: | :--------: |
+|1	|1|
+|2|2|
+|3|	3|
 
 #### <a name="chapter3part4"></a>Chapter 3 - Part 4: LEFT JOIN (LEFT OUTER JOIN): Retrieving All Rows from the Left Table
 
