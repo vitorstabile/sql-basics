@@ -3279,6 +3279,65 @@ Let's revisit the "Online Bookstore" database introduced in Module 1 and build u
 |2|2|
 |3|	3|
 
+**Example 1: Retrieving Book Titles and Author Names**
+
+To retrieve a list of book titles along with their author's names, you can use an INNER JOIN to combine the Books, Authors, and Book_Authors tables:
+
+```sql
+SELECT b.Title, a.FirstName, a.LastName
+FROM Books AS b
+INNER JOIN Book_Authors AS ba ON b.BookID = ba.BookID
+INNER JOIN Authors AS a ON ba.AuthorID = a.AuthorID;
+```
+
+This query will return the following result:
+
+
+|Title|	FirstName|	LastName|
+| :--------: | :--------: | :--------: |
+|The Great Gatsby|	F. Scott|	Fitzgerald|
+|To Kill a Mockingbird	|Harper|	Lee|
+|1984|	George	|Orwell|
+
+**Example 2: Filtering Books by Publication Year**
+
+To retrieve only the books published after 1950 along with their author's names:
+
+```sql
+SELECT b.Title, a.FirstName, a.LastName
+FROM Books AS b
+INNER JOIN Book_Authors AS ba ON b.BookID = ba.BookID
+INNER JOIN Authors AS a ON ba.AuthorID = a.AuthorID
+WHERE b.PublicationYear > 1950;
+```
+
+This query will return:
+
+|Title	|FirstName	|LastName|
+| :--------: | :--------: | :--------: |
+|To Kill a Mockingbird	|Harper	|Lee|
+
+**Example 3: Counting Books per Author**
+
+To find out how many books each author has in the database:
+
+```sql
+SELECT a.FirstName, a.LastName, COUNT(b.BookID) AS NumberOfBooks
+FROM Authors AS a
+INNER JOIN Book_Authors AS ba ON a.AuthorID = ba.AuthorID
+INNER JOIN Books AS b ON ba.BookID = b.BookID
+GROUP BY a.AuthorID, a.FirstName, a.LastName;
+```
+
+This query will return:
+
+
+|FirstName|	LastName	|NumberOfBooks|
+| :--------: | :--------: | :--------: |
+|F. Scott|	Fitzgerald|	1|
+|Harper|	Lee|1|
+|George|	Orwell|	1|
+
 #### <a name="chapter3part4"></a>Chapter 3 - Part 4: LEFT JOIN (LEFT OUTER JOIN): Retrieving All Rows from the Left Table
 
 #### <a name="chapter3part4.1"></a>Chapter 3 - Part 4.1: Understanding the LEFT JOIN
