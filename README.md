@@ -2922,9 +2922,185 @@ Explanation:
 
 #### <a name="chapter3part2"></a>Chapter 3 - Part 2: Introduction to JOINs: Combining Data from Multiple Tables
 
+In relational databases, data is often spread across multiple tables to reduce redundancy and improve data integrity. To retrieve meaningful information, we need to combine data from these related tables. This is where JOINs come in. JOINs allow us to link rows from two or more tables based on a related column, creating a unified result set that provides a more complete view of the data. Understanding JOINs is crucial for effective data retrieval and analysis in SQL.
+
 #### <a name="chapter3part2.1"></a>Chapter 3 - Part 2.1: Understanding Primary and Foreign Keys
 
+Before diving into JOINs, it's essential to understand the concepts of primary and foreign keys. These keys are the foundation for establishing relationships between tables.
+
+**Primary Key**
+
+A primary key is a column or a set of columns in a table that uniquely identifies each row in that table. It must contain unique values and cannot contain NULL values. Think of it as the social security number for each row in your table.
+
+**Example**:
+
+In our "Online Bookstore" database, the books table likely has a book_id column as its primary key. Each book in the table has a unique book_id.
+
+**Foreign Key**
+
+A foreign key is a column or a set of columns in one table that refers to the primary key of another table. It establishes a link between the two tables. The table containing the foreign key is called the child table or referencing table, and the table containing the primary key is called the parent table or referenced table.
+
+**Example**:
+
+Consider an orders table in our bookstore database. It might have a customer_id column that refers to the customer_id column (the primary key) in the customers table. This customer_id in the orders table is a foreign key. It indicates which customer placed a particular order.
+
 #### <a name="chapter3part2.2"></a>Chapter 3 - Part 2.2: Introduction to JOINs: Combining Data from Multiple Tables
+
+JOINs are SQL clauses used to combine rows from two or more tables based on a related column between them. The related column is usually a primary key in one table and a foreign key in another. JOINs allow you to retrieve data from multiple tables in a single query, providing a more comprehensive view of your data.
+
+**The Need for JOINs**
+
+Without JOINs, retrieving related data from multiple tables would be cumbersome and inefficient. You would have to execute multiple queries and manually combine the results in your application code. JOINs simplify this process by allowing you to perform this combination directly within the database.
+
+Example:
+
+Suppose you want to retrieve the names of all customers who have placed orders and the details of those orders. Without JOINs, you would need to:
+
+- Query the orders table to get a list of customer_id values.
+
+- Iterate through the customer_id values and query the customers table for each customer_id to retrieve the customer's name.
+
+With a JOIN, you can achieve this with a single query.
+
+**Basic JOIN Syntax**
+
+The basic syntax for a JOIN involves specifying the tables you want to join and the condition that defines how the tables are related.
+
+```sql
+SELECT column1, column2, ...
+FROM table1
+JOIN table2
+ON table1.column_name = table2.column_name;
+```
+
+- SELECT column1, column2, ...: Specifies the columns you want to retrieve from the joined tables.
+
+- FROM table1: Specifies the first table in the join.
+
+- JOIN table2: Specifies the second table in the join. The JOIN keyword can be replaced with specific join types like INNER JOIN, LEFT JOIN, etc. (covered in later lessons).
+
+- ON table1.column_name = table2.column_name: Specifies the join condition. This condition defines how the rows from the two tables are related. It typically compares the primary key column from one table with the foreign key column in the other table.
+
+**Example**:
+
+To retrieve the book title and author name for all books in our bookstore database, assuming we have books table with book_id and title columns, and authors table with author_id and author_name columns, and a book_authors table linking them with book_id and author_id columns:
+
+```sql
+SELECT books.title, authors.author_name
+FROM books
+JOIN book_authors ON books.book_id = book_authors.book_id
+JOIN authors ON book_authors.author_id = authors.author_id;
+```
+
+**Table Aliases**
+
+Using table aliases can make your JOIN queries more readable, especially when dealing with multiple tables or long table names. A table alias is a short, temporary name assigned to a table within a query.
+
+Syntax:
+
+```sql
+SELECT alias1.column1, alias2.column2
+FROM table1 AS alias1
+JOIN table2 AS alias2
+ON alias1.column_name = alias2.column_name;
+```
+
+Example:
+
+Using table aliases in the previous example:
+
+```sql
+SELECT b.title, a.author_name
+FROM books AS b
+JOIN book_authors AS ba ON b.book_id = ba.book_id
+JOIN authors AS a ON ba.author_id = a.author_id;
+```
+
+This makes the query easier to read and understand.
+
+**Qualifying Column Names**
+
+When selecting columns from multiple tables in a JOIN query, it's important to qualify the column names by prefixing them with the table name or alias. This is especially important when the same column name exists in multiple tables.
+
+Example:
+
+If both the customers and orders tables have a column named date, you need to specify which table the date column refers to:
+
+```sql
+SELECT customers.customer_name, orders.order_date
+FROM customers
+JOIN orders ON customers.customer_id = orders.customer_id;
+```
+
+If you don't qualify the column names, the database might return an error or produce unexpected results.
+
+**Joining Multiple Tables**
+
+You can join more than two tables in a single query by adding more JOIN clauses. The order in which you join the tables can sometimes affect performance, so it's good to understand your data and relationships.
+
+Example:
+
+To retrieve customer name, order date, and book title for all orders in our bookstore database:
+
+```sql
+SELECT c.customer_name, o.order_date, b.title
+FROM customers AS c
+JOIN orders AS o ON c.customer_id = o.customer_id
+JOIN order_items AS oi ON o.order_id = oi.order_id
+JOIN books AS b ON oi.book_id = b.book_id;
+```
+
+This query joins four tables: customers, orders, order_items, and books, to retrieve the desired information.
+
+Let's consider a simplified version of our "Online Bookstore" database with the following tables:
+
+customers table:
+
+| customer_id | customer_name    | 	customer_email        |
+| :---------: | :--------------: | :----------------------|
+| 1           | John Smith       |  john.smith@email.com  |
+| 2           | Alice Johnson    | 	alice.j@example.com   |
+| 3           | Bob Williams     |  bob.williams@test.org |
+
+orders table:
+
+| order_id      | customer_id  |  order_date     |
+| :-----------: | :----------: | :---------------|
+| 101           | 1            |  2023-01-15     |
+| 102           | 2            |  2023-02-20     |
+| 103           | 3            |  2023-03-10     |
+| 104           | 4            |  2023-04-05     |
+
+Example 1: Retrieving Customer Names and Order Dates
+
+To retrieve the name of each customer and the date of their orders:
+
+```sql
+SELECT c.customer_name, o.order_date
+FROM customers AS c
+JOIN orders AS o ON c.customer_id = o.customer_id;
+```
+
+Example 2: Retrieving Customer Email and Order ID
+
+To retrieve the email of each customer and their order ID:
+
+```sql
+SELECT c.customer_email, o.order_id
+FROM customers AS c
+JOIN orders AS o ON c.customer_id = o.customer_id;
+```
+
+Example 3: Joining with a WHERE Clause
+
+You can combine JOINs with WHERE clauses to filter the results. For example, to retrieve the name and order date for orders placed in January 2023:
+
+```sql
+SELECT c.customer_name, o.order_date
+FROM customers AS c
+JOIN orders AS o ON c.customer_id = o.customer_id
+WHERE o.order_date LIKE '2023-01%';
+```
 
 #### <a name="chapter3part2.3"></a>Chapter 3 - Part 2.3: Practical Examples and Demonstrations
 
