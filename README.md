@@ -2729,11 +2729,155 @@ This query uses the IN operator to specify a list of values for the genre column
 
 #### <a name="chapter3part1"></a>Chapter 3 - Part 1: Understanding Primary and Foreign Keys
 
+Primary and foreign keys are the backbone of relational database design, ensuring data integrity and enabling efficient relationships between tables. Understanding these concepts is crucial for effectively querying and manipulating data across multiple tables, which we'll explore in the upcoming lessons on JOINs. Without a solid grasp of primary and foreign keys, you'll struggle to build robust and reliable database applications.
+
 #### <a name="chapter3part1.1"></a>Chapter 3 - Part 1.1: Understanding Primary Keys
+
+A primary key is a column or a set of columns in a table that uniquely identifies each row in that table. It's like a social security number for a person or a license plate for a car – no two rows can have the same primary key value.
+
+**Key Characteristics of Primary Keys**
+
+- **Uniqueness**: Every value in the primary key column (or combination of columns) must be unique.
+
+- **Non-Null**: Primary key columns cannot contain NULL values. A NULL value means "unknown" or "missing," and it wouldn't make sense for a unique identifier to be unknown.
+
+- **One per Table**: A table can have only one primary key. However, the primary key can consist of multiple columns (a composite key).
+
+- **Immutability (Ideally)**: While not strictly enforced by all database systems, it's best practice for primary key values to be immutable, meaning they should not be changed after they're assigned. Changing a primary key can lead to data integrity issues and broken relationships with other tables.
+
+**Examples of Primary Keys**
+
+- **Online Bookstore Database**: In our ```books``` table, the ```book_id``` column is a good candidate for a primary key. Each book has a unique ID, and this ID will never be NULL. In the ```authors``` table, ```author_id``` serves as the primary key.
+
+- **E-commerce Website**: In a table of ```customers```, the ```customer_id``` column would likely be the primary key. In an ```orders``` table, ```order_id``` would be the primary key.
+
+- **Hypothetical Scenario: University Database**: In a ```students``` table, the ```student_id``` would be the primary key. In a ```courses``` table, a combination of ```course_code``` and ```semester``` might form a composite primary key, ensuring that each course offering is uniquely identified.
+
+**Composite Primary Keys**
+
+A composite primary key is a primary key that consists of two or more columns. This is used when a single column cannot uniquely identify a row.
+
+**Example:**
+
+Let's say we have a table called order_items that stores the individual items within each order in our online bookstore. The table might have the following columns:
+
+- **```order_id```**: The ID of the order.
+
+- **```book_id```**: The ID of the book in the order.
+
+- **```quantity```**: The quantity of the book ordered.
+
+In this case, neither ```order_id``` nor ```book_id``` alone can uniquely identify a row. An order can contain multiple books, and a book can be present in multiple orders. However, the combination of ```order_id``` and ```book_id``` will uniquely identify each item within an order. Therefore, we can define a composite primary key consisting of these two columns.
 
 #### <a name="chapter3part1.2"></a>Chapter 3 - Part 1.2: Understanding Foreign Keys
 
+A foreign key is a column (or set of columns) in one table that refers to the primary key in another table. It establishes a link between the two tables. The table containing the foreign key is called the "child" table or "referencing" table, and the table containing the primary key is called the "parent" table or "referenced" table.
+
+**Key Characteristics of Foreign Keys**
+
+- **Referential Integrity**: The main purpose of a foreign key is to enforce referential integrity. This means that the foreign key value in the child table must either match a valid primary key value in the parent table or be NULL. This prevents orphaned records – records in the child table that refer to non-existent records in the parent table.
+
+- **Relationship**: Foreign keys define the relationships between tables. They specify how tables are related to each other.
+
+- **Multiple per Table**: A table can have multiple foreign keys, each referencing a different parent table.
+
+- **Data Type Matching**: The data type of the foreign key column(s) must match the data type of the primary key column(s) it references.
+
+**Examples of Foreign Keys**
+
+- **Online Bookstore Database**: In our ```books``` table, we might have an ```author_id``` column. This ```author_id``` would be a foreign key referencing the ```author_id``` (primary key) in the ```authors``` table. This establishes a relationship between books and authors, indicating which author wrote each book.
+
+- **E-commerce Website**: In the ```orders``` table, the ```customer_id``` column would be a foreign key referencing the ```customer_id``` (primary key) in the ```customers``` table. This links each order to the customer who placed it.
+
+- **Hypothetical Scenario: University Database**: In a ```enrollments``` table (which tracks student enrollments in courses), we would have two foreign keys: ```student_id``` referencing the ```students``` table and ```course_id``` referencing the ```courses``` table. This links each enrollment record to a specific student and a specific course.
+
+**Foreign Key Constraints**
+
+Foreign key constraints are rules that enforce referential integrity. They ensure that relationships between tables remain consistent and valid. Common foreign key constraints include:
+
+- **ON DELETE CASCADE**: If a row is deleted from the parent table, all related rows in the child table are automatically deleted as well. Use this with caution, as it can lead to unintended data loss.
+
+- **ON UPDATE CASCADE**: If the primary key value in the parent table is updated, the corresponding foreign key values in the child table are automatically updated as well.
+
+- **ON DELETE SET NULL**: If a row is deleted from the parent table, the foreign key values in the child table are set to NULL. This is only allowed if the foreign key column allows NULL values.
+
+- **ON DELETE SET DEFAULT**: If a row is deleted from the parent table, the foreign key values in the child table are set to a default value. This requires a default value to be defined for the foreign key column.
+
+- **RESTRICT (or NO ACTION)**: This is the default behavior in many database systems. It prevents the deletion or update of a row in the parent table if there are related rows in the child table.
+
+**Example of Foreign Key Constraints**
+
+Continuing with our online bookstore example, let's say we want to ensure that when an author is deleted from the ```authors``` table, all their books are also removed from the ```books``` table. We can achieve this by setting the ```ON DELETE CASCADE``` constraint on the ```author_id``` foreign key in the ```books``` table.
+
 #### <a name="chapter3part1.3"></a>Chapter 3 - Part 1.3: Practical Examples and Demonstrations
+
+Let's illustrate primary and foreign keys with examples using our online bookstore database. Assume we have two tables: ```authors``` and ```books```.
+
+Table: ```authors```
+
+| Column       | Data Type    | Constraints     |
+| :----------: | :----------: | :-------------: |
+| author_id    | INTEGER      |  PRIMARY KEY    |
+| author_name  | TEXT         |  NOT NULL       |
+
+```sql
+CREATE TABLE authors (
+    author_id INT PRIMARY KEY AUTO_INCREMENT,  -- Unique identifier for each author
+    author_name VARCHAR(50) NOT NULL          -- Author's name (required)
+);
+```
+
+Table: ```books```
+
+| Column       | Data Type    | Constraints                                      |
+| :----------: | :----------: | :----------------------------------------------: |
+| book_id      | INTEGER      |  PRIMARY KEY                                     |
+| title        | TEXT         |  NOT NULL                                        |
+| author_id    | INTEGER      |  NOT NULL, FOREIGN KEY referencing authors       |
+| price        | REAL         |  NOT NULL                                        |
+
+```sql
+CREATE TABLE books (
+    book_id INT PRIMARY KEY AUTO_INCREMENT,   -- Unique identifier for each book
+    title VARCHAR(100) NOT NULL,           -- Book title (required)
+    author_id INT,                           -- Foreign key referencing the Authors table
+    price DECIMAL(10, 2),                    -- PRICE of the Book
+    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE  -- Establishes the foreign key relationship
+);
+```
+
+In this scenario:
+
+- ```author_id``` in the ```authors``` table is the primary key, uniquely identifying each author.
+
+- ```book_id``` in the ```books``` table is the primary key, uniquely identifying each book.
+
+- ```author_id``` in the ```books``` table is a foreign key referencing the ```authors``` table. This establishes a relationship between books and authors. When you delete an author from the ```authors``` table, you need to handle the books associated with that author in the ```books``` table. This is why we are using ```ON DELETE CASCADE```.
+
+If we not created the table with ```ON DELETE CASCADE```, we can make
+
+- **Drop the Existing Foreign Key (if it exists)**: If you've already created the Books table without ON DELETE CASCADE, you'll need to drop the existing foreign key constraint first. The exact syntax for this can vary slightly depending on your database system (MySQL, PostgreSQL, etc.). Here's how it generally looks in MySQL:
+
+```sql
+ALTER TABLE books
+DROP FOREIGN KEY books_ibfk_1;  -- Replace 'books_ibfk_1' with the actual name of your foreign key constraint
+```
+
+To find the name of the foreign key constraint, you can use a query like this in MySQL:
+
+```sql
+SHOW CREATE TABLE books;
+```
+The output will show the CREATE TABLE statement, and you can find the FOREIGN KEY definition and its constraint name.
+
+- **Re-create the Foreign Key with ON DELETE CASCADE**: Now, re-add the foreign key constraint with the ON DELETE CASCADE option:
+
+```sql
+ALTER TABLE books
+ADD CONSTRAINT FK_AuthorBook
+FOREIGN KEY (author_id) REFERENCES authors(author_id)
+ON DELETE CASCADE;
+```
 
 #### <a name="chapter3part2"></a>Chapter 3 - Part 2: Introduction to JOINs: Combining Data from Multiple Tables
 
