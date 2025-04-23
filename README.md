@@ -3073,7 +3073,7 @@ orders table:
 | 103           | 3            |  2023-03-10     |
 | 104           | 4            |  2023-04-05     |
 
-Example 1: Retrieving Customer Names and Order Dates
+**Example 1: Retrieving Customer Names and Order Dates**
 
 To retrieve the name of each customer and the date of their orders:
 
@@ -3083,7 +3083,7 @@ FROM customers AS c
 JOIN orders AS o ON c.customer_id = o.customer_id;
 ```
 
-Example 2: Retrieving Customer Email and Order ID
+**Example 2: Retrieving Customer Email and Order ID**
 
 To retrieve the email of each customer and their order ID:
 
@@ -3093,7 +3093,7 @@ FROM customers AS c
 JOIN orders AS o ON c.customer_id = o.customer_id;
 ```
 
-Example 3: Joining with a WHERE Clause
+**Example 3: Joining with a WHERE Clause**
 
 You can combine JOINs with WHERE clauses to filter the results. For example, to retrieve the name and order date for orders placed in January 2023:
 
