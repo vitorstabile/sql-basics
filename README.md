@@ -2811,6 +2811,8 @@ Continuing with our online bookstore example, let's say we want to ensure that w
 
 #### <a name="chapter3part1.3"></a>Chapter 3 - Part 1.3: Practical Examples and Demonstrations
 
+**Primary Keys and Foreign Keys**
+
 Let's illustrate primary and foreign keys with examples using our online bookstore database. Assume we have two tables: ```authors``` and ```books```.
 
 Table: ```authors```
@@ -2878,6 +2880,45 @@ ADD CONSTRAINT FK_AuthorBook
 FOREIGN KEY (author_id) REFERENCES authors(author_id)
 ON DELETE CASCADE;
 ```
+
+**Composition Keys**
+
+Imagine we're designing a database for a university to manage student enrollments in courses. We have the following entities:
+
+- **Students**: Each student has a unique ID, name, etc.
+
+- **Courses**: Each course has a unique ID, title, credits, etc.
+
+- **Enrollments**: This table represents which students are enrolled in which courses.
+
+In this scenario, a single student can enroll in multiple courses, and a single course can have multiple students. Therefore, neither the ```StudentID``` nor the ```CourseID``` alone can uniquely identify a row in the ```Enrollments``` table. This is where a composite key comes in handy.
+
+| StudentID    | CourseID    | 	EnrollmentDate     | Grade       |
+| :----------: | :---------: | :-----------------: |  :--------: |
+| 101          | 201         |  2023-09-01         |  A          |
+| 101          | 202         |  2023-09-01         |  B          |
+| 102          | 201         |  2023-09-01         |  C          |
+| 102          | 203         |  2023-09-01         |  A          |
+
+The composite key for the ```Enrollments``` table would be the combination of (```StudentID```, ```CourseID```). This ensures that each row in the ```Enrollments``` table is uniquely identified by the combination of the student and the course they are enrolled in. A student can only be enrolled in a specific course once.
+
+```sql
+CREATE TABLE Enrollments (
+    StudentID INT,
+    CourseID INT,
+    EnrollmentDate DATE,
+    Grade VARCHAR(2),
+    PRIMARY KEY (StudentID, CourseID),
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+);
+```
+
+Explanation:
+
+- PRIMARY KEY (StudentID, CourseID): This line defines the composite key consisting of the StudentID and CourseID columns.
+- FOREIGN KEY (StudentID) REFERENCES Students(StudentID): This creates a foreign key relationship with the Students table, ensuring that the StudentID exists in the Students table.
+- FOREIGN KEY (CourseID) REFERENCES Courses(CourseID): This creates a foreign key relationship with the Courses table, ensuring that the CourseID exists in the Courses table.
 
 #### <a name="chapter3part2"></a>Chapter 3 - Part 2: Introduction to JOINs: Combining Data from Multiple Tables
 
