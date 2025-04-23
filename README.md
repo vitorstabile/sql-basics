@@ -3340,15 +3340,317 @@ This query will return:
 
 #### <a name="chapter3part4"></a>Chapter 3 - Part 4: LEFT JOIN (LEFT OUTER JOIN): Retrieving All Rows from the Left Table
 
+The LEFT JOIN, also known as LEFT OUTER JOIN, is a crucial tool in SQL for combining data from multiple tables while ensuring that all rows from one table (the "left" table) are included in the result, regardless of whether there are matching rows in the other table (the "right" table). This is particularly useful when you need to see all records from a primary table and any related information from another table, even if some records in the primary table don't have corresponding entries in the related table. Understanding LEFT JOINs is essential for building comprehensive queries and generating meaningful reports from relational databases.
+
 #### <a name="chapter3part4.1"></a>Chapter 3 - Part 4.1: Understanding the LEFT JOIN
+
+A LEFT JOIN returns all rows from the left table and the matching rows from the right table. If there is no match in the right table for a row in the left table, the result will contain NULL values for the columns from the right table. The basic syntax is as follows:
+
+```sql
+SELECT column_list
+FROM left_table
+LEFT JOIN right_table ON left_table.column_name = right_table.column_name;
+```
+
+- left_table: The table from which all rows will be returned.
+
+- right_table: The table that will be joined with the left table based on the specified condition.
+
+- ON left_table.column_name = right_table.column_name: The join condition that specifies how the tables are related. This is typically based on primary and foreign key relationships.
+
+- column_list: Specifies the columns to be retrieved from both tables.
+
+**Key Principles of LEFT JOIN**
+
+- **All Rows from the Left Table**: The most important characteristic of a LEFT JOIN is that it guarantees the inclusion of every row from the left table in the result set.
+
+- **Matching Rows from the Right Table**: If a row in the left table has a matching row in the right table (based on the ON condition), the corresponding columns from the right table will be included in the result.
+
+- **NULL Values for Non-Matching Rows**: If a row in the left table does not have a matching row in the right table, the columns from the right table will contain NULL values for that row.
+
+- **Order Matters**: The order of the tables in the LEFT JOIN clause is significant. The table listed first is the left table, and the table listed second is the right table. Swapping the order of the tables will change the result.
 
 #### <a name="chapter3part4.2"></a>Chapter 3 - Part 4.2: Practical Examples Using the Bookstore Database
 
+Let's continue using the "Online Bookstore" database introduced in Module 1. Assume we have two tables: books and authors.
+
+- books table: Contains information about each book, including book_id (primary key), title, author_id (foreign key referencing the authors table), and price.
+
+- authors table: Contains information about each author, including author_id (primary key) and author_name.
+
+**Example 1: Retrieving All Books and Their Authors**
+
+Suppose we want to retrieve a list of all books and their corresponding author names. We want to ensure that all books are listed, even if an author's information is missing (which shouldn't happen in a well-designed database, but it's a good example for illustrating LEFT JOIN).
+
+```sql
+SELECT
+    books.title,
+    authors.author_name
+FROM
+    books
+LEFT JOIN
+    authors ON books.author_id = authors.author_id;
+```
+
+In this query:
+
+- books is the left table. All rows from the books table will be included in the result.
+
+- authors is the right table. Only matching rows from the authors table (based on author_id) will be included.
+
+- If a book has an author_id that does not exist in the authors table, the author_name column will contain NULL for that book.
+
+**Example 2: Identifying Books Without an Author (Hypothetical)**
+
+While it's unlikely in a properly designed bookstore database, let's imagine a scenario where some books might not have an associated author in the authors table (perhaps due to data entry errors or incomplete records). We can use a LEFT JOIN to identify these books.
+
+```sql
+SELECT
+    books.title
+FROM
+    books
+LEFT JOIN
+    authors ON books.author_id = authors.author_id
+WHERE
+    authors.author_id IS NULL;
+```
+
+In this query:
+
+- We use a WHERE clause to filter the results and only include rows where authors.author_id is NULL. This indicates that there was no matching author for the book in the authors table.
+
+**Example 3: Joining with Additional Tables**
+
+Let's add a categories table to our bookstore database, with columns category_id (primary key) and category_name. We can modify our query to include the category name as well. Assume the books table now also has a category_id column.
+
+```sql
+SELECT
+    books.title,
+    authors.author_name,
+    categories.category_name
+FROM
+    books
+LEFT JOIN
+    authors ON books.author_id = authors.author_id
+LEFT JOIN
+    categories ON books.category_id = categories.category_id;
+```
+
+This query demonstrates how to chain multiple LEFT JOIN operations. It retrieves the book title, author name, and category name for all books. If a book doesn't have a matching author or category, the corresponding columns will contain NULL values.
+
+**Example 4: Using Aliases for Readability**
+
+Using aliases can make your queries more readable, especially when joining multiple tables.
+
+```sql
+SELECT
+    b.title,
+    a.author_name
+FROM
+    books AS b
+LEFT JOIN
+    authors AS a ON b.author_id = a.author_id;
+```
+
+Here, b is an alias for books, and a is an alias for authors. This makes the query shorter and easier to understand.
+
 #### <a name="chapter3part5"></a>Chapter 3 - Part 5: RIGHT JOIN (RIGHT OUTER JOIN): Retrieving All Rows from the Right Table
+
+The RIGHT JOIN, also known as RIGHT OUTER JOIN, is a crucial tool in SQL for retrieving data from multiple tables. Unlike the INNER JOIN, which only returns matching rows, the RIGHT JOIN ensures that all rows from the right table are included in the result set, even if there are no matching rows in the left table. This is particularly useful when you need to see a complete list of records from one table and any related information from another.
 
 #### <a name="chapter3part5.1"></a>Chapter 3 - Part 5.1: Understanding the RIGHT JOIN
 
+The RIGHT JOIN combines rows from two tables based on a related column. The syntax is as follows:
+
+```sql
+SELECT column_list
+FROM table_name_1
+RIGHT JOIN table_name_2 ON table_name_1.column_name = table_name_2.column_name;
+```
+
+- table_name_1 is the left table.
+
+- table_name_2 is the right table.
+
+- column_name is the column used for the join condition.
+
+- The RIGHT JOIN keyword specifies that all rows from table_name_2 (the right table) should be included in the result.
+
+- If there is a match between rows in table_name_1 and table_name_2 based on the ON condition, the corresponding columns from both tables are included in the result.
+
+- If there is no match for a row in table_name_2 in table_name_1, the columns from table_name_1 will contain NULL values for that row.
+
+**Example: Online Bookstore Database**
+
+Let's continue using the "Online Bookstore" database introduced in Module 1. Assume we have two tables: books and authors.
+
+books table:
+
+
+|book_id	|title	|author_id|
+| :--------: | :--------: | :--------: |
+|1|	The Great Novel|	1|
+|2|	Another Good Book|	2|
+|3|	A Mystery|	1|
+|4|	The Lost Manuscript|	3|
+
+
+authors table:
+
+
+|author_id	|author_name|
+| :--------: | :--------: |
+|1|	John Smith|
+|2|	Jane Doe|
+|3|	David Lee|
+|4|	Emily White|
+
+Now, let's use a RIGHT JOIN to retrieve all authors and their corresponding books:
+
+```sql
+SELECT
+    b.title,
+    a.author_name
+FROM
+    books b
+RIGHT JOIN
+    authors a ON b.author_id = a.author_id;
+```
+
+Result:
+
+
+|title	|author_name|
+| :--------: | :--------: |
+|The Great Novel|	John Smith|
+|A Mystery|	John Smith|
+|Another Good Book|	Jane Doe|
+|The Lost Manuscript|	David Lee|
+|NULL|	Emily White|
+
+Notice that Emily White is included in the result, even though she doesn't have any books in the books table. The title column is NULL for Emily White because there's no matching book.
+
+**Handling NULL Values**
+
+When using RIGHT JOIN, it's common to encounter NULL values in the columns from the left table when there's no match. You can use the COALESCE() function to replace NULL values with a default value.
+
+For example, to replace the NULL title with "No Book":
+
+```sql
+SELECT
+    COALESCE(b.title, 'No Book') AS title,
+    a.author_name
+FROM
+    books b
+RIGHT JOIN
+    authors a ON b.author_id = a.author_id;
+```
+
+Result:
+
+|title	|author_name|
+| :--------: | :--------: |
+|The Great Novel|	John Smith|
+|A Mystery|	John Smith|
+|Another Good Book|	Jane Doe|
+|The Lost Manuscript|	David Lee|
+|No Book|	Emily White|
+
 #### <a name="chapter3part5.2"></a>Chapter 3 - Part 5.2: Practical Examples
+
+**Example 1: Customer Orders**
+
+Consider two tables: customers and orders. You want to retrieve all customers, even those who haven't placed any orders.
+
+customers table:
+
+
+|customer_id|	customer_name|
+| :--------: | :--------: |
+|1|	Alice|
+|2|	Bob|
+|3|	Charlie|
+
+orders table:
+
+
+|order_id	|customer_id	|order_date|
+| :--------: | :--------: | :--------: |
+|1|	1	|2023-01-01|
+|2	|2|	2023-01-02|
+
+```sql
+SELECT
+    c.customer_name,
+    o.order_id,
+    o.order_date
+FROM
+    customers c
+RIGHT JOIN
+    orders o ON c.customer_id = o.customer_id;
+```
+
+This query will not return all customers. To return all customers, you need to switch the tables and use RIGHT JOIN on the customers table.
+
+```sql
+SELECT
+    c.customer_name,
+    o.order_id,
+    o.order_date
+FROM
+    orders o
+RIGHT JOIN
+    customers c ON o.customer_id = c.customer_id;
+```
+
+Result:
+
+|customer_name|	order_id|	order_date|
+| :--------: | :--------: | :--------: |
+|Alice	|1	|2023-01-01|
+|Bob	|2	|2023-01-02|
+|Charlie	|NULL|	NULL|
+
+Charlie is included, even though he hasn't placed any orders.,
+
+**Example 2: Employee Departments**
+
+Consider two tables: employees and departments. You want to retrieve all departments, even those with no employees.
+
+employees table:
+
+|employee_id	|employee_name|	department_id|
+| :--------: | :--------: | :--------: |
+|1|	Alice|	1|
+|2|	Bob|	2|
+
+departments table:
+
+|department_id|	department_name|
+| :--------: | :--------: |
+|1	|Sales|
+|2|	Marketing|
+|3	|HR|
+
+```sql
+SELECT
+    e.employee_name,
+    d.department_name
+FROM
+    employees e
+RIGHT JOIN
+    departments d ON e.department_id = d.department_id;
+```
+
+Result:
+
+|employee_name	|department_name|
+| :--------: | :--------: |
+|Alice	|Sales|
+|Bob|	Marketing|
+|NULL|	HR|
+
+The HR department is included, even though there are no employees in that department.
 
 #### <a name="chapter3part6"></a>Chapter 3 - Part 6: FULL OUTER JOIN: Retrieving All Rows from Both Tables
 
