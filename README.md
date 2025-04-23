@@ -224,7 +224,7 @@
       - [Chapter 13 - Part 7.2: Online Resources and Communities](#chapter13part7.2)
       - [Chapter 13 - Part 7.3: Practical Projects and Exercises](#chapter13part7.3)
       - [Chapter 13 - Part 7.4: Best Practices for Continuous Learning](#chapter13part7.4)
-AppendixA. [Appendix A: Useful DuckDB Code Snippet](#appendixa)
+30. [Appendix A: Useful DuckDB Code Snippet](#appendixa)
     - [Appendix A - Part 1: Remove characters from VARCHARS using REGEXP_REPLACE](#appendixapart1)
     - [Appendix A - Part 2: Check if a column have different values in other column](#appendixapart2)
     - [Appendix A - Part 3: Check for duplicate lines](#appendixapart3)
