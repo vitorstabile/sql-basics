@@ -4809,19 +4809,181 @@ Backups and data recovery are essential components of database management. By un
 
 #### <a name="chapter5part1"></a>Chapter 5 - Part 1: Introduction to Aggregate Functions: COUNT, SUM, AVG, MIN, MAX
 
+Aggregate functions are essential tools in SQL for summarizing and analyzing data. They allow you to perform calculations on multiple rows of a table and return a single aggregated value. This lesson will introduce you to five fundamental aggregate functions: COUNT, SUM, AVG, MIN, and MAX. Understanding these functions is crucial for extracting meaningful insights from your data and forms the foundation for more advanced data analysis techniques in SQL.
+
 #### <a name="chapter5part1.1"></a>Chapter 5 - Part 1.1: Understanding Aggregate Functions
+
+Aggregate functions operate on a set of rows and return a single value. They are commonly used with the GROUP BY clause (which we'll cover in the next lesson) to calculate aggregates for different groups within your data. However, they can also be used without GROUP BY to calculate aggregates for the entire table.
+
+Here's a breakdown of the five key aggregate functions:
+
+- **COUNT()**: Counts the number of rows or non-null values in a specified column.
+- **SUM()**: Calculates the sum of numeric values in a specified column.
+- **AVG()**: Calculates the average of numeric values in a specified column.
+- **MIN()**: Finds the minimum value in a specified column.
+- **MAX()**: Finds the maximum value in a specified column.
 
 #### <a name="chapter5part1.2"></a>Chapter 5 - Part 1.2: COUNT() Function
 
+The COUNT() function is used to count the number of rows in a table or the number of non-null values in a specific column. It has two main forms:
+
+- **COUNT(*)**: Counts all rows in a table, regardless of whether they contain null values.
+- **COUNT(column_name)**: Counts the number of rows where the specified column has a non-null value.
+
+**Examples of COUNT()**
+
+Let's use our "Online Bookstore" database to illustrate the COUNT() function. Suppose we want to know the total number of books in the books table.
+
+```sql
+SELECT COUNT(*) AS total_books
+FROM books;
+```
+
+This query will return a single row with a column named total_books containing the total number of books in the table.
+
+Now, let's say we want to count the number of books that have a listed price (i.e., the price column is not null).
+
+```sql
+SELECT COUNT(price) AS books_with_price
+FROM books;
+```
+
+This query will return the number of books where the price column is not null. If some books have a missing price, this number will be different from the total number of books.
+
+**COUNT(DISTINCT column_name)**
+
+The COUNT() function can also be used with the DISTINCT keyword to count the number of unique values in a column. For example, if we want to know the number of unique authors in our books table, we can use the following query:
+
+```sql
+SELECT COUNT(DISTINCT author) AS unique_authors
+FROM books;
+```
+
+This query will return the number of distinct authors in the books table, ignoring any duplicate author names.
+
 #### <a name="chapter5part1.3"></a>Chapter 5 - Part 1.3: SUM() Function
+
+The SUM() function calculates the sum of numeric values in a specified column. It ignores null values.
+
+**Examples of SUM()**
+
+Suppose we want to calculate the total price of all books in our books table.
+
+```sql
+SELECT SUM(price) AS total_price
+FROM books;
+```
+
+This query will return the sum of all values in the price column, representing the total value of our inventory.
+
+If we want to calculate the total revenue from all orders in the orders table (assuming we have a total_amount column), we can use the following query:
+
+```sql
+SELECT SUM(total_amount) AS total_revenue
+FROM orders;
+```
+
+This query will return the total revenue generated from all orders.
+
+**Handling NULL Values in SUM()**
+
+It's important to remember that SUM() ignores null values. If a column contains null values, they will not be included in the sum. If all values in the column are NULL, SUM() will return NULL.
 
 #### <a name="chapter5part1.4"></a>Chapter 5 - Part 1.4: AVG() Function
 
+The AVG() function calculates the average of numeric values in a specified column. Like SUM(), it ignores null values.
+
+**Examples of AVG()**
+
+To calculate the average price of books in our books table:
+
+```sql
+SELECT AVG(price) AS average_price
+FROM books;
+```
+
+This query will return the average price of all books in the table.
+
+If we want to calculate the average rating of books (assuming we have a rating column), we can use the following query:
+
+```sql
+SELECT AVG(rating) AS average_rating
+FROM books;
+```
+
+This query will return the average rating of all books.
+
+**Handling NULL Values in AVG()**
+
+AVG() also ignores null values. The average is calculated based on the non-null values in the column. If all values in the column are NULL, AVG() will return NULL.
+
 #### <a name="chapter5part1.5"></a>Chapter 5 - Part 1.5: MIN() and MAX() Functions
+
+The MIN() and MAX() functions find the minimum and maximum values, respectively, in a specified column. These functions can be used with numeric, string, and date/time data types.
+
+**Examples of MIN() and MAX()**
+
+To find the lowest price of a book in our books table:
+
+```sql
+SELECT MIN(price) AS lowest_price
+FROM books;
+```
+
+This query will return the minimum value in the price column.
+
+To find the highest price of a book:
+
+```sql
+SELECT MAX(price) AS highest_price
+FROM books;
+```
+
+This query will return the maximum value in the price column.
+
+We can also use MIN() and MAX() with string data types. For example, to find the alphabetically first and last author names:
+
+```sql
+SELECT MIN(author) AS first_author, MAX(author) AS last_author
+FROM books;
+```
+
+This query will return the author name that comes first alphabetically (first_author) and the author name that comes last alphabetically (last_author).
 
 #### <a name="chapter5part1.6"></a>Chapter 5 - Part 1.6: Combining Aggregate Functions
 
+You can combine multiple aggregate functions in a single query to get a more comprehensive overview of your data. For example, to get the total number of books, the average price, the lowest price, and the highest price in a single query:
+
+```sql
+SELECT
+    COUNT(*) AS total_books,
+    AVG(price) AS average_price,
+    MIN(price) AS lowest_price,
+    MAX(price) AS highest_price
+FROM books;
+```
+
+This query will return a single row with four columns, each representing a different aggregate value.
+
 #### <a name="chapter5part1.7"></a>Chapter 5 - Part 1.7: Real-World Application
+
+Consider an e-commerce company that wants to analyze its sales data. They can use aggregate functions to answer questions like:
+
+- What is the total revenue generated in the last month? (SUM())
+- What is the average order value? (AVG())
+- What is the most popular product? (COUNT(), combined with GROUP BY which we will learn in the next lesson)
+- What is the highest and lowest order value? (MIN() and MAX())
+
+These insights can help the company make informed decisions about pricing, marketing, and inventory management.
+
+Another example is a social media platform. They can use aggregate functions to:
+
+- Count the total number of users. (COUNT())
+- Calculate the average number of posts per user. (AVG(), combined with GROUP BY)
+- Find the user with the most followers. (MAX(), combined with GROUP BY)
+- Find the user with the least followers. (MIN(), combined with GROUP BY)
+
+These metrics can help the platform understand user engagement and identify areas for improvement.
 
 #### <a name="chapter5part2"></a>Chapter 5 - Part 2: Grouping Data with GROUP BY: Analyzing Data Subsets
 
