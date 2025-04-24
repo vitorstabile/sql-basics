@@ -3965,37 +3965,427 @@ WHERE customers.customer_id IS NULL;
 
 #### <a name="chapter4part1"></a>Chapter 4 - Part 1: Inserting New Data with INSERT INTO
 
+Inserting data into a database is a fundamental operation. The ```INSERT INTO``` statement is the primary way to add new rows of data into a table. Understanding how to use this statement effectively is crucial for building and maintaining any database-driven application. This lesson will cover the syntax of the ```INSERT INTO``` statement, different ways to insert data, and best practices for ensuring data integrity.
+
 #### <a name="chapter4part1.1"></a>Chapter 4 - Part 1.1: Basic INSERT INTO Syntax
+
+The INSERT INTO statement has two primary forms. The first form explicitly lists the columns you are inserting data into:
+
+```sql
+INSERT INTO table_name (column1, column2, column3, ...)
+VALUES (value1, value2, value3, ...);
+```
+
+- INSERT INTO: Specifies that you are inserting data into a table.
+
+- table_name: The name of the table you are inserting data into.
+
+- (column1, column2, column3, ...): An optional list of the columns you are inserting data into. If omitted, you must provide values for all columns in the table.
+
+- VALUES (value1, value2, value3, ...): The values you want to insert into the corresponding columns. The order of the values must match the order of the columns specified (or the order of columns in the table if no columns are specified).
+
+The second form omits the column list, but requires you to provide values for every column in the table, in the order they are defined:
+
+```sql
+INSERT INTO table_name
+VALUES (value1, value2, value3, ...);
+```
+
+Example: Let's say we have a table named books in our "Online Bookstore" database with the following structure:
+
+|Column	|Data Type|
+| :--------: | :--------: |
+|book_id|	INTEGER|
+|title|	TEXT|
+|author|	TEXT|
+|price|	REAL|
+|publication_year|	INTEGER|
+
+To insert a new book into the books table, we can use either form of the INSERT INTO statement.
+
+**Example 1 (Specifying Columns):**
+
+```sql
+INSERT INTO books (title, author, price, publication_year)
+VALUES ('The Hitchhiker''s Guide to the Galaxy', 'Douglas Adams', 9.99, 1979);
+```
+
+In this example, we are only inserting data into the title, author, price, and publication_year columns. The book_id column (presumably an auto-incrementing primary key) will be automatically assigned a value by the database.
+
+**Example 2 (Omitting Columns):**
+
+```sql
+INSERT INTO books
+VALUES (5, 'Pride and Prejudice', 'Jane Austen', 7.50, 1813);
+```
+
+In this example, we are providing values for all columns in the books table, including book_id. It's crucial to know the order of the columns in the table definition when using this form.
 
 #### <a name="chapter4part1.2"></a>Chapter 4 - Part 1.2: Inserting Data into Specific Columns
 
+Specifying the columns you are inserting data into offers several advantages:
+
+- **Flexibility**: You can insert data into only the columns you have values for.
+
+- **Clarity**: It makes the statement more readable and easier to understand.
+
+- **Maintainability**: If the table structure changes (e.g., a new column is added), your INSERT statements are less likely to break if you explicitly specify the columns.
+
+**Example**: Suppose we want to add a new book to the books table, but we don't know the publication year yet. We can still insert the book with the available information:
+
+```sql
+INSERT INTO books (title, author, price)
+VALUES ('To Kill a Mockingbird', 'Harper Lee', 12.00);
+```
+
+In this case, the publication_year column will be assigned a NULL value (if the column allows nulls) or a default value (if one is defined for the column).
+
 #### <a name="chapter4part1.3"></a>Chapter 4 - Part 1.3: Inserting Multiple Rows
+
+You can insert multiple rows into a table with a single INSERT INTO statement using the following syntax:
+
+```sql
+INSERT INTO table_name (column1, column2, column3, ...)
+VALUES
+    (value1_1, value1_2, value1_3, ...),
+    (value2_1, value2_2, value2_3, ...),
+    (value3_1, value3_2, value3_3, ...),
+    ...;
+```
+
+**Example**: Let's add three new books to the books table at once:
+
+```sql
+INSERT INTO books (title, author, price, publication_year)
+VALUES
+    ('1984', 'George Orwell', 10.00, 1949),
+    ('Brave New World', 'Aldous Huxley', 11.50, 1932),
+    ('Fahrenheit 451', 'Ray Bradbury', 9.75, 1953);
+```
+
+This is more efficient than executing three separate INSERT INTO statements.
 
 #### <a name="chapter4part1.4"></a>Chapter 4 - Part 1.4: Inserting Data from Another Table
 
+You can also insert data into a table by selecting data from another table using the INSERT INTO ... SELECT statement:
+
+```sql
+INSERT INTO table_name (column1, column2, column3, ...)
+SELECT columnA, columnB, columnC, ...
+FROM another_table
+WHERE condition;
+```
+
+- table_name: The table you are inserting data into.
+
+- (column1, column2, column3, ...): The columns in the target table.
+
+- SELECT columnA, columnB, columnC, ...: The columns you are selecting from the source table. The order and data types of these columns must match the order and data types of the columns in the target table.
+
+- FROM another_table: The table you are selecting data from.
+
+- WHERE condition: An optional WHERE clause to filter the data being inserted.
+
+**Example**: Suppose we have a table called archived_books with the same structure as books. We can insert all books published before 1950 from archived_books into the books table:
+
+```sql
+INSERT INTO books (title, author, price, publication_year)
+SELECT title, author, price, publication_year
+FROM archived_books
+WHERE publication_year < 1950;
+```
+
 #### <a name="chapter4part1.5"></a>Chapter 4 - Part 1.5: Data Type Considerations
+
+When inserting data, it's crucial to ensure that the data types of the values you are inserting match the data types of the corresponding columns in the table. If the data types don't match, the database may attempt to implicitly convert the data, which can lead to unexpected results or errors.
+
+- **Strings**: Enclose string values in single quotes (e.g., 'The Lord of the Rings'). If the string itself contains a single quote, escape it by doubling it (e.g., 'The Hitchhiker''s Guide to the Galaxy').
+
+- **Numbers**: Do not enclose numeric values in quotes (e.g., 9.99, 1979).
+
+- **Dates**: Date formats vary depending on the database system. Consult your database documentation for the correct date format (e.g., 'YYYY-MM-DD', 'MM/DD/YYYY').
+
+- **NULL Values**: Use the keyword NULL to insert a null value into a column that allows nulls.
+
+```sql
+INSERT INTO books (title, author, price, publication_year)
+VALUES ('The Shining', 'Stephen King', 15.00, NULL);
+```
+
+In this example, the publication_year column will be assigned a NULL value.
 
 #### <a name="chapter4part1.6"></a>Chapter 4 - Part 1.6: Handling Errors and Constraints
 
+When inserting data, you may encounter errors due to constraint violations. Constraints are rules that enforce data integrity, such as:
+
+- **NOT NULL**: A column cannot contain a null value.
+
+- **UNIQUE**: A column (or set of columns) must contain unique values.
+
+- **PRIMARY KEY**: A column (or set of columns) that uniquely identifies each row in the table. Primary keys are typically also NOT NULL.
+
+- **FOREIGN KEY**: A column that references the primary key of another table. Foreign keys enforce referential integrity, ensuring that relationships between tables are maintained.
+
+- **CHECK**: A condition that must be true for all values in a column.
+
+If you attempt to insert data that violates a constraint, the database will return an error and the INSERT statement will fail.
+
+**Example**: Suppose the book_id column in the books table is a primary key with an auto-incrementing constraint. If you try to insert a row with a book_id that already exists, you will get a primary key violation error.
+
+**Example**: Suppose the price column has a CHECK constraint that ensures the price is greater than 0. If you try to insert a row with a negative price, you will get a check constraint violation error.
+
 #### <a name="chapter4part1.7"></a>Chapter 4 - Part 1.7: Best Practices for INSERT INTO Statements
+
+- **Always specify columns**: Explicitly listing the columns you are inserting data into makes your code more readable, maintainable, and less prone to errors.
+
+- **Validate data**: Before inserting data, validate it to ensure that it is in the correct format and meets any constraints. This can help prevent errors and ensure data integrity.
+
+- **Use parameterized queries**: To prevent SQL injection vulnerabilities, use parameterized queries or prepared statements when inserting data from user input. This will be covered in a later module.
+
+- **Handle errors gracefully**: Implement error handling to catch any exceptions that may occur during the insertion process. Log the errors and provide informative messages to the user.
+
+- **Use transactions**: When inserting multiple rows or performing multiple data manipulation operations, use transactions to ensure that all operations are completed successfully or none are. This will be covered in the next lesson.
 
 #### <a name="chapter4part2"></a>Chapter 4 - Part 2: Updating Existing Data with UPDATE
 
+Updating data is a crucial aspect of database management, allowing us to correct errors, reflect changes in information, and maintain data accuracy. The UPDATE statement in SQL is the tool we use to modify existing records within a table. Understanding how to use UPDATE effectively, including specifying which rows to update and how to handle potential errors, is essential for anyone working with databases.
+
 #### <a name="chapter4part2.1"></a>Chapter 4 - Part 2.1: The Basic Syntax of UPDATE
+
+The fundamental syntax of the UPDATE statement is as follows:
+
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+```
+
+Let's break down each part:
+
+- UPDATE table_name: Specifies the table you want to modify.
+
+- SET column1 = value1, column2 = value2, ...: Indicates which columns you want to update and the new values you want to assign to them. You can update one or more columns in a single UPDATE statement.
+
+- WHERE condition: This is the most critical part. It specifies which rows should be updated. If you omit the WHERE clause, all rows in the table will be updated, which is rarely what you intend.
 
 #### <a name="chapter4part2.2"></a>Chapter 4 - Part 2.2: Understanding the WHERE Clause
 
+The WHERE clause is essential for targeting specific rows for modification. It uses the same conditional operators and logic as the WHERE clause in SELECT statements (covered in Module 2).
+
+**Example 1: Updating a Single Row**
+
+Let's say we have an authors table in our online bookstore database with the following structure and data:
+
+|author_id|	first_name|	last_name|	email|
+| :--------: | :--------: | :--------: | :--------: |
+|1|	Jane|	Austen|	jane.austen@example.com|
+|2|	Charles|	Dickens|	charles.dickens@example.com|
+|3|	Leo|	Tolstoy|	leo.tolstoy@example.com|
+
+If Jane Austen changed her email address, we would use the following UPDATE statement:
+
+```sql
+UPDATE authors
+SET email = 'jane.austen.new@example.com'
+WHERE author_id = 1;
+```
+
+This statement updates the email column for the row where author_id is 1.
+
+**Example 2: Updating Multiple Columns**
+
+Suppose Charles Dickens moved and we want to update both his email and a new address column (assuming we've added this column to the authors table).
+
+```sql
+UPDATE authors
+SET email = 'charles.dickens.new@example.com', address = '123 New Address, London'
+WHERE author_id = 2;
+```
+
+This statement updates both the email and address columns for the author with author_id 2.
+
+**Example 3: Using Comparison Operators**
+
+We can use other comparison operators in the WHERE clause. For example, if we wanted to give a bonus to all authors whose last name starts with 'T', we could (hypothetically) update a bonus column:
+
+```sql
+UPDATE authors
+SET bonus = 100  -- Assuming a bonus column exists
+WHERE last_name LIKE 'T%';
+```
+
+This uses the LIKE operator with a wildcard to match any last name starting with 'T'.
+
+**Example 4: Updating Based on a Range**
+
+Let's say we have a books table with a publication_year column. We want to mark all books published before 1900 as "classic". We would first need to add a genre column to the books table if it doesn't already exist.
+
+```sql
+UPDATE books
+SET genre = 'Classic'
+WHERE publication_year < 1900;
+```
+
+This updates the genre column to 'Classic' for all books published before 1900.
+
 #### <a name="chapter4part2.3"></a>Chapter 4 - Part 2.3: Updating with Values from Another Table (Advanced)
+
+In some cases, you might want to update values in one table based on data in another table. This often involves using a JOIN within the UPDATE statement.
+
+**Example: Updating Book Prices Based on Author Popularity**
+
+Let's imagine we have an authors table with a popularity_score column and a books table with a price column and an author_id column. We want to increase the price of books written by popular authors (those with a popularity_score above a certain threshold).
+
+```sql
+UPDATE books
+SET price = price * 1.10 -- Increase price by 10%
+WHERE author_id IN (SELECT author_id FROM authors WHERE popularity_score > 75);
+```
+
+This example uses a subquery (which will be covered in more detail in Module 6) to select the author_id of popular authors and then updates the price of books written by those authors. A more explicit JOIN syntax might also be supported by your specific database system:
+
+```sql
+UPDATE books
+SET price = books.price * 1.10
+FROM books
+INNER JOIN authors ON books.author_id = authors.author_id
+WHERE authors.popularity_score > 75;
+```
 
 #### <a name="chapter4part2.4"></a>Chapter 4 - Part 2.4: Important Considerations and Best Practices
 
+- **Always Use a WHERE Clause**: As mentioned earlier, forgetting the WHERE clause can have disastrous consequences, updating all rows in your table unintentionally.
+
+- **Test Your UPDATE Statements**: Before running an UPDATE statement on a production database, test it on a development or staging environment to ensure it behaves as expected.
+
+- **Backup Your Data**: It's always a good practice to back up your data before performing any major data manipulation operations, including UPDATE statements. This allows you to restore your database to its previous state if something goes wrong. We will discuss the importance of backups and data recovery later in this module.
+
+- **Understand Transactions**: For critical updates, use transactions to ensure data integrity. Transactions allow you to group multiple SQL statements into a single unit of work. If any statement within the transaction fails, the entire transaction is rolled back, preventing partial updates. We will cover transactions in detail later in this module.
+
+- **Data Types**: Ensure that the values you are assigning to columns are compatible with the column's data type. Attempting to insert a string into an integer column, for example, will result in an error.
+
+- **Null Values**: Be mindful of NULL values. You can update a column to NULL using SET column_name = NULL. Also, remember that comparing a column to NULL in the WHERE clause requires using IS NULL or IS NOT NULL.
+
+- **Performance**: Updating large numbers of rows can be slow. Consider using indexes on the columns used in the WHERE clause to improve performance. We will discuss indexes in Module 7.
+
 #### <a name="chapter4part3"></a>Chapter 4 - Part 3: Deleting Data with DELETE FROM
+
+Deleting data from a database is a critical operation that requires careful consideration. The DELETE FROM statement in SQL allows you to remove specific rows from a table. Understanding how to use this statement effectively, along with its potential consequences, is essential for maintaining data integrity and ensuring the accuracy of your database. This lesson will cover the syntax of the DELETE FROM statement, how to use WHERE clauses to target specific rows, and the importance of understanding the impact of your deletions.
 
 #### <a name="chapter4part3.1"></a>Chapter 4 - Part 3.1: The DELETE FROM Statement: Basic Syntax
 
+The fundamental syntax for deleting data in SQL is as follows:
+
+```sql
+DELETE FROM table_name
+WHERE condition;
+```
+
+- DELETE FROM: This clause specifies that you want to delete rows from a table.
+
+- table_name: This is the name of the table from which you want to delete data.
+
+- WHERE condition: This clause is crucial. It specifies the condition that determines which rows will be deleted. If you omit the WHERE clause, all rows in the table will be deleted.
+
+Let's say we have an authors table in our "Online Bookstore" database with the following structure and data:
+
+
+|author_id|	first_name|	last_name|
+| :--------: | :--------: | :--------: |
+|1|	Jane|	Austen|
+|2|	Charles|	Dickens|
+|3|	William|	Shakespeare|
+|4|	Agatha|	Christie|
+
+To delete the author with author_id = 3, you would use the following SQL statement:
+
+```sql
+DELETE FROM authors
+WHERE author_id = 3;
+```
+
+After executing this statement, the authors table would look like this:
+
+|author_id|	first_name|	last_name|
+| :--------: | :--------: | :--------: |
+|1|	Jane|	Austen|
+|2|	Charles|	Dickens|
+|4|	Agatha|	Christie|
+
 #### <a name="chapter4part3.2"></a>Chapter 4 - Part 3.2: Using the WHERE Clause Effectively
 
+The WHERE clause is the most important part of the DELETE FROM statement. It allows you to specify exactly which rows you want to remove. You can use various operators and conditions in the WHERE clause, just as you would in a SELECT statement (as covered in Module 2).
+
+**Common Operators in WHERE Clauses**
+
+- ```=```: Equal to
+- ```>```: Greater than
+- ```<```: Less than
+- ```>=```: Greater than or equal to
+- ```<=```: Less than or equal to
+- ```<> or !=```: Not equal to
+- ```LIKE```: Pattern matching (e.g., WHERE last_name LIKE 'A%')
+- ```IN```: Checks if a value is in a list (e.g., WHERE author_id IN (1, 2))
+- ```BETWEEN```: Checks if a value is within a range (e.g., WHERE author_id BETWEEN 1 AND 3)
+- ```IS NULL```: Checks if a value is NULL
+- ```IS NOT NULL```: Checks if a value is not NULL
+
+**Combining Conditions with AND and OR**
+
+You can combine multiple conditions in the WHERE clause using the AND and OR operators.
+
+- ```AND```: Both conditions must be true for a row to be deleted.
+- ```OR```: At least one of the conditions must be true for a row to be deleted.
+
+Suppose we want to delete all authors whose first name is 'Jane' and last name is 'Austen'.
+
+```sql
+DELETE FROM authors
+WHERE first_name = 'Jane' AND last_name = 'Austen';
+```
+
+Alternatively, if we want to delete all authors whose first name is 'Jane' or whose last name is 'Dickens', we would use:
+
+```sql
+DELETE FROM authors
+WHERE first_name = 'Jane' OR last_name = 'Dickens';
+```
+
+**Subqueries in WHERE Clauses**
+
+You can also use subqueries within the WHERE clause of a DELETE FROM statement. This allows you to delete rows based on the results of another query. We will cover subqueries in detail in Module 6, but here's a basic example:
+
+Let's say we have a books table with a author_id column, and we want to delete all authors who have no books in the books table.
+
+```sql
+DELETE FROM authors
+WHERE author_id NOT IN (SELECT DISTINCT author_id FROM books);
+```
+
+This statement first selects all distinct author_id values from the books table. Then, it deletes all rows from the authors table where the author_id is not in the list of author_id values returned by the subquery.
+
 #### <a name="chapter4part3.3"></a>Chapter 4 - Part 3.3: The Importance of WHERE and the Dangers of Accidental Deletion
+
+As mentioned earlier, omitting the WHERE clause in a DELETE FROM statement will delete all rows from the table. This is a destructive operation, and it's crucial to be extremely careful when using the DELETE FROM statement.
+
+**Example of Accidental Deletion:**
+
+```sql
+DELETE FROM authors; -- This will delete all rows from the authors table!
+```
+
+To prevent accidental deletions, it's a good practice to:
+
+- **Always start with a SELECT statement**: Before running a DELETE FROM statement, first write a SELECT statement with the same WHERE clause to verify that you are targeting the correct rows. For example:
+
+```sql
+SELECT * FROM authors WHERE author_id = 3; -- Verify the row to be deleted
+DELETE FROM authors WHERE author_id = 3; -- Then, execute the DELETE statement
+```
+
+- **Use transactions**: Transactions allow you to group multiple SQL statements into a single unit of work. If any statement fails, you can roll back the entire transaction, undoing any changes made. We will cover transactions in more detail in the next lesson.
+
+- **Backups**: Regularly back up your database so that you can restore it if you accidentally delete data. The importance of backups and data recovery will be discussed later in this module.
 
 #### <a name="chapter4part4"></a>Chapter 4 - Part 4: Understanding Transactions: Ensuring Data Integrity
 
