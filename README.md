@@ -4865,13 +4865,213 @@ Backups and data recovery are essential components of database management. By un
 
 ## <a name="chapter6"></a>Chapter 6: Scalar Functions
 
+- LEN() (in other SQL flavors – LENGTH()) – returns the length of a string, including the blank spaces
+
+- UCASE() (in other SQL flavors – UPPER()) – returns a string converted to the upper case
+
+- LCASE() (in other SQL flavors – LOWER()) – returns a string converted to the lower case
+
+- INITCAP() – returns a string converted to the title case (i.e., each word of the string starts from a capital letter)
+
+- MID() (in other SQL flavors – SUBSTR()) – extracts a substring from a string
+
+- ROUND() – returns the numerical value rounded to a specified number of decimals
+
+- NOW() – returns the current date and time
+
+```sql
+-- Length of the product name
+SELECT ProductName, LENGTH(ProductName) AS NameLength FROM Products;
+
+-- Product name in uppercase
+SELECT ProductName, UPPER(ProductName) AS UppercaseName FROM Products;
+
+-- Product name in lowercase
+SELECT ProductName, LOWER(ProductName) AS LowercaseName FROM Products;
+
+-- Round the price to the nearest whole number
+SELECT ProductName, ROUND(Price) AS RoundedPrice FROM Products;
+
+-- Current date and time
+SELECT NOW();
+```
+
 ## <a name="chapter7"></a>Chapter 7: Case manipulation Functions
+
+Case manipulation functions represent a subset of character functions, and they're used to change the case of the text data. With these functions, we can convert the data into the upper, lower, or title case.
+
+- UCASE() (in other SQL flavors – UPPER()) – returns a string converted to the upper case
+
+- LCASE() (in other SQL flavors – LOWER()) – returns a string converted to the lower case
+
+- INITCAP() – returns a string converted to the title case (i.e., each word of the string starts from a capital letter)
+
+```sql
+-- Product name in uppercase
+SELECT ProductName, UCASE(ProductName) AS UppercaseName FROM Products;
+
+-- Product name in lowercase
+SELECT ProductName, LCASE(ProductName) AS LowercaseName FROM Products;
+
+-- (Hypothetical) Product name in title case (not supported in all SQL dialects)
+-- SELECT ProductName, INITCAP(ProductName) AS TitleCaseName FROM Products;
+```
 
 ## <a name="chapter8"></a>Chapter 8: Character manipulation Functions
 
+Character manipulation functions represent a subset of character functions, and they're used to modify the text data.
+
+- CONCAT() – joins two or more string values appending the second string to the end of the first one
+
+- SUBSTR() – returns a part of a string satisfying the provided start and end points
+
+- LENGTH() (in other SQL flavors – LEN()) – returns the length of a string, including the blank spaces
+
+- REPLACE() – replaces all occurrences of a defined substring in a provided string with another substring
+
+- INSTR() – returns the numeric position of a defined substring in a provided string
+
+- LPAD() and RPAD() – return the padding of the left-side/right-side character for right-justified/left-justified value
+
+- TRIM() – removes all the defined characters, as well as white spaces, from the left, right, or both ends of a provided string
+
+```sql
+-- Concatenate product name and category
+SELECT CONCAT(ProductName, ' (', Category, ')') AS ProductInfo FROM Products;
+
+-- Extract the first 5 characters of the product name
+SELECT ProductName, SUBSTR(ProductName, 1, 5) AS ShortName FROM Products;
+
+-- Find the position of 'laptop' in the description
+SELECT Description, INSTR(Description, 'laptop') AS LaptopPosition FROM Products;
+
+-- Replace 'leather' with 'genuine leather' in the description
+SELECT Description, REPLACE(Description, 'leather', 'genuine leather') AS UpdatedDescription FROM Products;
+
+-- Pad the product name with spaces on the left to a length of 20
+SELECT ProductName, LPAD(ProductName, 20, ' ') AS PaddedProductName FROM Products;
+
+-- Remove leading and trailing spaces from the description (if any)
+SELECT Description, TRIM(Description) AS TrimmedDescription FROM Products;
+```
+
 ## <a name="chapter9"></a>Chapter 9: Case() Functions
 
+The way to implement the if-then-else logic in SQL. This function sequentially checks the provided conditions in the WHEN clauses and returns the value from the corresponding THEN clause when the first condition is satisfied. If none of the conditions is satisfied, the function returns the value from the ELSE clause in case it's provided, otherwise, it returns NULL. The syntax is:
+
+```sql
+CASE
+    WHEN condition_1 THEN value_1
+    WHEN condition_2 THEN value_2
+    WHEN condition_3 THEN value_3
+    ...
+    ELSE value
+END;
+```
+
 ## <a name="chapter10"></a>Chapter 10: Set Operators
+
+Set operators are used to combine the results of two or more ```SELECT``` statements into a single result set. These operators treat the result of each SELECT statement as a set and perform operations on these sets.
+
+**Key Requirements:**
+
+- The ```SELECT``` statements must have the same number of columns in the result sets.
+  
+- The corresponding columns in the ```SELECT``` statements must have compatible data types.
+  
+- The order and names of the columns do not need to be the same, but the data types must be compatible.
+
+**Common Set Operators:**
+
+- UNION: Combines the result sets of two or more SELECT statements, removing duplicate rows.
+
+- UNION ALL: Combines the result sets of two or more SELECT statements, including all rows (duplicates are not removed).
+
+- INTERSECT: Returns the rows that are common to the result sets of two SELECT statements.
+
+- MINUS (or EXCEPT): Returns the rows from the first SELECT statement that are not present in the result set of the second SELECT statement.
+
+Table 1: Customers
+
+| CustomerID  | CustomerName | City          |
+| :---------: | :-----------:|:-------------:|
+| 1           | Alice        | New York      |
+| 2           | Bob          | Los Angeles   |
+| 3           | Charlie      | Chicago       |
+| 4           | David        | Houston       |
+
+Table 1: Orders
+
+| OrderID  | CustomerID | City          |
+| :------: | :---------:|:-------------:|
+| 101      | 1          | New York      |
+| 102      | 2          | Los Angeles   |
+| 103      | 5          | Miami         |
+| 104      | 6          | Dallas        |
+
+- 1. UNION:
+
+Let's combine the cities from the Customers and Orders tables, removing duplicates.
+
+```sql
+SELECT City FROM Customers
+UNION
+SELECT City FROM Orders;
+```
+
+| City          |
+|:-------------:|
+| New York      |
+| Los Angeles   |
+| Chicago       |
+| Houstoun      |
+| Miami         |
+| Dallas        |
+
+- 2. UNION ALL:
+
+Let's combine the cities from the Customers and Orders tables, including duplicates.
+
+| City          |
+|:-------------:|
+| New York      |
+| Los Angeles   |
+| Chicago       |
+| Houstoun      |
+| New York      |
+| Los Angeles   |
+| Miami         |
+| Dallas        |
+
+- 3. INTERSECT:
+ 
+Let's find the cities that are present in both the Customers and Orders tables.
+
+```sql
+SELECT City FROM Customers
+INTERSECT
+SELECT City FROM Orders;
+```
+
+| City          |
+|:-------------:|
+| New York      |
+| Los Angeles   |
+
+- 4. MINUS (or EXCEPT):
+
+Let's find the cities that are present in the Customers table but not in the Orders table.
+
+```sql
+SELECT City FROM Customers
+EXCEPT -- or MINUS, depending on the database system
+SELECT City FROM Orders;
+```
+
+| City          |
+|:-------------:|
+| Chicago       |
+| Houston       |
 
 ## <a name="chapter11"></a>Chapter 11: Subqueries and Views
 
@@ -4938,6 +5138,33 @@ Backups and data recovery are essential components of database management. By un
 #### <a name="chapter11part6.3"></a>Chapter 11 - Part 6.3: Advantages and Disadvantages of Using Views
 
 ## <a name="chapter12"></a>Chapter 12: CTE (Common Table Expression)
+
+A CTE (Common Table Expression) is a temporary named result set that you can define within a single SELECT, INSERT, UPDATE, or DELETE statement. It's essentially a named subquery that exists only for the duration of the query execution. CTEs are not stored as database objects; they are temporary and exist only in memory while the query is running.
+
+- Temporary: CTEs exist only for the duration of a single query.
+
+- Named Result Set: They provide a name for a subquery, making the query more readable and maintainable.
+
+- Recursive: CTEs can be recursive, allowing you to work with hierarchical data.
+
+- Multiple CTEs: You can define multiple CTEs within a single query.
+
+- Readability: CTEs improve the readability and structure of complex queries.
+
+- Reusability: They allow you to reuse the result set within the main query, avoiding redundant calculations or subqueries.
+
+```sql
+WITH CTE_Name AS (
+    -- Subquery definition
+    SELECT column1, column2
+    FROM TableName
+    WHERE condition
+)
+-- Main query that uses the CTE
+SELECT column1, column2
+FROM CTE_Name
+WHERE condition;
+```
 
 ## <a name="chapter13"></a>Chapter 13: Advanced SQL Concepts and Best Practices
 
