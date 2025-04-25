@@ -136,7 +136,6 @@
     - [Chapter 5 - Part 3: Filtering Groups with HAVING: Applying Conditions to Aggregated Data](#chapter5part3)
       - [Chapter 5 - Part 3.1: Understanding the HAVING Clause](#chapter5part3.1)
       - [Chapter 5 - Part 3.2: Practical Examples Using the Bookstore Database](#chapter5part3.2)
-      - [Chapter 5 - Part 3.3: Real-World Application](#chapter5part3.3)
     - [Chapter 5 - Part 4: Combining Aggregate Functions and Joins](#chapter5part4)
       - [Chapter 5 - Part 4.1: Understanding the Synergy of Aggregate Functions and Joins](#chapter5part4.1)
       - [Chapter 5 - Part 4.2: Practical Examples in the Bookstore Database](#chapter5part4.2)
@@ -4987,17 +4986,246 @@ These metrics can help the platform understand user engagement and identify area
 
 #### <a name="chapter5part2"></a>Chapter 5 - Part 2: Grouping Data with GROUP BY: Analyzing Data Subsets
 
+Grouping data is a crucial step in data analysis, allowing you to summarize and understand trends within specific subsets of your data. The GROUP BY clause in SQL enables you to categorize rows based on one or more columns, paving the way for applying aggregate functions to each group. This lesson will delve into the mechanics of GROUP BY, demonstrating how to effectively analyze data subsets and extract meaningful insights.
+
 #### <a name="chapter5part2.1"></a>Chapter 5 - Part 2.1: Understanding the GROUP BY Clause
+
+The GROUP BY clause is used in conjunction with aggregate functions (like COUNT, SUM, AVG, MIN, and MAX) to group rows that have the same values in one or more columns into a summary row. The basic syntax is as follows:
+
+```sql
+SELECT column1, column2, aggregate_function(column3)
+FROM table_name
+WHERE condition
+GROUP BY column1, column2
+ORDER BY column1, column2;
+```
+
+- column1, column2: These are the columns by which you want to group the data.
+
+- aggregate_function(column3): This is the aggregate function you want to apply to the grouped data.
+
+- table_name: The name of the table you are querying.
+
+- WHERE condition: An optional clause to filter rows before grouping.
+
+- ORDER BY column1, column2: An optional clause to sort the results after grouping.
+
+**Key Principles:**
+
+- Grouping Logic: GROUP BY combines rows with identical values in the specified columns into groups.
+
+- Aggregate Functions: Aggregate functions operate on these groups, producing a single value for each group.
+
+- Non-Aggregated Columns: Any column in the SELECT list that is not an aggregate function must be included in the GROUP BY clause.
+
+- WHERE vs. GROUP BY: The WHERE clause filters rows before grouping, while the HAVING clause (covered in the next lesson) filters groups after aggregation.
 
 #### <a name="chapter5part2.2"></a>Chapter 5 - Part 2.2: Practical Examples Using the Bookstore Database
 
+Let's continue using the "Online Bookstore" database to illustrate the GROUP BY clause. Assume we have a table called Orders with the following structure:
+
+|OrderID|	CustomerID|	BookID|	OrderDate|	Quantity|	Price|
+| :--------: | :--------: | :--------: |  :--------: |  :--------: | :--------: |
+|1|	101|	201|	2023-01-15|	2|	25.00|
+|2|	102|	202|	2023-01-20|	1|	15.00|
+|3|	101|	203|	2023-01-25|	3|	30.00|
+|4|	103|	201|	2023-02-01|	1|	25.00|
+|5|	102|	202|	2023-02-10|	2|	15.00|
+|6|	101|	201|	2023-02-15|	1|	25.00|
+|7|	103|	203|	2023-02-20|	2|	30.00|
+
+**Example 1: Counting Orders per Customer**
+
+To find the number of orders placed by each customer, we can use the following query:
+
+```sql
+SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders
+FROM Orders
+GROUP BY CustomerID;
+```
+
+This query groups the rows in the Orders table by CustomerID. For each unique CustomerID, the COUNT(OrderID) function counts the number of orders associated with that customer. The result will be a table showing each customer's ID and the corresponding number of orders they placed.
+
+**Example 2: Calculating Total Quantity Sold per Book**
+
+To determine the total quantity of each book sold, we can use the following query:
+
+```sql
+SELECT BookID, SUM(Quantity) AS TotalQuantitySold
+FROM Orders
+GROUP BY BookID;
+```
+
+This query groups the rows by BookID. For each unique BookID, the SUM(Quantity) function calculates the total quantity sold for that book. The result will show each book's ID and the total quantity sold.
+
+**Example 3: Finding the Average Order Price per Customer**
+
+To calculate the average order price for each customer, we can use the following query:
+
+```sql
+SELECT CustomerID, AVG(Price) AS AverageOrderPrice
+FROM Orders
+GROUP BY CustomerID;
+```
+
+This query groups the rows by CustomerID. For each unique CustomerID, the AVG(Price) function calculates the average price of orders placed by that customer.
+
+**Example 4: Combining WHERE and GROUP BY**
+
+Suppose we want to find the number of orders placed by each customer only for orders placed in January 2023. We can combine the WHERE clause with the GROUP BY clause:
+
+```sql
+SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders
+FROM Orders
+WHERE OrderDate BETWEEN '2023-01-01' AND '2023-01-31'
+GROUP BY CustomerID;
+```
+
+The WHERE clause filters the rows to include only orders placed in January 2023 before the grouping occurs. Then, the GROUP BY clause groups the filtered rows by CustomerID, and the COUNT(OrderID) function counts the number of orders for each customer in that month.
+
+**Example 5: Grouping by Multiple Columns**
+
+You can group by multiple columns to create more granular groupings. For example, to find the number of orders for each book placed by each customer, you can use the following query:
+
+```sql
+SELECT CustomerID, BookID, COUNT(OrderID) AS NumberOfOrders
+FROM Orders
+GROUP BY CustomerID, BookID
+ORDER BY CustomerID, BookID;
+```
+
+This query groups the rows by both CustomerID and BookID. The result will show each unique combination of customer and book, along with the number of orders for that combination. The ORDER BY clause sorts the results first by CustomerID and then by BookID for better readability.
+
 #### <a name="chapter5part3"></a>Chapter 5 - Part 3: Filtering Groups with HAVING: Applying Conditions to Aggregated Data
+
+Filtering groups with aggregated data is a crucial step in SQL analysis, allowing you to focus on subsets of your data that meet specific criteria after aggregation. The HAVING clause is the key to achieving this, acting as a WHERE clause for groups. Understanding how to use HAVING effectively unlocks more sophisticated data insights and reporting capabilities.
 
 #### <a name="chapter5part3.1"></a>Chapter 5 - Part 3.1: Understanding the HAVING Clause
 
+The HAVING clause is used in SQL to filter the results of a GROUP BY query. It allows you to specify conditions that aggregated group must meet to be included in the final result set. Think of it as a WHERE clause that operates on groups rather than individual rows.
+
+**Syntax**
+
+The basic syntax of the HAVING clause is as follows:
+
+```sql
+SELECT column1, column2, aggregate_function(column3)
+FROM table_name
+WHERE condition -- Optional: Filters rows *before* grouping
+GROUP BY column1, column2
+HAVING condition_on_aggregate; -- Filters groups *after* grouping
+```
+
+- SELECT: Specifies the columns to retrieve, including aggregated values.
+- FROM: Specifies the table to retrieve data from.
+- WHERE: (Optional) Filters rows before the grouping occurs. This is important for performance, as it reduces the amount of data that needs to be grouped.
+- GROUP BY: Specifies the columns to group the rows by.
+- HAVING: Specifies the condition that groups must satisfy to be included in the result. This condition typically involves aggregate functions.
+
+**Key Differences Between WHERE and HAVING**
+
+It's essential to understand the difference between the WHERE and HAVING clauses:
+
+|Feature|	WHERE Clause|	HAVING Clause|
+| :--------: | :--------: | :--------: |
+|Filtering|	Filters individual rows.|	Filters groups of rows (after aggregation).|
+|Usage|	Used before the GROUP BY clause.|	Used after the GROUP BY clause.|
+|Conditions|	Can use any column in the table.|	Typically uses aggregate functions.|
+|Performance|	Filters data early, improving performance.|	Filters data later, after aggregation.|
+
+**Example:**
+
+Imagine you want to find all departments in a company that have an average salary greater than $60,000.
+
+- WHERE would be used to filter individual employees based on their salary before grouping them into departments.
+- HAVING would be used to filter the grouped departments based on the average salary calculated for each department.
+
+**When to Use HAVING**
+
+Use the HAVING clause when you need to filter based on the result of an aggregate function. If you can filter rows before grouping using a WHERE clause, that's generally more efficient.
+
 #### <a name="chapter5part3.2"></a>Chapter 5 - Part 3.2: Practical Examples Using the Bookstore Database
 
-#### <a name="chapter5part3.3"></a>Chapter 5 - Part 3.3: Real-World Application
+Let's apply the HAVING clause to our "Online Bookstore" database. Assume we have the following tables:
+
+- Books: book_id, title, author_id, genre, price
+- Authors: author_id, author_name
+- Orders: order_id, book_id, quantity, order_date
+
+**Example 1: Finding Genres with Average Price Above a Threshold**
+
+Suppose we want to find all book genres where the average price of books in that genre is greater than $25.
+
+```sql
+SELECT genre, AVG(price) AS average_price
+FROM Books
+GROUP BY genre
+HAVING AVG(price) > 25;
+```
+
+**Explanation:**
+
+- SELECT genre, AVG(price) AS average_price: Selects the genre and calculates the average price, aliasing it as average_price.
+- FROM Books: Specifies the Books table.
+- GROUP BY genre: Groups the books by genre.
+- HAVING AVG(price) > 25: Filters the groups, including only those where the average price is greater than $25.
+
+**Example 2: Finding Authors with More Than Two Books**
+
+Let's find all authors who have written more than two books in our bookstore.
+
+```sql
+SELECT Authors.author_name, COUNT(Books.book_id) AS book_count
+FROM Authors
+JOIN Books ON Authors.author_id = Books.author_id
+GROUP BY Authors.author_name
+HAVING COUNT(Books.book_id) > 2;
+```
+
+**Explanation:**
+
+- SELECT Authors.author_name, COUNT(Books.book_id) AS book_count: Selects the author's name and counts the number of books written by each author, aliasing it as book_count.
+- FROM Authors JOIN Books ON Authors.author_id = Books.author_id: Joins the Authors and Books tables on the author_id column.
+- GROUP BY Authors.author_name: Groups the results by author name.
+- HAVING COUNT(Books.book_id) > 2: Filters the groups, including only those authors who have written more than two books.
+
+**Example 3: Combining WHERE and HAVING**
+
+Now, let's combine WHERE and HAVING. Suppose we want to find genres (excluding 'Fiction') where the average book price is greater than $20.
+
+```sql
+SELECT genre, AVG(price) AS average_price
+FROM Books
+WHERE genre <> 'Fiction'
+GROUP BY genre
+HAVING AVG(price) > 20;
+```
+
+**Explanation:**
+
+- SELECT genre, AVG(price) AS average_price: Selects the genre and calculates the average price.
+- FROM Books: Specifies the Books table.
+- WHERE genre <> 'Fiction': Filters the rows before grouping, excluding books in the 'Fiction' genre.
+- GROUP BY genre: Groups the books by genre.
+- HAVING AVG(price) > 20: Filters the groups, including only those where the average price is greater than $20.
+
+**Example 4: Using Multiple Conditions in HAVING**
+
+You can also use multiple conditions in the HAVING clause using AND and OR operators. For example, let's find genres where the average price is greater than $20 and the number of books is greater than 5.
+
+```sql
+SELECT genre, AVG(price) AS average_price, COUNT(*) AS book_count
+FROM Books
+GROUP BY genre
+HAVING AVG(price) > 20 AND COUNT(*) > 5;
+```
+
+**Explanation:**
+
+- SELECT genre, AVG(price) AS average_price, COUNT(*) AS book_count: Selects the genre, calculates the average price, and counts the number of books in each genre.
+- FROM Books: Specifies the Books table.
+- GROUP BY genre: Groups the books by genre.
+- HAVING AVG(price) > 20 AND COUNT(*) > 5: Filters the groups, including only those where the average price is greater than $20 and the number of books is greater than 5.
 
 #### <a name="chapter5part4"></a>Chapter 5 - Part 4: Combining Aggregate Functions and Joins
 
