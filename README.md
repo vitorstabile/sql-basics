@@ -6559,16 +6559,161 @@ In this example:
 
 You can use various comparison operators with single-row subqueries:
 
-- =: Equal to
-- >: Greater than
-- <: Less than
-- >=: Greater than or equal to
-- <=: Less than or equal to
-- <> or !=: Not equal to
+- ```=```: Equal to
+- ```>```: Greater than
+- ```<```: Less than
+- ```>=```: Greater than or equal to
+- ```<=```: Less than or equal to
+- ```<> or !=```: Not equal to
+
+**Example: Finding Authors Who Have Written the Most Expensive Book**
+
+Suppose you want to find the author who wrote the most expensive book.
+
+First, find the maximum price:
+
+```sql
+SELECT MAX(price)
+FROM books;
+```
+
+Then, use this in the outer query to find the author:
+
+```sql
+SELECT author_name
+FROM authors
+WHERE author_id IN (SELECT author_id FROM books WHERE price = (SELECT MAX(price) FROM books));
+```
+
+This query first finds the maximum price of any book and then selects the author's name from the authors table where the author_id matches the author_id of the book with the maximum price. Note the use of IN here because the subquery SELECT author_id FROM books WHERE price = (SELECT MAX(price) FROM books) could potentially return multiple author_ids if multiple books have the same maximum price.
+
+**Handling NULL Values in Single-Row Subqueries**
+
+If a single-row subquery returns NULL, the comparison in the WHERE clause will usually evaluate to UNKNOWN, and no rows will be returned. It's important to consider this possibility and handle NULL values appropriately, perhaps by using IS NULL or IS NOT NULL in conjunction with your subquery.
 
 #### <a name="chapter11part2.3"></a>Chapter 11 - Part 2.3: Multiple-Row Subqueries
 
+Multiple-row subqueries return a set of values, not just a single value. Therefore, you can't use standard comparison operators like =, >, or < directly. Instead, you use operators like IN, NOT IN, ANY, ALL, and EXISTS.
+
+**The IN Operator**
+
+The IN operator checks if a value exists within a set of values returned by the subquery.
+
+**Example: Finding Books in Specific Categories**
+
+Let's say we want to find all books that belong to either the "Fiction" or "Mystery" categories. Assuming we have a categories table with a category_id and category_name, and the books table has a category_id foreign key.
+
+First, we need to find the category_id for "Fiction" and "Mystery":
+
+```sql
+SELECT category_id
+FROM categories
+WHERE category_name IN ('Fiction', 'Mystery');
+```
+
+Now, we use this subquery to find the books:
+
+```sql
+SELECT title, category_id
+FROM books
+WHERE category_id IN (SELECT category_id FROM categories WHERE category_name IN ('Fiction', 'Mystery'));
+```
+
+In this example:
+
+- The subquery (SELECT category_id FROM categories WHERE category_name IN ('Fiction', 'Mystery')) returns a list of category_ids for the specified categories.
+- The outer query SELECT title, category_id FROM books WHERE category_id IN ... selects the title and category_id of books where the category_id is in the list returned by the subquery.
+
+**The NOT IN Operator**
+
+The NOT IN operator checks if a value does not exist within a set of values returned by the subquery.
+
+**Example: Finding Books Not in Specific Categories**
+
+To find books that don't belong to "Fiction" or "Mystery" categories:
+
+```sql
+SELECT title, category_id
+FROM books
+WHERE category_id NOT IN (SELECT category_id FROM categories WHERE category_name IN ('Fiction', 'Mystery'));
+```
+
+**The ANY and ALL Operators**
+
+The ANY and ALL operators are used to compare a single value to a range of values returned by the subquery.
+
+- ANY: Returns true if the comparison is true for any of the values returned by the subquery.
+- ALL: Returns true if the comparison is true for all of the values returned by the subquery.
+
+**Example: Using ANY**
+
+Suppose you want to find books that have a price greater than at least one of the prices in a specific category (e.g., "Science Fiction").
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > ANY (SELECT price FROM books WHERE category_id = (SELECT category_id FROM categories WHERE category_name = 'Science Fiction'));
+```
+
+This query finds all books whose price is greater than the price of any book in the "Science Fiction" category.
+
+**Example: Using ALL**
+
+Suppose you want to find books that have a price greater than all of the prices in a specific category (e.g., "Science Fiction").
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > ALL (SELECT price FROM books WHERE category_id = (SELECT category_id FROM categories WHERE category_name = 'Science Fiction'));
+```
+
+This query finds all books whose price is greater than the price of every book in the "Science Fiction" category.
+
+**The EXISTS Operator**
+
+The EXISTS operator checks for the existence of rows that meet a certain condition in a subquery. It returns true if the subquery returns at least one row, and false otherwise. EXISTS does not require you to retrieve any specific columns from the subquery; it only cares about whether any rows are returned.
+
+**Example: Finding Authors Who Have Written Books in the "Mystery" Category**
+
+```sql
+SELECT author_name
+FROM authors
+WHERE EXISTS (SELECT 1 FROM books b
+              JOIN categories c ON b.category_id = c.category_id
+              WHERE b.author_id = authors.author_id
+              AND c.category_name = 'Mystery');
+```
+
+**In this example**:
+
+- The subquery (SELECT 1 FROM books b JOIN categories c ON b.category_id = c.category_id WHERE b.author_id = authors.author_id AND c.category_name = 'Mystery') checks if there is at least one book written by the author (from the outer query) that belongs to the "Mystery" category. The SELECT 1 is a common practice with EXISTS because the actual value returned doesn't matter; only the existence of a row is important.
+- The outer query SELECT author_name FROM authors WHERE EXISTS ... selects the name of authors for whom the subquery returns true (i.e., authors who have written books in the "Mystery" category).
+
 #### <a name="chapter11part2.4"></a>Chapter 11 - Part 2.4: Correlated Subqueries
+
+A correlated subquery is a subquery that refers to a column from the outer query. In other words, the subquery depends on the outer query for its values. Correlated subqueries are executed once for each row in the outer query.
+
+**Example: Finding Books Priced Higher Than the Average Price for Their Category**
+
+Let's say we want to find books that are priced higher than the average price of books within the same category.
+
+```sql
+SELECT title, price, category_id
+FROM books AS b1
+WHERE price > (SELECT AVG(price)
+               FROM books AS b2
+               WHERE b2.category_id = b1.category_id);
+```
+
+In this example:
+
+- The outer query SELECT title, price, category_id FROM books AS b1 selects the title, price, and category_id from the books table (aliased as b1).
+- The subquery (SELECT AVG(price) FROM books AS b2 WHERE b2.category_id = b1.category_id) calculates the average price of books within the same category as the current book in the outer query. The WHERE b2.category_id = b1.category_id part is what makes this a correlated subquery; it references the category_id from the outer query's b1 alias.
+- The WHERE price > ... clause in the outer query filters the books to only include those whose price is greater than the average price of books in their respective categories.
+
+**Performance Considerations with Correlated Subqueries**
+
+Correlated subqueries can be less efficient than non-correlated subqueries because they are executed for each row of the outer query. Therefore, it's important to use them judiciously and consider alternative approaches, such as using joins, if performance becomes an issue.
 
 #### <a name="chapter11part3"></a>Chapter 11 - Part 3: Using Subqueries in SELECT Clauses
 
