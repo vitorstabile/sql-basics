@@ -6196,15 +6196,304 @@ SELECT City FROM Orders;
 
 #### <a name="chapter11part1"></a>Chapter 11 - Part 1: Introduction to Subqueries: Queries Within Queries
 
+Subqueries are a powerful tool in SQL that allow you to embed one query inside another. This enables you to solve complex data retrieval problems by breaking them down into smaller, more manageable steps. They are essential for tasks like filtering data based on the results of another query, calculating aggregate values for use in comparisons, and creating dynamic datasets. This lesson will provide a comprehensive introduction to subqueries, covering their syntax, different types, and practical applications, particularly within the context of the "Online Bookstore" database we've been using.
+
 #### <a name="chapter11part1.1"></a>Chapter 11 - Part 1.1: Understanding Subqueries
+
+A subquery, also known as an inner query or nested query, is a SQL query embedded inside another SQL query. The outer query is often referred to as the main query. Subqueries are used to perform a query within a query, allowing you to use the result of the inner query to filter or manipulate data in the outer query.
+
+**Subquery Syntax**
+
+The basic syntax of a subquery involves placing a SELECT statement inside parentheses () within another SQL statement. The subquery is executed first, and its result is then used by the outer query.
+
+```sql
+SELECT column1, column2
+FROM table_name
+WHERE column_name IN (SELECT column_name FROM another_table WHERE condition);
+```
+
+In this example:
+
+- The SELECT column1, column2 FROM table_name is the outer query.
+- The (SELECT column_name FROM another_table WHERE condition) is the subquery.
+- The subquery is executed first, returning a set of values.
+- The outer query then uses the IN operator to filter rows from table_name based on the values returned by the subquery.
+
+**Types of Subqueries**
+
+Subqueries can be classified based on their return type and usage:
+
+- **Scalar Subqueries**: These return a single value. They can be used anywhere a single value is expected, such as in WHERE clauses, SELECT lists, or HAVING clauses.
+
+- **Column Subqueries**: These return a single column of multiple rows. They are often used with operators like IN, NOT IN, ANY, or ALL in the WHERE clause.
+
+- **Table Subqueries**: These return a table (one or more columns and one or more rows). They can be used in the FROM clause as if they were a regular table (often requiring an alias).
+
+- **Correlated Subqueries**: These depend on the outer query for their values. The outer query iterates through each row, and the subquery is executed for each row.
 
 #### <a name="chapter11part1.2"></a>Chapter 11 - Part 1.2: Using Subqueries in WHERE Clauses
 
+Subqueries are frequently used in WHERE clauses to filter rows based on a condition that depends on the result of another query.
+
+**Scalar Subqueries in WHERE Clauses**
+
+A scalar subquery returns a single value. This value can then be used in a comparison within the WHERE clause.
+
+**Example**: Find all books in the "Online Bookstore" database that have a price higher than the average price of all books.
+
+First, let's assume we have a books table with columns like book_id, title, and price.
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > (SELECT AVG(price) FROM books);
+```
+
+In this example:
+
+- The subquery (SELECT AVG(price) FROM books) calculates the average price of all books in the books table.
+- The outer query then selects the title and price of all books where the price is greater than the average price returned by the subquery.
+
+**Explanation**:
+
+- The subquery SELECT AVG(price) FROM books is executed first. Let's say it returns a value of 25.00 (the average book price).
+
+- The outer query becomes SELECT title, price FROM books WHERE price > 25.00.
+
+- The outer query then retrieves all books from the books table where the price is greater than 25.00.
+
+**Another Example**: Find all authors whose total book sales exceed a certain threshold. Assume we have an authors table with author_id and name, and a sales table with book_id, author_id, and quantity_sold.
+
+```sql
+SELECT a.name
+FROM authors a
+WHERE a.author_id IN (SELECT s.author_id FROM sales s GROUP BY s.author_id HAVING SUM(s.quantity_sold) > 1000);
+```
+
+Here, the subquery identifies author_id values where the sum of quantity_sold exceeds 1000. The outer query then retrieves the names of those authors.
+
+**Column Subqueries with IN, NOT IN, ANY, and ALL**
+
+Column subqueries return a single column of multiple rows. These are often used with operators like IN, NOT IN, ANY, and ALL.
+
+**Example**: Find all books that belong to genres that have at least one book with a price greater than $30.
+
+```sql
+SELECT title, price, genre_id
+FROM books
+WHERE genre_id IN (SELECT genre_id FROM books WHERE price > 30);
+```
+
+In this example:
+
+- The subquery (SELECT genre_id FROM books WHERE price > 30) returns a list of genre_id values for genres that have at least one book with a price greater than 30.
+
+- The outer query then selects the title, price, and genre_id of all books where the genre_id is in the list returned by the subquery.
+
+**Explanation**:
+
+- The subquery SELECT genre_id FROM books WHERE price > 30 is executed first. Let's say it returns the values (1, 3).
+
+- The outer query becomes SELECT title, price, genre_id FROM books WHERE genre_id IN (1, 3).
+
+- The outer query then retrieves all books from the books table where the genre_id is either 1 or 3.
+
+**Using NOT IN**: To find all books that do not belong to genres that have at least one book with a price greater than $30, you would use NOT IN:
+
+```sql
+SELECT title, price, genre_id
+FROM books
+WHERE genre_id NOT IN (SELECT genre_id FROM books WHERE price > 30);
+```
+
+**Using ANY (or SOME)**: The ANY operator returns true if any of the subquery values meet the condition.
+
+**Example**: Find books with a price greater than at least one book in the 'Fiction' genre.
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > ANY (SELECT price FROM books WHERE genre_id = (SELECT genre_id FROM genres WHERE genre_name = 'Fiction'));
+```
+
+**Using ALL**: The ALL operator returns true if all of the subquery values meet the condition.
+
+**Example**: Find books with a price greater than all books in the 'Fiction' genre.
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > ALL (SELECT price FROM books WHERE genre_id = (SELECT genre_id FROM genres WHERE genre_name = 'Fiction'));
+```
+
+**Correlated Subqueries in WHERE Clauses**
+
+A correlated subquery is a subquery that references a column from the outer query. This means that the subquery is executed once for each row in the outer query. Correlated subqueries can be less efficient than non-correlated subqueries, but they are necessary for certain types of queries.
+
+**Example**: Find all authors who have written at least one book in the same genre as another author.
+
+```sql
+SELECT a1.name
+FROM authors a1
+WHERE EXISTS (SELECT 1 FROM books b1 JOIN books b2 ON b1.genre_id = b2.genre_id WHERE b1.author_id = a1.author_id AND b2.author_id <> a1.author_id);
+```
+
+In this example:
+
+- The outer query selects the name from the authors table (aliased as a1).
+- The correlated subquery checks if there exists any book (b1) written by the current author (a1) that shares the same genre_id with another book (b2) written by a different author.
+- The EXISTS operator returns true if the subquery returns at least one row, indicating that the author has written a book in the same genre as another author.
+
+**Explanation**:
+
+- The outer query starts by selecting the first author from the authors table.
+- The correlated subquery is executed for that author. It checks if there exists any book written by that author that shares the same genre_id with another book written by a different author.
+- If the subquery returns at least one row (i.e., the EXISTS operator returns true), the author's name is included in the result set.
+- The process is repeated for each author in the authors table.
+
 #### <a name="chapter11part1.3"></a>Chapter 11 - Part 1.3: Using Subqueries in SELECT Clauses
+
+Subqueries can also be used in the SELECT clause to return a value for each row in the outer query. These are typically scalar subqueries, as they must return a single value.
+
+**Example**: For each book, display its title and the average price of all books in the same genre.
+
+```sql
+SELECT
+    b.title,
+    (SELECT AVG(price) FROM books WHERE genre_id = b.genre_id) AS avg_genre_price
+FROM
+    books b;
+```
+
+In this example:
+
+- The outer query selects the title from the books table (aliased as b).
+- The subquery (SELECT AVG(price) FROM books WHERE genre_id = b.genre_id) calculates the average price of all books in the same genre as the current book.
+- The result of the subquery is aliased as avg_genre_price and included in the result set for each book.
+
+**Explanation**:
+
+- The outer query starts by selecting the first book from the books table.
+- The subquery is executed for that book. It calculates the average price of all books in the same genre as the current book.
+- The result of the subquery (the average genre price) is included in the result set for that book.
+- The process is repeated for each book in the books table.
+
+**Another Example**: Display each author's name along with the total number of books they have written.
+
+```sql
+SELECT
+    a.name,
+    (SELECT COUNT(*) FROM books WHERE author_id = a.author_id) AS total_books
+FROM
+    authors a;
+```
+
+Here, the subquery counts the number of books for each author, and the outer query displays the author's name along with this count.
 
 #### <a name="chapter11part1.4"></a>Chapter 11 - Part 1.4: Table Subqueries in the FROM Clause
 
+Table subqueries, also known as derived tables, are subqueries used in the FROM clause. They allow you to treat the result of a subquery as if it were a table. Derived tables must be given an alias.
+
+**Example**: Find the genres with an average book price greater than $28.
+
+```sql
+SELECT genre_name, avg_price
+FROM (SELECT genre_id, AVG(price) AS avg_price FROM books GROUP BY genre_id) AS genre_avg
+JOIN genres ON genre_avg.genre_id = genres.genre_id
+WHERE avg_price > 28;
+```
+
+In this example:
+
+- The subquery (SELECT genre_id, AVG(price) AS avg_price FROM books GROUP BY genre_id) calculates the average price for each genre and returns a table with genre_id and avg_price columns.
+- This subquery is aliased as genre_avg.
+- The outer query joins the genre_avg derived table with the genres table on the genre_id column.
+- The WHERE clause filters the results to include only genres where the avg_price is greater than 28.
+
+**Explanation**:
+
+- The subquery SELECT genre_id, AVG(price) AS avg_price FROM books GROUP BY genre_id is executed first. It returns a table with the average price for each genre.
+- The outer query treats this table as if it were a regular table named genre_avg.
+- The outer query joins genre_avg with the genres table to retrieve the genre_name for each genre.
+- The WHERE clause filters the results to include only genres where the avg_price is greater than 28.
+
+**Another Example**: Find the top 3 most popular books (based on sales quantity). Assume we have a sales table with book_id and quantity_sold.
+
+```sql
+SELECT b.title, sub.total_sold
+FROM (SELECT book_id, SUM(quantity_sold) AS total_sold FROM sales GROUP BY book_id ORDER BY total_sold DESC LIMIT 3) AS sub
+JOIN books b ON sub.book_id = b.book_id;
+```
+
+Here, the subquery calculates the total quantity sold for each book, orders the results in descending order, and limits the result to the top 3. The outer query then joins this derived table with the books table to retrieve the titles of these top 3 books.
+
 #### <a name="chapter11part1.5"></a>Chapter 11 - Part 1.5: Table Subqueries in the HAVING Clause
+
+The HAVING clause is used to filter groups created by the GROUP BY clause. When you use a subquery in the HAVING clause, you're essentially saying, "Only include those groups where some condition, evaluated by this subquery, is true."
+
+**Syntax**
+
+```sql
+SELECT column1, column2, aggregate_function(column3)
+FROM table_name
+WHERE condition -- Optional WHERE clause to filter rows *before* grouping
+GROUP BY column1, column2
+HAVING condition_involving_subquery;
+```
+
+**Explanation**
+
+- SELECT column1, column2, aggregate_function(column3): This selects the columns you want to display and calculates aggregate functions (like COUNT, SUM, AVG, MIN, MAX) for each group.
+- FROM table_name: Specifies the table you're querying.
+- WHERE condition: Optional. Filters the rows before they are grouped. This is important for performance; filter as early as possible.
+- GROUP BY column1, column2: Groups the rows based on the specified columns. All rows with the same values for column1 and column2 will be in the same group.
+- HAVING condition_involving_subquery: This is where the magic happens. The HAVING clause filters the groups created by the GROUP BY clause. The condition_involving_subquery is a boolean expression that must be true for a group to be included in the final result. The subquery is evaluated for each group.
+
+**Example Scenario: Bookstore Database**
+
+Let's say we want to find all book categories in our bookstore database where the average price of books in that category is higher than the average price of all books in the database.
+
+```sql
+SELECT category, AVG(price) AS avg_price
+FROM books
+GROUP BY category
+HAVING AVG(price) > (SELECT AVG(price) FROM books);
+```
+
+**Breakdown**
+
+- SELECT category, AVG(price) AS avg_price: Selects the book category and calculates the average price for each category, aliasing it as avg_price.
+- FROM books: Specifies the books table.
+- GROUP BY category: Groups the books by their category.
+- HAVING AVG(price) > (SELECT AVG(price) FROM books): This is the key part.
+  - AVG(price): Calculates the average price for the current category being considered by the HAVING clause.
+  - (SELECT AVG(price) FROM books): This is the subquery. It calculates the average price of all books in the books table. This subquery is executed once for the entire query.
+  - >: The HAVING clause only includes those categories where the average price for that category is greater than the overall average price.
+    
+**Important Considerations**
+
+- Subquery Type: The subquery in the HAVING clause often returns a single value (like in the example above). This is a scalar subquery. It can also be a correlated subquery (explained below).
+- Correlated Subqueries: A correlated subquery refers to a column from the outer query. This means the subquery is evaluated for each group processed by the HAVING clause. Correlated subqueries can be less efficient than non-correlated subqueries.
+- Performance: Using subqueries in the HAVING clause can sometimes impact performance, especially with large datasets. Make sure you have appropriate indexes on the tables involved. Consider alternative approaches (like using temporary tables or common table expressions - CTEs) if performance becomes an issue.
+- Readability: While powerful, complex subqueries can make your SQL harder to read. Use clear aliases and formatting to improve readability. Consider breaking down complex logic into smaller, more manageable subqueries or CTEs.
+
+**Example of Correlated Subquery (Less Common, but Illustrative)**
+
+Let's say you want to find categories where the average book price is higher than the average price of books published in the last year within that same category.
+
+```sql
+SELECT category, AVG(price) AS avg_price
+FROM books
+GROUP BY category
+HAVING AVG(price) > (
+    SELECT AVG(price)
+    FROM books AS b2
+    WHERE b2.category = books.category  -- Correlated subquery!
+      AND b2.publication_date >= DATE('now', '-1 year')
+);
+```
+
+In this case, the subquery is correlated because b2.category = books.category refers to the category column from the outer query. The subquery is evaluated separately for each category to determine the average price of books published in the last year within that category.
 
 #### <a name="chapter11part2"></a>Chapter 11 - Part 2: Using Subqueries in WHERE Clauses
 
