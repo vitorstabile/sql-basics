@@ -6717,13 +6717,108 @@ Correlated subqueries can be less efficient than non-correlated subqueries becau
 
 #### <a name="chapter11part3"></a>Chapter 11 - Part 3: Using Subqueries in SELECT Clauses
 
+Subqueries are powerful tools in SQL that allow you to perform complex data retrieval and manipulation. While they can be used in various parts of a SQL query, using them in the SELECT clause offers a unique way to enrich your result sets with calculated or related data. This lesson will explore how to effectively use subqueries within the SELECT clause to enhance your queries and derive more meaningful insights from your data.
+
 #### <a name="chapter11part3.1"></a>Chapter 11 - Part 3.1: Understanding Subqueries in the SELECT Clause
+
+A subquery, also known as an inner query or nested query, is a query embedded inside another SQL query. When used in the SELECT clause, a subquery acts as an expression that returns a single value. This value is then included as a column in the result set of the main query.
+
+The primary purpose of using subqueries in the SELECT clause is to calculate values that are related to each row in the main query's result set. This is particularly useful when you need to perform aggregations or lookups that depend on the specific context of each row.
+
+**Key Characteristics**
+
+- **Single Value Return**: Subqueries in the SELECT clause must return a single value (i.e., one column and one row). If a subquery returns multiple rows or columns, it will result in an error.
+
+- **Correlation (Optional)**: Subqueries can be either correlated or uncorrelated. A correlated subquery refers to columns from the outer query, meaning it depends on the current row being processed by the outer query. An uncorrelated subquery is independent of the outer query and returns the same value for every row.
+
+- **Readability**: While powerful, subqueries can sometimes make queries harder to read. It's important to format your queries clearly and use aliases to improve readability.
 
 #### <a name="chapter11part3.2"></a>Chapter 11 - Part 3.2: Uncorrelated Subqueries in the SELECT Clause
 
+An uncorrelated subquery in the SELECT clause is independent of the outer query. It's evaluated only once and the resulting single value is applied to every row of the outer query's result set.
+
+**Example: Calculating Percentage of Total Sales**
+
+Let's say we want to calculate the percentage of each book's sales compared to the total sales in our online bookstore database. We can use an uncorrelated subquery to find the total sales and then use that value to calculate the percentage for each book.
+
+```sql
+SELECT
+    book_title,
+    price,
+    (price / (SELECT SUM(price) FROM books)) * 100 AS percentage_of_total_sales
+FROM
+    books;
+```
+
+In this example:
+
+- The outer query selects the book_title and price from the books table.
+- The subquery (SELECT SUM(price) FROM books) calculates the total price of all books in the books table. This subquery is uncorrelated because it doesn't reference any columns from the outer query.
+- The result of the subquery (total price) is then used to calculate the percentage_of_total_sales for each book.
+
+**Another Example: Displaying the Average Book Price**
+
+Suppose you want to display the average book price alongside each book's details. You can use an uncorrelated subquery to retrieve the average price.
+
+```sql
+SELECT
+    book_title,
+    price,
+    (SELECT AVG(price) FROM books) AS average_book_price
+FROM
+    books;
+```
+
+Here, the subquery (SELECT AVG(price) FROM books) calculates the average price of all books. This value is then displayed as the average_book_price for each row in the result set.
+
 #### <a name="chapter11part3.3"></a>Chapter 11 - Part 3.3: Correlated Subqueries in the SELECT Clause
 
+A correlated subquery in the SELECT clause depends on the outer query. It references one or more columns from the outer query, meaning it's evaluated once for each row processed by the outer query. This allows you to calculate values that are specific to each row.
+
+**Example: Finding the Number of Books Above the Average Price per Category**
+
+Let's say we want to find the number of books in each category that have a price above the average price for that category.
+
+First, we need to add a category column to the books table. Let's assume we've done that. Now we can use a correlated subquery to achieve this:
+
+```sql
+SELECT
+    book_title,
+    price,
+    category,
+    (SELECT AVG(price) FROM books AS b2 WHERE b2.category = b1.category) AS average_category_price
+FROM
+    books AS b1;
+```
+
+In this example:
+
+- The outer query selects the book_title, price, and category from the books table (aliased as b1).
+- The subquery (SELECT AVG(price) FROM books AS b2 WHERE b2.category = b1.category) calculates the average price for the current book's category. This subquery is correlated because it references the category column from the outer query (b1.category).
+- The subquery is evaluated for each row in the outer query, so the average_category_price is specific to each book's category.
+
+**Another Example: Calculating the Difference from the Category Average**
+
+Building on the previous example, we can calculate the difference between each book's price and the average price of its category:
+
+```sql
+SELECT
+    book_title,
+    price,
+    category,
+    price - (SELECT AVG(price) FROM books AS b2 WHERE b2.category = b1.category) AS difference_from_average
+FROM
+    books AS b1;
+```
+
+This query extends the previous one by subtracting the average category price (calculated by the correlated subquery) from the book's price. The result, difference_from_average, shows how much each book's price deviates from its category's average.
+
 #### <a name="chapter11part3.4"></a>Chapter 11 - Part 3.4: Practical Considerations and Best Practices
+
+- **Performance**: Subqueries in the SELECT clause, especially correlated ones, can impact performance. The database has to execute the subquery for each row of the outer query. Consider alternative approaches like using JOINs or temporary tables for better performance, especially with large datasets.
+- **Readability**: Complex subqueries can make your SQL code difficult to understand. Use aliases, indentation, and comments to improve readability. Break down complex queries into smaller, more manageable parts if necessary.
+- **Testing**: Always test your queries thoroughly to ensure they return the correct results. Pay close attention to edge cases and potential null values.
+- **Alternatives**: Before using a subquery in the SELECT clause, consider whether a JOIN or a window function (which will be covered in a later module) could achieve the same result more efficiently.
 
 #### <a name="chapter11part4"></a>Chapter 11 - Part 4: Creating Views: Virtual Tables for Simplified Queries
 
