@@ -6472,10 +6472,10 @@ HAVING AVG(price) > (SELECT AVG(price) FROM books);
     
 **Important Considerations**
 
-- Subquery Type: The subquery in the HAVING clause often returns a single value (like in the example above). This is a scalar subquery. It can also be a correlated subquery (explained below).
-- Correlated Subqueries: A correlated subquery refers to a column from the outer query. This means the subquery is evaluated for each group processed by the HAVING clause. Correlated subqueries can be less efficient than non-correlated subqueries.
-- Performance: Using subqueries in the HAVING clause can sometimes impact performance, especially with large datasets. Make sure you have appropriate indexes on the tables involved. Consider alternative approaches (like using temporary tables or common table expressions - CTEs) if performance becomes an issue.
-- Readability: While powerful, complex subqueries can make your SQL harder to read. Use clear aliases and formatting to improve readability. Consider breaking down complex logic into smaller, more manageable subqueries or CTEs.
+- **Subquery Type**: The subquery in the HAVING clause often returns a single value (like in the example above). This is a scalar subquery. It can also be a correlated subquery (explained below).
+- **Correlated Subqueries**: A correlated subquery refers to a column from the outer query. This means the subquery is evaluated for each group processed by the HAVING clause. Correlated subqueries can be less efficient than non-correlated subqueries.
+- **Performance**: Using subqueries in the HAVING clause can sometimes impact performance, especially with large datasets. Make sure you have appropriate indexes on the tables involved. Consider alternative approaches (like using temporary tables or common table expressions - CTEs) if performance becomes an issue.
+- **Readability**: While powerful, complex subqueries can make your SQL harder to read. Use clear aliases and formatting to improve readability. Consider breaking down complex logic into smaller, more manageable subqueries or CTEs.
 
 **Example of Correlated Subquery (Less Common, but Illustrative)**
 
@@ -6497,9 +6497,74 @@ In this case, the subquery is correlated because b2.category = books.category re
 
 #### <a name="chapter11part2"></a>Chapter 11 - Part 2: Using Subqueries in WHERE Clauses
 
+Subqueries are a powerful tool in SQL that allow you to write more complex and flexible queries. They essentially involve embedding one query inside another. This lesson focuses on using subqueries specifically within the WHERE clause, which allows you to filter data based on the results of another query. This is particularly useful when you need to compare values against a set of values that are not explicitly known or are derived from other tables.
+
 #### <a name="chapter11part2.1"></a>Chapter 11 - Part 2.1: Understanding Subqueries in WHERE Clauses
 
+A subquery is a SQL query nested inside another SQL query. The inner query (the subquery) is executed first, and its result is used by the outer query. When used in a WHERE clause, the subquery's result is typically used to filter the rows returned by the outer query.
+
+The basic syntax looks like this:
+
+```sql
+SELECT column1, column2
+FROM table_name
+WHERE column_name operator (SELECT column_name FROM another_table WHERE condition);
+```
+
+Here's a breakdown:
+
+- SELECT column1, column2 FROM table_name: This is the outer query, which selects data from a table.
+- WHERE column_name operator (SELECT column_name FROM another_table WHERE condition): This is the WHERE clause that uses a subquery.
+- column_name: The column in the outer query's table that you want to filter.
+- operator: A comparison operator like =, >, <, >=, <=, IN, NOT IN, ANY, ALL, or EXISTS.
+- (SELECT column_name FROM another_table WHERE condition): The subquery, which returns a single value or a set of values.
+
+**Types of Subqueries in WHERE Clauses**
+
+There are primarily two types of subqueries you'll use in WHERE clauses:
+
+- **Single-row subqueries**: These subqueries return only one row and one column. They can be used with comparison operators like =, >, <, >=, and <=.
+
+- **Multiple-row subqueries**: These subqueries return one or more rows. They are typically used with operators like IN, NOT IN, ANY, ALL, and EXISTS.
+
 #### <a name="chapter11part2.2"></a>Chapter 11 - Part 2.2: Single-Row Subqueries
+
+Single-row subqueries are used when you need to compare a value against a single, known value that is the result of another query.
+
+**Example: Finding Books Priced Higher Than the Average Price**
+
+Let's say we want to find all books in our "Online Bookstore" database that have a price higher than the average price of all books.
+
+First, we need to find the average price of all books. This will be our subquery:
+
+```sql
+SELECT AVG(price)
+FROM books;
+```
+
+Now, we can use this subquery in the WHERE clause of our main query:
+
+```sql
+SELECT title, price
+FROM books
+WHERE price > (SELECT AVG(price) FROM books);
+```
+
+In this example:
+
+- The subquery (SELECT AVG(price) FROM books) calculates the average price of all books.
+- The outer query SELECT title, price FROM books WHERE price > ... selects the title and price of books where the price is greater than the result of the subquery (the average price).
+
+**Common Operators with Single-Row Subqueries**
+
+You can use various comparison operators with single-row subqueries:
+
+- =: Equal to
+- >: Greater than
+- <: Less than
+- >=: Greater than or equal to
+- <=: Less than or equal to
+- <> or !=: Not equal to
 
 #### <a name="chapter11part2.3"></a>Chapter 11 - Part 2.3: Multiple-Row Subqueries
 
