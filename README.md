@@ -206,10 +206,10 @@
     - [Chapter 13 - Part 4: SQL Injection Prevention: Writing Secure Queries](#chapter13part4)
       - [Chapter 13 - Part 4.1: Understanding SQL Injection](#chapter13part4.1)
       - [Chapter 13 - Part 4.2: Preventing SQL Injection: Secure Coding Practices](#chapter13part4.2)
-    - [Chapter 13 - Part 5: Introduction to Stored Procedures and Functions](#chapter13part5)
+    - [Chapter 13 - Part 5: Introduction to Stored Procedures, Functions and Triggers](#chapter13part5)
       - [Chapter 13 - Part 5.1: Understanding Stored Procedures](#chapter13part5.1)
       - [Chapter 13 - Part 5.2: Understanding Functions](#chapter13part5.2)
-      - [Chapter 13 - Part 5.3: Real-World Applications](#chapter13part5.3)
+      - [Chapter 13 - Part 5.3: Understanding Triggers](#chapter13part5.3)
     - [Chapter 13 - Part 6: Best Practices for Writing Clean and Efficient SQL Code](#chapter13part6)
       - [Chapter 13 - Part 6.1: Importance of Code Readability](#chapter13part6.1)
       - [Chapter 13 - Part 6.2: Writing Efficient SQL Queries](#chapter13part6.2)
@@ -8396,11 +8396,294 @@ Regular security audits and penetration testing are essential for identifying an
 
 #### <a name="chapter13part5"></a>Chapter 13 - Part 5: Introduction to Stored Procedures and Functions
 
+Stored procedures and functions are powerful tools in SQL that allow you to encapsulate and reuse code, improving efficiency, maintainability, and security. They are precompiled SQL code that can be executed with a single command, reducing network traffic and improving performance. This lesson will introduce you to the fundamental concepts of stored procedures and functions, their benefits, and how to create and use them.
+
 #### <a name="chapter13part5.1"></a>Chapter 13 - Part 5.1: Understanding Stored Procedures
+
+Stored procedures are named collections of SQL statements that are stored in the database. They can accept input parameters, perform operations, and return output parameters.
+
+**Benefits of Stored Procedures**
+
+- **Modularity**: Stored procedures break down complex tasks into smaller, manageable units, making code easier to understand and maintain.
+- **Reusability**: Once created, a stored procedure can be called multiple times from different applications or parts of the database.
+- **Performance**: Stored procedures are precompiled and stored on the database server, reducing the overhead of parsing and compiling SQL statements each time they are executed.
+- **Security**: Stored procedures can help protect data by encapsulating data access logic and controlling user permissions. You can grant users permission to execute a stored procedure without giving them direct access to the underlying tables.
+- **Reduced Network Traffic**: Instead of sending multiple SQL statements over the network, you can execute a single stored procedure, reducing network traffic and improving performance.
+
+**Creating Stored Procedures**
+
+The syntax for creating a stored procedure varies slightly depending on the database system you are using (e.g., MySQL, PostgreSQL, SQL Server). Here's a general example using MySQL syntax:
+
+```sql
+DELIMITER //  -- Change delimiter to // to allow semicolons within the procedure
+
+CREATE PROCEDURE GetBookDetails(IN book_id INT)
+BEGIN
+    SELECT title, author, price
+    FROM Books
+    WHERE id = book_id;
+END //
+
+DELIMITER ;   -- Reset delimiter to ;
+```
+
+**Explanation**:
+
+- DELIMITER //: This changes the statement delimiter from the default semicolon (;) to //. This is necessary because the stored procedure itself contains semicolons, and we need to tell MySQL to treat the entire CREATE PROCEDURE statement as a single unit.
+- CREATE PROCEDURE GetBookDetails(IN book_id INT): This creates a stored procedure named GetBookDetails that accepts one input parameter, book_id, which is an integer. The IN keyword indicates that this is an input parameter.
+- BEGIN ... END: This block contains the SQL statements that will be executed when the stored procedure is called.
+- SELECT title, author, price FROM Books WHERE id = book_id;: This is the SQL statement that retrieves the title, author, and price of a book from the Books table, based on the provided book_id.
+- DELIMITER ;: This resets the statement delimiter back to the default semicolon.
+
+**Calling Stored Procedures**
+
+To execute a stored procedure, you use the CALL statement:
+
+```sql
+CALL GetBookDetails(1);
+```
+
+This will execute the GetBookDetails stored procedure with book_id set to 1, returning the details of the book with that ID.
+
+**Input and Output Parameters**
+
+Stored procedures can accept input parameters (using the IN keyword), output parameters (using the OUT keyword), and input/output parameters (using the INOUT keyword).
+
+**Example with an Output Parameter (MySQL)**:
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE GetBookCount(OUT total_books INT)
+BEGIN
+    SELECT COUNT(*) INTO total_books
+    FROM Books;
+END //
+
+DELIMITER ;
+
+CALL GetBookCount(@book_count);  -- Call the procedure and store the output in @book_count
+SELECT @book_count;             -- Display the value of @book_count
+```
+
+**Explanation**:
+
+- CREATE PROCEDURE GetBookCount(OUT total_books INT): This creates a stored procedure named GetBookCount that has one output parameter, total_books, which is an integer. The OUT keyword indicates that this is an output parameter.
+- SELECT COUNT(*) INTO total_books FROM Books;: This SQL statement counts the total number of books in the Books table and stores the result in the total_books output parameter.
+- CALL GetBookCount(@book_count);: This calls the stored procedure and assigns the output value to a user-defined variable @book_count.
+- SELECT @book_count;: This displays the value stored in the @book_count variable, which is the total number of books.
+
+**Example with INOUT parameter**
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE UpdateBookPrice(INOUT book_id INT, IN new_price DECIMAL(10, 2))
+BEGIN
+    UPDATE Books
+    SET price = new_price
+    WHERE id = book_id;
+
+    SELECT id INTO book_id FROM Books WHERE id = book_id;
+END //
+
+DELIMITER ;
+
+SET @book_id = 1;
+CALL UpdateBookPrice(@book_id, 26.99);
+SELECT @book_id;
+```
+
+**Explanation**:
+
+- CREATE PROCEDURE UpdateBookPrice(INOUT book_id INT, IN new_price DECIMAL(10, 2)): This creates a stored procedure named UpdateBookPrice that has one INOUT parameter, book_id, which is an integer, and one IN parameter new_price which is a decimal. The INOUT keyword indicates that this parameter is used for both input and output.
+- UPDATE Books SET price = new_price WHERE id = book_id;: This SQL statement updates the price of the book in the Books table where the id matches the book_id INOUT parameter.
+- SELECT id INTO book_id FROM Books WHERE id = book_id;: This SQL statement selects the id of the book from the Books table where the id matches the book_id INOUT parameter and assigns it back to the book_id INOUT parameter.
+- SET @book_id = 1;: This sets the user-defined variable @book_id to 1.
+- CALL UpdateBookPrice(@book_id, 26.99);: This calls the stored procedure and passes the user-defined variable @book_id as the INOUT parameter and 26.99 as the IN parameter.
+- SELECT @book_id;: This displays the value stored in the @book_id variable, which is the id of the book that was updated.
 
 #### <a name="chapter13part5.2"></a>Chapter 13 - Part 5.2: Understanding Functions
 
-#### <a name="chapter13part5.3"></a>Chapter 13 - Part 5.3: Real-World Applications
+Functions in SQL are similar to stored procedures, but they have some key differences. Functions are designed to perform a specific calculation and return a single value. They are typically used within SQL statements, such as in SELECT clauses or WHERE clauses.
+
+**Benefits of Functions**
+
+- **Code Reusability**: Functions can be used in multiple SQL statements, reducing code duplication.
+- **Modularity**: Functions encapsulate specific calculations, making code easier to understand and maintain.
+- **Improved Readability**: Using functions can make SQL statements more concise and easier to read.
+
+**Creating Functions**
+
+The syntax for creating functions also varies depending on the database system. Here's a general example using MySQL syntax:
+
+```sql
+DELIMITER //
+
+CREATE FUNCTION CalculateDiscountedPrice(price DECIMAL(10, 2), discount DECIMAL(5, 2))
+RETURNS DECIMAL(10, 2)
+DETERMINISTIC
+BEGIN
+    DECLARE discounted_price DECIMAL(10, 2);
+    SET discounted_price = price * (1 - discount);
+    RETURN discounted_price;
+END //
+
+DELIMITER ;
+```
+
+**Explanation**:
+
+- DELIMITER //: Changes the delimiter to allow semicolons within the function definition.
+- CREATE FUNCTION CalculateDiscountedPrice(price DECIMAL(10, 2), discount DECIMAL(5, 2)): Creates a function named CalculateDiscountedPrice that accepts two input parameters: price (a decimal number with 10 digits and 2 decimal places) and discount (a decimal number with 5 digits and 2 decimal places).
+- RETURNS DECIMAL(10, 2): Specifies that the function will return a decimal value with 10 digits and 2 decimal places.
+- DETERMINISTIC: This keyword indicates that the function will always return the same result for the same input values. This is important for optimization and caching.
+- BEGIN ... END: This block contains the SQL statements that will be executed when the function is called.
+- DECLARE discounted_price DECIMAL(10, 2);: Declares a local variable named discounted_price to store the calculated discounted price.
+- SET discounted_price = price * (1 - discount);: Calculates the discounted price by multiplying the original price by (1 - discount).
+- RETURN discounted_price;: Returns the calculated discounted price.
+- DELIMITER ;: Resets the delimiter back to the default semicolon.
+
+**Calling Functions**
+
+To use a function, you simply call it within an SQL statement:
+
+```sql
+SELECT title, price, CalculateDiscountedPrice(price, 0.10) AS discounted_price
+FROM Books;
+```
+
+This will retrieve the title, price, and discounted price (with a 10% discount) for each book in the Books table.
+
+**Types of Functions**
+
+- **Built-in Functions**: SQL provides a variety of built-in functions for common tasks such as string manipulation, date calculations, and mathematical operations (e.g., UPPER(), NOW(), AVG()).
+- **User-Defined Functions (UDFs)**: These are functions that you create yourself to perform specific tasks that are not covered by the built-in functions.
+
+**Deterministic vs. Non-Deterministic Functions**
+
+- **Deterministic Functions**: These functions always return the same result for the same input values. The CalculateDiscountedPrice function in the previous example is a deterministic function.
+- **Non-Deterministic Functions**: These functions may return different results for the same input values. For example, a function that returns the current timestamp (NOW()) is a non-deterministic function.
+
+It's important to declare functions as DETERMINISTIC when they are, in fact, deterministic. This allows the database system to optimize queries that use the function.
+
+**Restrictions on Functions**
+
+Functions have certain restrictions compared to stored procedures:
+
+- Functions must return a value.
+- Functions typically cannot modify data (e.g., perform INSERT, UPDATE, or DELETE operations).
+- Functions should be deterministic whenever possible.
+
+#### <a name="chapter13part5.3"></a>Chapter 13 - Part 5.3: Understanding Triggers
+
+Triggers are a special type of stored procedure in SQL that automatically executes in response to certain events on a particular table or view. Think of them as event listeners that sit and wait for something to happen to your data, and then spring into action.
+
+**Key Concepts**:
+
+- **Event**: The action that causes the trigger to fire (e.g., INSERT, UPDATE, DELETE).
+- **Timing**: When the trigger fires, either BEFORE or AFTER the event.
+- **Table/View**: The specific table or view the trigger is associated with.
+- **Action**: The SQL code that the trigger executes when it fires.
+
+**Why Use Triggers?**
+
+- **Auditing**: Track changes to data over time (e.g., who updated a record and when).
+- **Data Validation**: Enforce complex business rules that can't be handled by constraints alone.
+- **Data Integrity**: Ensure consistency across related tables.
+- **Automation**: Automate tasks based on data changes (e.g., sending notifications).
+
+**Example Scenario:**
+
+Imagine you want to keep a log of every time a book's price is updated in your Books table. You could create a trigger that fires AFTER UPDATE on the Books table. This trigger would then insert a record into an AuditLog table, capturing the book's ID, the old price, the new price, and the timestamp of the update.
+
+**Basic Syntax (General Idea)**:
+
+```sql
+CREATE TRIGGER trigger_name
+{BEFORE | AFTER} {event}
+ON table_name
+FOR EACH ROW
+BEGIN
+  -- SQL code to execute
+END;
+```
+
+**Explanation**:
+
+- CREATE TRIGGER trigger_name: Assigns a name to your trigger.
+- {BEFORE | AFTER}: Specifies when the trigger should execute relative to the event.
+- {event}: Specifies the event that activates the trigger (e.g., INSERT, UPDATE, DELETE). You can often specify multiple events (e.g., INSERT OR UPDATE).
+- ON table_name: Specifies the table the trigger is associated with.
+- FOR EACH ROW: Indicates that the trigger should execute for each row affected by the event. (Some databases also support FOR EACH STATEMENT triggers, which fire once per statement, regardless of how many rows are affected.)
+- BEGIN ... END: Encloses the SQL code that the trigger will execute.
+
+**Important Considerations**:
+
+- **Performance**: Triggers can impact database performance, especially if they contain complex logic. Use them judiciously.
+- **Complexity**: Overuse of triggers can make a database harder to understand and maintain.
+- **Recursion**: Be careful to avoid creating triggers that trigger themselves (recursive triggers), as this can lead to infinite loops.
+
+**Scenario:**
+
+We want to track when new books are added to the Books table. We'll create a trigger that, after a new book is inserted, inserts a record into a BookInsertLog table with the book's ID and the timestamp of the insertion.
+
+**1. Create the BookInsertLog Table:**
+
+First, we need a table to store the log data.
+
+```sql
+CREATE TABLE BookInsertLog (
+    LogID INTEGER PRIMARY KEY AUTOINCREMENT,
+    BookID INTEGER,
+    InsertTimestamp DATETIME
+);
+```
+
+**2. Create the Trigger:**
+
+Now, let's create the trigger that will automatically insert a record into the BookInsertLog table whenever a new book is added to the Books table.
+
+```sql
+CREATE TRIGGER LogNewBook
+AFTER INSERT ON Books
+BEGIN
+    INSERT INTO BookInsertLog (BookID, InsertTimestamp)
+    VALUES (NEW.BookID, DATETIME('now'));
+END;
+```
+
+**Explanation:**
+
+- CREATE TRIGGER LogNewBook: Creates a trigger named LogNewBook.
+- AFTER INSERT ON Books: Specifies that the trigger should fire after a new row is inserted into the Books table.
+- BEGIN ... END: Encloses the SQL code to be executed.
+- INSERT INTO BookInsertLog (BookID, InsertTimestamp) VALUES (NEW.BookID, DATETIME('now'));: This is the core of the trigger.
+  - NEW.BookID: NEW is a special keyword that refers to the newly inserted row in the Books table. NEW.BookID accesses the BookID column of that new row.
+  - DATETIME('now'): This function (specific to SQLite, but similar functions exist in other databases) gets the current date and time.
+ 
+**How to Test It**:
+
+**1. Insert a new book into the Books table**:
+
+```sql
+INSERT INTO Books (Title, AuthorID, GenreID, Price, Quantity)
+VALUES ('The AI Revolution', 5, 3, 29.99, 20);
+```
+
+**2. Check the BookInsertLog table**:
+
+```sql
+SELECT * FROM BookInsertLog;
+```
+
+You should see a new row in the BookInsertLog table with the BookID of the newly inserted book and the current timestamp.
+
+**Important Notes**:
+
+- NEW Keyword: The NEW keyword is crucial. It allows you to access the values of the newly inserted row.
+- Database-Specific Syntax: The DATETIME('now') function is specific to SQLite. Other databases have similar functions (e.g., NOW() in MySQL, GETDATE() in SQL Server, CURRENT_TIMESTAMP in PostgreSQL). You'll need to adjust the syntax accordingly.
+- Error Handling: In a real-world scenario, you might want to add error handling to your trigger to gracefully handle potential issues (e.g., if the BookInsertLog table is unavailable).
 
 #### <a name="chapter13part6"></a>Chapter 13 - Part 6: Best Practices for Writing Clean and Efficient SQL Code
 
