@@ -210,14 +210,17 @@
       - [Chapter 13 - Part 5.1: Understanding Stored Procedures](#chapter13part5.1)
       - [Chapter 13 - Part 5.2: Understanding Functions](#chapter13part5.2)
       - [Chapter 13 - Part 5.3: Understanding Triggers](#chapter13part5.3)
-    - [Chapter 13 - Part 6: Best Practices for Writing Clean and Efficient SQL Code](#chapter13part6)
-      - [Chapter 13 - Part 6.1: Importance of Code Readability](#chapter13part6.1)
-      - [Chapter 13 - Part 6.2: Writing Efficient SQL Queries](#chapter13part6.2)
-    - [Chapter 13 - Part 7: Next Steps: Further Learning and Resources](#chapter13part7)
-      - [Chapter 13 - Part 7.1: Delving Deeper: Advanced SQL Topics](#chapter13part7.1)
-      - [Chapter 13 - Part 7.2: Online Resources and Communities](#chapter13part7.2)
-      - [Chapter 13 - Part 7.3: Practical Projects and Exercises](#chapter13part7.3)
-      - [Chapter 13 - Part 7.4: Best Practices for Continuous Learning](#chapter13part7.4)
+    - [Chapter 13 - Part 6: Introduction to Window Functions](#chapter13part6)
+      - [Chapter 13 - Part 6.1: Understanding Window Functions](#chapter13part6.1)
+      - [Chapter 13 - Part 6.2: Common Window Functions](#chapter13part6.2)
+    - [Chapter 13 - Part 7: Best Practices for Writing Clean and Efficient SQL Code](#chapter13part7)
+      - [Chapter 13 - Part 7.1: Importance of Code Readability](#chapter13part7.1)
+      - [Chapter 13 - Part 7.2: Writing Efficient SQL Queries](#chapter13part7.2)
+    - [Chapter 13 - Part 8: Next Steps: Further Learning and Resources](#chapter13part8)
+      - [Chapter 13 - Part 8.1: Delving Deeper: Advanced SQL Topics](#chapter13part8.1)
+      - [Chapter 13 - Part 8.2: Online Resources and Communities](#chapter13part8.2)
+      - [Chapter 13 - Part 8.3: Practical Projects and Exercises](#chapter13part8.3)
+      - [Chapter 13 - Part 8.4: Best Practices for Continuous Learning](#chapter13part8.4)
 30. [Appendix A: Useful DuckDB Code Snippet](#appendixa)
     - [Appendix A - Part 1: Remove characters from VARCHARS using REGEXP_REPLACE](#appendixapart1)
     - [Appendix A - Part 2: Check if a column have different values in other column](#appendixapart2)
@@ -8685,21 +8688,155 @@ You should see a new row in the BookInsertLog table with the BookID of the newly
 - Database-Specific Syntax: The DATETIME('now') function is specific to SQLite. Other databases have similar functions (e.g., NOW() in MySQL, GETDATE() in SQL Server, CURRENT_TIMESTAMP in PostgreSQL). You'll need to adjust the syntax accordingly.
 - Error Handling: In a real-world scenario, you might want to add error handling to your trigger to gracefully handle potential issues (e.g., if the BookInsertLog table is unavailable).
 
-#### <a name="chapter13part6"></a>Chapter 13 - Part 6: Best Practices for Writing Clean and Efficient SQL Code
+#### <a name="chapter13part6"></a>Chapter 13 - Part 6: Introduction to Window Functions
 
-#### <a name="chapter13part6.1"></a>Chapter 13 - Part 6.1: Importance of Code Readability
+Window functions are a powerful feature in SQL that allow you to perform calculations across sets of rows that are related to the current row. Unlike aggregate functions that collapse rows into a single output row, window functions retain the individual rows while providing aggregated or ranked data alongside them. This makes them incredibly useful for tasks like calculating running totals, moving averages, and ranking within partitions of data. They provide a way to gain deeper insights into your data without resorting to complex subqueries or procedural code.
 
-#### <a name="chapter13part6.2"></a>Chapter 13 - Part 6.2: Writing Efficient SQL Queries
+#### <a name="chapter13part6"></a>Chapter 13 - Part 6.1: Understanding Window Functions
 
-#### <a name="chapter13part7"></a>Chapter 13 - Part 7: Next Steps: Further Learning and Resources
+Window functions operate on a "window" of rows, which is a set of rows related to the current row. This window is defined using the OVER() clause. The OVER() clause specifies how the rows are partitioned and ordered for the window function calculation.
 
-#### <a name="chapter13part7.1"></a>Chapter 13 - Part 7.1: Delving Deeper: Advanced SQL Topics
+**The OVER() Clause**
 
-#### <a name="chapter13part7.2"></a>Chapter 13 - Part 7.2: Online Resources and Communities
+The OVER() clause is the heart of window functions. It determines the scope of the calculation. The basic syntax is:
 
-#### <a name="chapter13part7.3"></a>Chapter 13 - Part 7.3: Practical Projects and Exercises
+```sql
+function_name() OVER (
+  [PARTITION BY column1, column2, ...]
+  [ORDER BY column1, column2, ...]
+)
+```
 
-#### <a name="chapter13part7.4"></a>Chapter 13 - Part 7.4: Best Practices for Continuous Learning
+- function_name(): This is the window function you want to use (e.g., RANK(), SUM(), AVG()).
+- PARTITION BY: This clause divides the rows into partitions based on the specified columns. The window function is applied separately to each partition. If omitted, the entire result set is treated as a single partition.
+- ORDER BY: This clause defines the order of rows within each partition. This is important for functions that depend on the order of rows, such as RANK() or calculating running totals.
+
+**Partitioning**
+
+Partitioning divides the result set into groups of rows. The window function is then applied to each partition independently. Think of it as resetting the calculation for each group.
+
+**Example**:
+
+Imagine a table called employees with columns department and salary. To calculate the average salary within each department, you would partition by the department column.
+
+```sql
+SELECT
+    employee_name,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department) AS avg_department_salary
+FROM
+    employees;
+```
+
+In this query, AVG(salary) is calculated separately for each department. Each row will show the employee's name, department, salary, and the average salary for their department.
+
+**Ordering**
+
+Ordering defines the sequence in which rows are processed within each partition. This is crucial for functions that rely on the order of rows, such as calculating running totals or ranking.
+
+**Example**:
+
+Using the employees table again, let's rank employees within each department based on their salary.
+
+```sql
+SELECT
+    employee_name,
+    department,
+    salary,
+    RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank
+FROM
+    employees;
+```
+
+Here, RANK() assigns a rank to each employee based on their salary within their department. The ORDER BY salary DESC clause ensures that employees with higher salaries get a higher rank.
+
+**Framing (Brief Introduction)**
+
+While not covered in detail in this lesson (as it's more advanced), it's important to be aware of the concept of "framing" within the OVER() clause. Framing allows you to further refine the window of rows used for the calculation. You can specify a range of rows relative to the current row, such as the previous row, the next row, or a specific number of rows before or after the current row. This is often used for calculating moving averages or cumulative sums over a specific time period. Framing will be covered in more detail in a later lesson.
+
+#### <a name="chapter13part6"></a>Chapter 13 - Part 6.2: Common Window Functions
+
+This lesson introduces three fundamental window functions: RANK(), DENSE_RANK(), and ROW_NUMBER(). These functions are used for assigning ranks to rows within a partition.
+
+**RANK()**
+
+```sql
+The RANK() function assigns a rank to each row within a partition based on the specified ordering. If two or more rows have the same value for the ordering column(s), they receive the same rank. The next rank is then skipped.
+```
+
+**Example**:
+
+```sql
+SELECT
+    product_name,
+    category,
+    price,
+    RANK() OVER (PARTITION BY category ORDER BY price DESC) AS price_rank
+FROM
+    products;
+```
+
+If two products in the same category have the same price, they will both receive the same rank. If they are ranked 2, the next product will be ranked 4.
+
+**DENSE_RANK()**
+
+The DENSE_RANK() function is similar to RANK(), but it assigns consecutive ranks without skipping any ranks, even if there are ties.
+
+**Example**:
+
+```sql
+SELECT
+    product_name,
+    category,
+    price,
+    DENSE_RANK() OVER (PARTITION BY category ORDER BY price DESC) AS price_rank
+FROM
+    products;
+```
+
+If two products in the same category have the same price and are ranked 2, the next product will be ranked 3.
+
+**ROW_NUMBER()**
+
+The ROW_NUMBER() function assigns a unique sequential integer to each row within a partition, regardless of the values in the ordering column(s).
+
+```sql
+SELECT
+    product_name,
+    category,
+    price,
+    ROW_NUMBER() OVER (PARTITION BY category ORDER BY price DESC) AS row_num
+FROM
+    products;
+```
+
+Each product within a category will receive a unique row number, starting from 1.
+
+**Comparison Table**
+
+
+|Function|	Skips Ranks	|Consecutive Ranks	|Unique Row Number|
+| :------: | :------: | :------: | :------: |
+|RANK()|	Yes|	No|	No|
+|DENSE_RANK()|	No|	Yes|	No|
+|ROW_NUMBER()|	No|	Yes|	Yes|
+
+#### <a name="chapter13part7"></a>Chapter 13 - Part 7: Best Practices for Writing Clean and Efficient SQL Code
+
+#### <a name="chapter13part7.1"></a>Chapter 13 - Part 7.1: Importance of Code Readability
+
+#### <a name="chapter13part7.2"></a>Chapter 13 - Part 7.2: Writing Efficient SQL Queries
+
+#### <a name="chapter13part8"></a>Chapter 13 - Part 8: Next Steps: Further Learning and Resources
+
+#### <a name="chapter13part8.1"></a>Chapter 13 - Part 8.1: Delving Deeper: Advanced SQL Topics
+
+#### <a name="chapter13part8.2"></a>Chapter 13 - Part 8.2: Online Resources and Communities
+
+#### <a name="chapter13part8.3"></a>Chapter 13 - Part 8.3: Practical Projects and Exercises
+
+#### <a name="chapter13part8.4"></a>Chapter 13 - Part 8.4: Best Practices for Continuous Learning
 
 ## <a name="appendixa"></a>Appendix A: Useful DuckDB Code Snippet
 
