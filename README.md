@@ -7928,11 +7928,200 @@ SELECT * FROM books WHERE MATCH(description) AGAINST('science fiction' IN NATURA
 
 #### <a name="chapter13part3"></a>Chapter 13 - Part 3: Using EXPLAIN to Analyze Query Performance
 
+Understanding how your SQL queries perform is crucial for building efficient and responsive applications. The EXPLAIN statement is a powerful tool that allows you to analyze the execution plan of a query, revealing how the database intends to retrieve and process the data. By understanding the output of EXPLAIN, you can identify potential bottlenecks and optimize your queries for better performance. This lesson will delve into the intricacies of using EXPLAIN to analyze query performance, focusing on how to interpret its output and apply that knowledge to improve your SQL code.
+
 #### <a name="chapter13part3.1"></a>Chapter 13 - Part 3.1: Introduction to EXPLAIN
+
+The EXPLAIN statement in SQL provides insights into the query execution plan. It shows you the steps the database will take to execute your query, including which indexes it will use (or not use), the order in which tables will be joined, and the estimated cost of each operation. This information is invaluable for identifying performance bottlenecks and optimizing your queries.
+
+**How EXPLAIN Works**
+
+When you prepend EXPLAIN to a SELECT, INSERT, UPDATE, or DELETE statement, the database parses the query and generates an execution plan without actually executing the query. The execution plan is then presented as a table, with each row representing a step in the query execution process. The columns in the output provide details about each step, such as the table being accessed, the type of access (e.g., using an index or a full table scan), and the number of rows estimated to be processed.
+
+**Syntax of EXPLAIN**
+
+The basic syntax for using EXPLAIN is simple:
+
+```sql
+EXPLAIN SELECT * FROM table_name WHERE condition;
+```
+
+Different database systems may offer variations or extensions to the EXPLAIN statement. For example, MySQL has EXPLAIN EXTENDED and EXPLAIN PARTITIONS, while PostgreSQL has EXPLAIN ANALYZE. These extensions provide more detailed information about the query execution plan, including actual execution times and row counts. However, the basic EXPLAIN statement is supported by most SQL databases.
 
 #### <a name="chapter13part3.2"></a>Chapter 13 - Part 3.2: Interpreting EXPLAIN Output
 
+The output of EXPLAIN can vary depending on the database system you are using, but the fundamental concepts remain the same. Let's examine the key columns that are commonly found in EXPLAIN output and how to interpret them. We'll use examples based on the "Online Bookstore" database introduced in Module 1.
+
+**Key Columns in EXPLAIN Output**
+
+- **id**: The ID of the SELECT statement involved in the row. If you have subqueries or unions, you'll see different IDs for each part of the query. A higher ID generally indicates that the operation is performed later in the query execution.
+
+- **select_type**: Describes the type of SELECT statement. Common values include:
+  - SIMPLE: The simplest type of query, without subqueries or unions.
+  - PRIMARY: The outermost SELECT statement in a query with subqueries.
+  - SUBQUERY: The first SELECT statement in a subquery.
+  - DERIVED: A SELECT statement in the FROM clause that creates a temporary table.
+  - UNION: The second or later SELECT statement in a UNION.
+  - UNION RESULT: The result of a UNION.
+ 
+- **table**: The table that the row refers to. This indicates which table is being accessed in each step of the query execution.
+
+- **partitions**: (MySQL-specific) The partitions from which the table will fetch records.
+
+- **type**: This is one of the most important columns. It describes how the table is accessed. Common values, ordered from best to worst, include:
+  - system: The table has only one row (ideal, but rare).
+  - const: The table has at most one matching row, which is read at the start of the query. Very fast.
+  - eq_ref: One row is read from this table for each combination of rows from the previous tables. Uses an index.
+  - ref: All matching rows are read from this table for each combination of rows from the previous tables. Uses an index.
+  - range: Only rows within a given range are retrieved, using an index.
+  - index: A full index scan is performed. This is better than a full table scan but still not ideal.
+  - ALL: A full table scan is performed. This is the worst-case scenario and should be avoided if possible.
+ 
+- **possible_keys**: The indexes that could be used to find the rows in this table. This doesn't mean that the database will use these indexes, but they are available.
+
+- **key**: The index that the database actually chose to use. If this is NULL, no index was used.
+
+- **key_len**: The length of the index that was used. This can help you understand which parts of a composite index were used.
+
+- **ref**: The columns or constants that are compared to the index.
+
+- **rows**: An estimate of the number of rows that will be examined to produce the final result. This is a crucial metric for assessing query performance. Lower numbers are generally better.
+
+- filtered: (MySQL-specific) An estimate of the percentage of rows that will be filtered out after using the index.
+
+- Extra: Contains additional information about how the query is executed. Common values include:
+  - Using index: The information is retrieved directly from the index, without accessing the table. This is very efficient (covering index).
+  - Using where: The WHERE clause is used to filter rows after they have been retrieved from the table.
+  - Using temporary: A temporary table is created to hold intermediate results. This can be slow.
+  - Using filesort: The rows are sorted using a filesort algorithm, which is slower than using an index.
+  - Using join buffer (Block Nested Loop): The join is performed using a block nested loop algorithm, which can be slow for large tables.
+ 
+**Example 1: Simple SELECT Statement**
+
+Let's start with a simple query to retrieve all books by a specific author from the books table in our "Online Bookstore" database. Assume we have an index on the author_id column.
+
+```sql
+EXPLAIN SELECT * FROM books WHERE author_id = 123;
+```
+
+A possible EXPLAIN output (using MySQL syntax) might look like this:
+
+|id	| select_type	| table	| partitions	| type	| possible_keys	| key	| key_len	| ref	| rows	| filtered	| Extra |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+|1	|SIMPLE	|books	|NULL	|ref	|author_id	|author_id	|4	|const	|10	|100.00	|Using where|
+
+**Interpretation**:
+
+- type: ref indicates that an index is being used to retrieve the rows.
+- possible_keys: author_id shows that the author_id index could be used.
+- key: author_id confirms that the author_id index was actually used.
+- rows: 10 suggests that the database estimates it will need to examine 10 rows to find the matching books.
+- Extra: Using where means that the WHERE clause is being used to filter the rows.
+
+This output indicates that the query is performing well, as it is using an index to retrieve the data.
+
+**Example 2: JOIN Operation**
+
+Now, let's consider a query that joins the books table with the authors table to retrieve the book titles and author names. Assume we have indexes on books.author_id and authors.author_id (primary key).
+
+```sql
+EXPLAIN SELECT b.title, a.name
+FROM books b
+JOIN authors a ON b.author_id = a.author_id
+WHERE a.name = 'Jane Austen';
+```
+
+A possible EXPLAIN output might look like this:
+
+|id	| select_type	| table	| partitions	| type	| possible_keys	| key	| key_len	| ref	| rows	| filtered	| Extra |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+|1	|SIMPLE	|a	|NULL	|const	|PRIMARY	|PRIMARY	|4	|const	|1	|100.00	|Using index|
+|1	|SIMPLE	|b	|NULL	|ref	|author_id	|author_id	|4	|const	|5	|100.00	|Using where|
+
+**Interpretation**:
+
+- The first row represents the access to the authors table (aliased as a).
+  - type: const indicates that the database is using a constant value to access the authors table, which is very efficient.
+  - key: PRIMARY confirms that the primary key index on authors.author_id is being used.
+  - rows: 1 suggests that only one row will be retrieved from the authors table.
+  - Extra: Using index indicates that the data is being retrieved directly from the index, without accessing the table.
+ 
+- The second row represents the access to the books table (aliased as b).
+  - type: ref indicates that an index is being used to retrieve the rows.
+  - key: author_id confirms that the author_id index is being used.
+  - rows: 5 suggests that the database estimates it will need to examine 5 rows to find the matching books.
+  - Extra: Using where means that the WHERE clause is being used to filter the rows.
+ 
+This output indicates that the join operation is also performing well, as it is using indexes to access both tables.
+
+**Example 3: Query Without Index**
+
+Let's consider a query that searches for books based on a column that is not indexed, such as the publication_year.
+
+```sql
+EXPLAIN SELECT * FROM books WHERE publication_year = 2020;
+```
+
+A possible EXPLAIN output might look like this:
+
+|id	| select_type	| table	| partitions	| type	| possible_keys	| key	| key_len	| ref	| rows	| filtered	| Extra |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+|1	|SIMPLE	|books	|NULL	|ALL	|NULL	|NULL	|NULL	|NULL	|1000	|10.00	|Using where|
+
+**Interpretation:**
+
+  - type: ALL indicates that a full table scan is being performed. This is the least efficient access method.
+  - possible_keys: NULL means that no indexes could be used for this query.
+  - key: NULL confirms that no index was used.
+  - rows: 1000 suggests that the database will need to examine all 1000 rows in the books table.
+  - Extra: Using where means that the WHERE clause is being used to filter the rows after they have been retrieved from the table.
+
+This output indicates that the query is performing poorly, as it is performing a full table scan. To improve performance, you should consider adding an index to the publication_year column.
+
 #### <a name="chapter13part3.3"></a>Chapter 13 - Part 3.3: Optimizing Queries Based on EXPLAIN Output
+
+The primary goal of using EXPLAIN is to identify and address performance bottlenecks in your SQL queries. Here are some common optimization techniques based on the EXPLAIN output:
+
+- **Adding Indexes**: If the EXPLAIN output shows a type of ALL (full table scan), consider adding an index to the column(s) used in the WHERE clause. This will allow the database to use an index to quickly locate the matching rows.
+
+- **Covering Indexes**: If the EXPLAIN output shows Using where in the Extra column, it means that the database is retrieving the rows from the table after using the index. To further optimize the query, you can create a covering index that includes all the columns needed in the query. This will allow the database to retrieve the data directly from the index, without accessing the table. The Extra column will show Using index in this case.
+
+- **Rewriting Queries**: Sometimes, the query itself can be rewritten to improve performance. For example, you can avoid using OR conditions in the WHERE clause, as they can prevent the database from using indexes effectively. Instead, you can rewrite the query using UNION or UNION ALL.
+
+- **Optimizing JOINs**: If the EXPLAIN output shows that a join operation is performing poorly, you can try the following:
+  - Ensure that the join columns are indexed.
+  - Use the STRAIGHT_JOIN keyword (in MySQL) to force the database to join the tables in a specific order.
+  - Rewrite the query using subqueries or temporary tables.
+ 
+- **Analyzing Statistics**: The database uses statistics to estimate the cost of different execution plans. If the statistics are outdated, the database may choose a suboptimal plan. You can update the statistics using the ANALYZE TABLE command (in MySQL) or the ANALYZE command (in PostgreSQL).
+
+**Example: Adding an Index**
+
+Based on the previous example where the query on books table using publication_year resulted in a full table scan, let's add an index to the publication_year column:
+
+```sql
+CREATE INDEX idx_publication_year ON books (publication_year);
+```
+
+Now, if we run the EXPLAIN statement again:
+
+```sql
+EXPLAIN SELECT * FROM books WHERE publication_year = 2020;
+```
+
+The EXPLAIN output should now look something like this:
+
+|id	| select_type	| table	| partitions	| type	| possible_keys	| key	| key_len	| ref	| rows	| filtered	| Extra |
+| :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+|1	|SIMPLE	|books	|NULL	|ref	|idx_publication_year	|idx_publication_year	|4	|const	|20	|100.00	|Using where|
+
+**Interpretation**:
+
+- type: ref indicates that an index is being used.
+- key: idx_publication_year confirms that the new index is being used.
+- rows: 20 suggests that the database estimates it will need to examine 20 rows, which is a significant improvement compared to the previous 1000 rows.
+
+This demonstrates how adding an index can dramatically improve query performance.
 
 #### <a name="chapter13part4"></a>Chapter 13 - Part 4: SQL Injection Prevention: Writing Secure Queries
 
