@@ -7987,9 +7987,9 @@ The output of EXPLAIN can vary depending on the database system you are using, b
 
 - **rows**: An estimate of the number of rows that will be examined to produce the final result. This is a crucial metric for assessing query performance. Lower numbers are generally better.
 
-- filtered: (MySQL-specific) An estimate of the percentage of rows that will be filtered out after using the index.
+- **filtered**: (MySQL-specific) An estimate of the percentage of rows that will be filtered out after using the index.
 
-- Extra: Contains additional information about how the query is executed. Common values include:
+- **Extra**: Contains additional information about how the query is executed. Common values include:
   - Using index: The information is retrieved directly from the index, without accessing the table. This is very efficient (covering index).
   - Using where: The WHERE clause is used to filter rows after they have been retrieved from the table.
   - Using temporary: A temporary table is created to hold intermediate results. This can be slow.
@@ -8125,9 +8125,274 @@ This demonstrates how adding an index can dramatically improve query performance
 
 #### <a name="chapter13part4"></a>Chapter 13 - Part 4: SQL Injection Prevention: Writing Secure Queries
 
+SQL injection is a critical security vulnerability that allows attackers to interfere with the queries that an application makes to its database. By crafting malicious SQL statements, attackers can bypass security measures, gain unauthorized access to sensitive data, and even modify or delete data. This lesson will provide a comprehensive understanding of SQL injection, its potential impact, and, most importantly, how to prevent it by writing secure SQL queries. We will build upon the knowledge of SQL syntax and database interactions gained in previous modules to explore various techniques for mitigating this threat.
+
 #### <a name="chapter13part4.1"></a>Chapter 13 - Part 4.1: Understanding SQL Injection
 
+SQL injection occurs when user-supplied input is improperly included in an SQL query string. If the application doesn't sanitize or validate this input, an attacker can inject their own SQL code, altering the query's intended logic. This can lead to a variety of malicious outcomes, depending on the attacker's goals and the application's vulnerabilities.
+
+**How SQL Injection Works: A Simple Example**
+
+Imagine an online bookstore application with a login form. The application constructs an SQL query to authenticate users based on their username and password. A vulnerable query might look like this:
+
+```sql
+SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "';
+```
+
+Here, username and password are variables containing the user's input from the login form. If an attacker enters the following in the username field:
+
+```
+' OR '1'='1
+```
+
+The resulting SQL query becomes:
+
+```sql
+SELECT * FROM users WHERE username = '' OR '1'='1' AND password = '" + password + "';
+```
+
+Since '1'='1' is always true, the query effectively bypasses the username check and returns all users in the users table. The attacker can then potentially gain access to any account.
+
+**Types of SQL Injection**
+
+SQL injection attacks can be categorized based on how the attacker interacts with the database and the information they can retrieve:
+
+- **In-band SQL Injection**: This is the most common type, where the attacker receives the results of their injected query directly through the application's response. The example above demonstrates in-band SQL injection.
+- **Blind SQL Injection**: In this type, the attacker doesn't see the results of their injected query directly. Instead, they infer information based on the application's behavior, such as error messages or changes in response time. This often involves using IF statements or CASE expressions within the injected SQL to test conditions.
+- **Out-of-band SQL Injection**: This is a less common but potentially more dangerous type, where the attacker uses the database server itself to exfiltrate data, often by sending data to an external server they control. This requires specific database server features to be enabled.
+
+**The Impact of SQL Injection**
+
+The consequences of a successful SQL injection attack can be severe:
+
+- **Data Breach**: Attackers can gain access to sensitive data, such as user credentials, financial information, and personal details.
+- **Data Manipulation**: Attackers can modify or delete data, leading to data corruption or loss.
+- **Authentication Bypass**: Attackers can bypass login mechanisms and gain unauthorized access to accounts.
+- **Privilege Escalation**: Attackers can elevate their privileges within the database, allowing them to perform administrative tasks.
+- **Denial of Service**: Attackers can disrupt the application's availability by injecting queries that consume excessive resources or crash the database server.
+- **Remote Code Execution**: In some cases, attackers can even execute arbitrary code on the database server, potentially compromising the entire system.
+
 #### <a name="chapter13part4.2"></a>Chapter 13 - Part 4.2: Preventing SQL Injection: Secure Coding Practices
+
+The key to preventing SQL injection is to treat all user input as untrusted and to avoid directly embedding it into SQL queries. Here are several techniques to achieve this:
+
+**1. Parameterized Queries (Prepared Statements)**
+
+Parameterized queries, also known as prepared statements, are the most effective way to prevent SQL injection. They separate the SQL code from the data, preventing attackers from injecting malicious code.
+
+- **How they work**: Instead of directly embedding user input into the query string, you use placeholders (parameters) that are later bound to the actual data. The database driver handles the proper escaping and quoting of the data, ensuring that it's treated as data, not as part of the SQL code.
+
+**Example (using Python and SQLite)**:
+
+```py
+import sqlite3
+
+# Establish a connection to the database
+conn = sqlite3.connect('bookstore.db')
+cursor = conn.cursor()
+
+# User input (e.g., from a form)
+username = input("Enter username: ")
+password = input("Enter password: ")
+
+# SQL query with placeholders
+query = "SELECT * FROM users WHERE username = ? AND password = ?"
+
+# Execute the query with parameters
+cursor.execute(query, (username, password))
+
+# Fetch the results
+results = cursor.fetchall()
+
+if results:
+    print("Login successful!")
+else:
+    print("Login failed.")
+
+# Close the connection
+conn.close()
+```
+
+In this example, ? are placeholders for the username and password. The cursor.execute() method binds the user-provided values to these placeholders, ensuring that they are treated as data, not as SQL code.
+
+- **Benefits**:
+  - **Complete protection against SQL injection**: The database driver handles all necessary escaping and quoting.
+  - **Improved performance**: The database can cache the prepared statement, leading to faster execution for repeated queries.
+  - **Code readability**: Parameterized queries are generally easier to read and maintain.
+ 
+**2. Input Validation**
+
+While parameterized queries are the primary defense against SQL injection, input validation provides an additional layer of security. It involves verifying that user input conforms to expected formats and constraints.
+
+- **Types of Validation**:
+
+  - **Data Type Validation**: Ensure that input is of the expected data type (e.g., integer, string, email address).
+  - **Length Validation**: Limit the length of input to prevent buffer overflows or other issues.
+  - **Format Validation**: Use regular expressions to enforce specific formats (e.g., email addresses, phone numbers).
+  - **Whitelist Validation**: Only allow specific characters or values that are known to be safe.
+  - **Blacklist Validation**: Disallow specific characters or values that are known to be dangerous (use with caution, as blacklists can be incomplete).
+ 
+**Example (Python):**
+
+```py
+import re
+
+def validate_username(username):
+    """Validates that the username contains only alphanumeric characters and underscores."""
+    pattern = r"^[a-zA-Z0-9_]+$"
+    if re.match(pattern, username):
+        return True
+    else:
+        return False
+
+def validate_email(email):
+    """Validates that the email address is in a valid format."""
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if re.match(pattern, email):
+        return True
+    else:
+        return False
+
+# Example usage
+username = input("Enter username: ")
+if validate_username(username):
+    print("Username is valid.")
+else:
+    print("Username is invalid.")
+
+email = input("Enter email: ")
+if validate_email(email):
+    print("Email is valid.")
+else:
+    print("Email is invalid.")
+```
+
+- **Important Considerations**:
+
+  - **Validate on the server-side**: Client-side validation can be bypassed.
+  - **Use a combination of validation techniques**: Don't rely on a single method.
+  - **Provide informative error messages**: Help users correct invalid input.
+ 
+**3. Escaping User Input**
+
+Escaping user input involves replacing potentially dangerous characters with their escaped equivalents. This prevents these characters from being interpreted as SQL code.
+
+- **How it works**: Each database system has its own escaping rules. For example, in MySQL, you might need to escape single quotes (') with a backslash (\').
+
+**Example (using Python and MySQL):**
+
+```py
+import mysql.connector
+
+# Establish a connection to the database
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="yourusername",
+  password="yourpassword",
+  database="bookstore"
+)
+
+mycursor = mydb.cursor()
+
+# User input
+username = input("Enter username: ")
+
+# Escape the username
+username = mydb.converter.escape(username)
+
+# Construct the SQL query
+sql = "SELECT * FROM users WHERE username = " + username
+
+# Execute the query
+mycursor.execute(sql)
+
+# Fetch the results
+myresult = mycursor.fetchall()
+
+for x in myresult:
+  print(x)
+```
+
+- **Limitations**:
+
+  - **Error-prone**: It's easy to make mistakes when manually escaping characters.
+  - **Database-specific**: Escaping rules vary between database systems.
+  - **Less effective than parameterized queries**: Escaping can be bypassed in certain situations.
+ 
+- **Recommendation**: Use parameterized queries instead of escaping whenever possible. Only use escaping as a last resort or when parameterized queries are not supported.
+
+**4. Least Privilege Principle**
+
+The principle of least privilege dictates that database users should only be granted the minimum necessary privileges to perform their tasks. This limits the potential damage that an attacker can cause if they manage to gain access to an account.
+
+- **Implementation**:
+
+  - **Create separate database users for different applications**: Avoid using the root or administrator account for application access.
+  - **Grant specific privileges to each user**: Only allow users to access the tables and columns they need.
+  - **Use roles to manage privileges**: Roles allow you to group privileges and assign them to users, simplifying administration.
+ 
+**Example (MySQL)**:
+
+```sql
+-- Create a new user for the bookstore application
+CREATE USER 'bookstore_app'@'localhost' IDENTIFIED BY 'password';
+
+-- Grant SELECT privilege on the 'books' table
+GRANT SELECT ON bookstore.books TO 'bookstore_app'@'localhost';
+
+-- Grant INSERT, UPDATE, and DELETE privileges on the 'orders' table
+GRANT INSERT, UPDATE, DELETE ON bookstore.orders TO 'bookstore_app'@'localhost';
+
+-- Revoke all other privileges
+REVOKE ALL PRIVILEGES ON bookstore.* FROM 'bookstore_app'@'localhost';
+
+-- Flush privileges to apply the changes
+FLUSH PRIVILEGES;
+```
+
+**5. Stored Procedures**
+
+Stored procedures are precompiled SQL code stored within the database. They can help prevent SQL injection by encapsulating SQL logic and reducing the need to directly embed user input into queries.
+
+- **How they work**: You pass parameters to the stored procedure, and the procedure handles the data processing and query execution.
+
+**Example (MySQL)**:
+
+```sql
+-- Create a stored procedure to retrieve book details by ID
+DELIMITER //
+CREATE PROCEDURE GetBookDetails(IN book_id INT)
+BEGIN
+  SELECT * FROM books WHERE id = book_id;
+END //
+DELIMITER ;
+
+-- Call the stored procedure
+CALL GetBookDetails(123);
+```
+
+- **Benefits**:
+  - **Reduced SQL injection risk**: Parameters are treated as data, not as SQL code.
+  - **Improved performance**: Stored procedures are precompiled and can be cached.
+  - **Code reusability**: Stored procedures can be called from multiple applications.
+
+- **Important Considerations**:
+  - **Carefully design stored procedures**: Ensure that they don't introduce new vulnerabilities.
+  - **Use parameterized queries within stored procedures**: This provides an additional layer of security.
+ 
+**6. Regular Security Audits and Penetration Testing**
+
+Regular security audits and penetration testing are essential for identifying and addressing potential vulnerabilities in your application.
+
+- **Security Audits**: Involve reviewing your code, configuration, and security policies to identify weaknesses.
+
+- **Penetration Testing**: Involves simulating real-world attacks to test the effectiveness of your security measures.
+
+- **Benefits**:
+
+  - **Proactive identification of vulnerabilities**: Allows you to fix issues before they can be exploited.
+  - **Improved security posture**: Helps you strengthen your defenses against attacks.
+  - **Compliance with security standards**: Many security standards require regular audits and penetration testing.
 
 #### <a name="chapter13part5"></a>Chapter 13 - Part 5: Introduction to Stored Procedures and Functions
 
