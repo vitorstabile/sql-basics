@@ -235,7 +235,7 @@
     - [Appendix A - Part 11: Find Cities that starts and ends with a,e,i,o or u with regex](#appendixapart11)
     - [Appendix A - Part 12: Find Cities that not starts and ends with a,e,i,o or u](#appendixapart12)
     - [Appendix A - Part 13: Using more than One order By](#appendixapart13)
-    - [Appendix A - Part 14: Calculate a Discount for Active Products]()
+    - [Appendix A - Part 14: Calculate a Discount for Active Products](#appendixapart14)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
