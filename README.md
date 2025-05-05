@@ -9878,39 +9878,76 @@ INSERT INTO pricing (sku, barcode, discount_percent, discount_start_date, discou
 ('SW-008', '2233445566778', NULL, NULL, NULL),
 ('PT-006', '3344556677889', 8.00, '2025-05-12', '2025-05-20');
 
-SELECT sku, barcode, discount_percent FROM pricing GROUP BY sku, barcode, discount_percent;
+-- Aproach 1: Calculating the Effective Price  of all products using CASE and RIGHT JOIN
 
-WITH active_discount AS (
-    SELECT
-        pri.sku AS sku,
-        prod.name AS name,
-        pri.barcode AS barcode,
-        prod.price AS price,
-        pri.discount_percent AS discount
-    FROM products AS prod
-    INNER JOIN pricing AS pri
-    ON prod.sku = pri.sku
-    WHERE CURRENT_DATE BETWEEN discount_start_date AND discount_end_date
+WITH active_discounts AS (
+	SELECT
+		sku,
+        MAX(CASE
+            WHEN CURRENT_DATE BETWEEN discount_start_date AND discount_end_date
+            THEN discount_percent
+            ELSE 0
+        END) AS discount_percent
+    FROM pricing
+    GROUP BY sku
 )
+
 SELECT
-    sku AS sku,
-    barcode AS barcode,
+    prod.sku AS sku,
     price AS price,
-    discount AS discount,
-    (price - price*(COALESCE(discount/100,0))) AS effective_price
-FROM active_discount;
+    COALESCE(discount_percent, 0.00) AS discount,
+    (price - price*(COALESCE(discount_percent/100,0))) AS effective_price
+FROM active_discounts AS ac
+RIGHT JOIN products AS prod
+ON prod.sku = ac.sku;
 
-┌─────────┬───────────────┬───────────────┬───────────────┬─────────────────┐
-│   sku   │    barcode    │     price     │   discount    │ effective_price │
-│ varchar │    varchar    │ decimal(10,2) │ decimal(10,2) │     double      │
-├─────────┼───────────────┼───────────────┼───────────────┼─────────────────┤
-│ TS-001  │ 1234567890123 │         25.00 │         10.00 │            22.5 │
-│ PT-005  │ 9876543210987 │         60.00 │         15.50 │            50.7 │
-│ SK-012  │ 1122334455667 │         35.75 │         20.00 │            28.6 │
-│ DR-021  │ 5566778899001 │         75.00 │         12.75 │         65.4375 │
-└─────────┴───────────────┴───────────────┴───────────────┴─────────────────┘
+┌─────────┬───────────────┬───────────────┬─────────────────┐
+│   sku   │     price     │   discount    │ effective_price │
+│ varchar │ decimal(10,2) │ decimal(12,2) │     double      │
+├─────────┼───────────────┼───────────────┼─────────────────┤
+│ TS-001  │         25.00 │         10.00 │            22.5 │
+│ PT-005  │         60.00 │         15.50 │            50.7 │
+│ SK-012  │         35.75 │         20.00 │            28.6 │
+│ DR-021  │         75.00 │         12.75 │         65.4375 │
+│ SW-008  │         55.20 │          0.00 │            55.2 │
+│ PT-006  │         52.99 │          0.00 │           52.99 │
+│ TS-002  │         45.50 │          0.00 │            45.5 │
+└─────────┴───────────────┴───────────────┴─────────────────┘
 
-Another Approach
+-- Aproach 2: Calculating the Effective Price of all products using WHERE, RIGHT JOIN
+
+WITH active_discounts AS (
+	SELECT 
+		sku,
+		MAX(discount_percent) AS discount_percent
+	FROM pricing
+	WHERE CURRENT_DATE BETWEEN discount_start_date AND discount_end_date
+	GROUP BY sku
+)
+
+SELECT
+    prod.sku AS sku,
+    price AS price,
+    COALESCE(discount_percent, 0.00) AS discount,
+    (price - price*(COALESCE(discount_percent/100,0))) AS effective_price
+FROM active_discounts AS ac
+RIGHT JOIN products AS prod
+ON prod.sku = ac.sku;
+
+┌─────────┬───────────────┬───────────────┬─────────────────┐
+│   sku   │     price     │   discount    │ effective_price │
+│ varchar │ decimal(10,2) │ decimal(10,2) │     double      │
+├─────────┼───────────────┼───────────────┼─────────────────┤
+│ TS-001  │         25.00 │         10.00 │            22.5 │
+│ PT-005  │         60.00 │         15.50 │            50.7 │
+│ SK-012  │         35.75 │         20.00 │            28.6 │
+│ DR-021  │         75.00 │         12.75 │         65.4375 │
+│ TS-002  │         45.50 │          0.00 │            45.5 │
+│ SW-008  │         55.20 │          0.00 │            55.2 │
+│ PT-006  │         52.99 │          0.00 │           52.99 │
+└─────────┴───────────────┴───────────────┴─────────────────┘
+
+-- Aproach 3: Calculating the Effective Price of all products using WHERE, LEFT JOIN
 
 WITH ActiveDiscounts AS (
     SELECT
