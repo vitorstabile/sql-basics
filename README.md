@@ -235,6 +235,7 @@
     - [Appendix A - Part 11: Find Cities that starts and ends with a,e,i,o or u with regex](#appendixapart11)
     - [Appendix A - Part 12: Find Cities that not starts and ends with a,e,i,o or u](#appendixapart12)
     - [Appendix A - Part 13: Using more than One order By](#appendixapart13)
+    - [Appendix A - Part 14: Calculate a Discount for Active Products]()
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -9829,5 +9830,116 @@ ORDER BY RIGHT(Name, 3) ASC, ID ASC;
 │ Ashley  │
 │ Julia   │
 └─────────┘
+
+```
+
+ #### <a name="appendixapart14"></a>Appendix A - Part 14: Calculate a Discount for Active Products
+
+
+```
+
+Challenge 1: Calculate the effective price for each product, considering active discounts.
+
+CREATE TABLE products (
+	sku VARCHAR(255) PRIMARY KEY,
+	name VARCHAR(255),
+	category VARCHAR(255),
+	color VARCHAR(255),
+	size VARCHAR(10),
+	price DECIMAL(10,2)
+);
+
+CREATE TABLE pricing (
+	sku VARCHAR(255),
+	barcode VARCHAR(255),
+	discount_percent DECIMAL(10,2),
+	discount_start_date DATE,
+	discount_end_date DATE,
+	FOREIGN KEY (sku) REFERENCES products(sku)
+);
+
+-- Insert data into the 'products' table
+INSERT INTO products (sku, name, category, color, size, price) VALUES
+('TS-001', 'Classic Cotton Tee', 'Tops', 'Blue', 'M', 25.00),
+('TS-002', 'Striped Linen Shirt', 'Tops', 'White', 'L', 45.50),
+('PT-005', 'Slim Fit Jeans', 'Bottoms', 'Blue', '30', 60.00),
+('SK-012', 'A-Line Denim Skirt', 'Bottoms', 'Blue', 'S', 35.75),
+('DR-021', 'Summer Floral Dress', 'Dresses', 'Multi', 'M', 75.00),
+('SW-008', 'Wool Knit Sweater', 'Tops', 'Grey', 'L', 55.20),
+('PT-006', 'Chino Trousers', 'Bottoms', 'Beige', '32', 52.99);
+
+-- Insert data into the 'pricing' table
+INSERT INTO pricing (sku, barcode, discount_percent, discount_start_date, discount_end_date) VALUES
+('TS-001', '1234567890123', 10.00, '2025-05-01', '2025-05-10'),
+('PT-005', '9876543210987', 15.50, '2025-04-20', '2025-05-07'),
+('SK-012', '1122334455667', 20.00, '2025-05-05', '2025-05-15'),
+('TS-001', '1234567890123', 5.00, '2025-03-15', '2025-03-31'),
+('DR-021', '5566778899001', 12.75, '2025-05-03', '2025-05-06'),
+('SW-008', '2233445566778', NULL, NULL, NULL),
+('PT-006', '3344556677889', 8.00, '2025-05-12', '2025-05-20');
+
+SELECT sku, barcode, discount_percent FROM pricing GROUP BY sku, barcode, discount_percent;
+
+WITH active_discount AS (
+    SELECT
+        pri.sku AS sku,
+        prod.name AS name,
+        pri.barcode AS barcode,
+        prod.price AS price,
+        pri.discount_percent AS discount
+    FROM products AS prod
+    INNER JOIN pricing AS pri
+    ON prod.sku = pri.sku
+    WHERE CURRENT_DATE BETWEEN discount_start_date AND discount_end_date
+)
+SELECT
+    sku AS sku,
+    barcode AS barcode,
+    price AS price,
+    discount AS discount,
+    (price - price*(COALESCE(discount/100,0))) AS effective_price
+FROM active_discount;
+
+┌─────────┬───────────────┬───────────────┬───────────────┬─────────────────┐
+│   sku   │    barcode    │     price     │   discount    │ effective_price │
+│ varchar │    varchar    │ decimal(10,2) │ decimal(10,2) │     double      │
+├─────────┼───────────────┼───────────────┼───────────────┼─────────────────┤
+│ TS-001  │ 1234567890123 │         25.00 │         10.00 │            22.5 │
+│ PT-005  │ 9876543210987 │         60.00 │         15.50 │            50.7 │
+│ SK-012  │ 1122334455667 │         35.75 │         20.00 │            28.6 │
+│ DR-021  │ 5566778899001 │         75.00 │         12.75 │         65.4375 │
+└─────────┴───────────────┴───────────────┴───────────────┴─────────────────┘
+
+Another Approach
+
+WITH ActiveDiscounts AS (
+    SELECT
+        sku,
+        MAX(discount_percent) AS max_discount_percent
+    FROM pricing
+    WHERE CURRENT_DATE BETWEEN discount_start_date AND discount_end_date
+    GROUP BY sku
+)
+SELECT
+    p.sku,
+    p.name,
+    p.price,
+    ad.max_discount_percent,
+    p.price * (1 - ad.max_discount_percent / 100) AS effective_price
+FROM products p
+LEFT JOIN ActiveDiscounts ad ON p.sku = ad.sku;
+
+┌─────────┬─────────────────────┬───────────────┬──────────────────────┬────────────────────┐
+│   sku   │        name         │     price     │ max_discount_percent │  effective_price   │
+│ varchar │       varchar       │ decimal(10,2) │    decimal(10,2)     │       double       │
+├─────────┼─────────────────────┼───────────────┼──────────────────────┼────────────────────┤
+│ TS-001  │ Classic Cotton Tee  │         25.00 │                10.00 │               22.5 │
+│ PT-005  │ Slim Fit Jeans      │         60.00 │                15.50 │ 50.699999999999996 │
+│ SK-012  │ A-Line Denim Skirt  │         35.75 │                20.00 │               28.6 │
+│ DR-021  │ Summer Floral Dress │         75.00 │                12.75 │            65.4375 │
+│ TS-002  │ Striped Linen Shirt │         45.50 │                      │                    │
+│ SW-008  │ Wool Knit Sweater   │         55.20 │                      │                    │
+│ PT-006  │ Chino Trousers      │         52.99 │                      │                    │
+└─────────┴─────────────────────┴───────────────┴──────────────────────┴────────────────────┘
 
 ```
