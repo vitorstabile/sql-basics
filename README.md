@@ -236,6 +236,7 @@
     - [Appendix A - Part 12: Find Cities that not starts and ends with a,e,i,o or u](#appendixapart12)
     - [Appendix A - Part 13: Using more than One order By](#appendixapart13)
     - [Appendix A - Part 14: Calculate a Discount for Active Products](#appendixapart14)
+    - [Appendix A - Part 15: Count the number of ocorrences in a String](#appendixapart15)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -9978,5 +9979,19 @@ LEFT JOIN ActiveDiscounts ad ON p.sku = ad.sku;
 │ SW-008  │ Wool Knit Sweater   │         55.20 │                      │                    │
 │ PT-006  │ Chino Trousers      │         52.99 │                      │                    │
 └─────────┴─────────────────────┴───────────────┴──────────────────────┴────────────────────┘
+
+```
+
+ #### <a name="appendixapart15"></a>Appendix A - Part 15: Count the number of ocorrences in a String
+
+ ```
+SELECT (LENGTH('apple banana apple orange apple') - LENGTH(REPLACE('apple banana apple orange apple', 'apple', ''))) / LENGTH('apple') as count;
+
+┌────────┐
+│ count  │
+│ double │
+├────────┤
+│    3.0 │
+└────────┘
 
 ```
