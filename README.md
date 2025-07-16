@@ -220,7 +220,205 @@
       - [Chapter 13 - Part 8.1: Delving Deeper: Advanced SQL Topics](#chapter13part8.1)
       - [Chapter 13 - Part 8.2: Online Resources and Communities](#chapter13part8.2)
       - [Chapter 13 - Part 8.3: Practical Projects and Exercises](#chapter13part8.3)
-      - [Chapter 13 - Part 8.4: Best Practices for Continuous Learning](#chapter13part8.4)
+      - [Chapter 13 - Part 8.4: Best Practices for Continuous Learning](#chapter13part8.4)     
+14. [Chapter 14: Advanced Querying Techniques](#chapter14)
+    - [Chapter 14 - Part 1: Window Functions: Introduction and Syntax](#chapter14part1)
+      - [Chapter 14 - Part 1.1: Understanding Window Functions](#chapter14part1.1)
+      - [Chapter 14 - Part 1.2: Partitioning with PARTITION BY](#chapter14part1.2)
+      - [Chapter 14 - Part 1.3: Ordering with ORDER BY](#chapter14part1.3)
+      - [Chapter 14 - Part 1.4: Window Frames](#chapter14part1.4)
+      - [Chapter 14 - Part 1.5: Practical Examples and Demonstrations](#chapter14part1.5)
+    - [Chapter 14 - Part 2: Window Functions: Ranking and Partitioning](#chapter14part2)
+      - [Chapter 14 - Part 2.1: Ranking Functions](#chapter14part2.1)
+      - [Chapter 14 - Part 2.2: Partitioning with PARTITION BY](#chapter14part2.2)
+      - [Chapter 14 - Part 2.3: Combining Ranking and Partitioning](#chapter14part2.3)
+    - [Chapter 14 - Part 3: Window Functions: Aggregate Calculations](#chapter14part3)
+      - [Chapter 14 - Part 3.1: Aggregate Window Functions: The Basics](#chapter14part3.1)
+      - [Chapter 14 - Part 3.2: Common Aggregate Window Functions](#chapter14part3.2)
+      - [Chapter 14 - Part 3.3: Window Frames](#chapter14part3.3)
+      - [Chapter 14 - Part 3.4: Practical Examples and Demonstrations](#chapter14part3.4)
+    - [Chapter 14 - Part 4: Common Table Expressions (CTEs): Recursive Queries](#chapter14part4)
+      - [Chapter 14 - Part 4.1: Understanding Recursive CTEs](#chapter14part4.1)
+      - [Chapter 14 - Part 4.2: Practical Examples and Demonstrations](#chapter14part4.2)
+    - [Chapter 14 - Part 5: CTEs: Improving Readability and Performance](#chapter14part5)
+      - [Chapter 14 - Part 5.1: Enhancing Readability with CTEs](#chapter14part5.1)
+      - [Chapter 14 - Part 5.2: Improving Performance with CTEs](#chapter14part5.2)
+      - [Chapter 14 - Part 5.3: Practical Examples and Demonstrations](#chapter14part5.3)
+    - [Chapter 14 - Part 6: Optimizing Complex Queries: Execution Plans](#chapter14part6)
+      - [Chapter 14 - Part 6.1: Understanding Execution Plans](#chapter14part6.1)
+      - [Chapter 14 - Part 6.2: Common Operations and Their Implications](#chapter14part6.2)
+      - [Chapter 14 - Part 6.3: Practical Examples and Demonstrations](#chapter14part6.3)
+15. [Chapter 15: Data Manipulation and Transactions](#chapter15)
+    - [Chapter 15 - Part 1: Advanced INSERT Statements: Inserting from Select Statements](#chapter15part1)
+      - [Chapter 15 - Part 1.1: Understanding INSERT INTO ... SELECT ... Syntax](#chapter15part1.1)
+      - [Chapter 15 - Part 1.2: Inserting Specific Columns](#chapter15part1.2)
+      - [Chapter 15 - Part 1.3: Data Type Considerations](#chapter15part1.3)
+      - [Chapter 15 - Part 1.4: Using Expressions and Functions in the SELECT Statement](#chapter15part1.4)
+      - [Chapter 15 - Part 1.5: Inserting Data from Multiple Tables Using Joins](#chapter15part1.5)
+      - [Chapter 15 - Part 1.6: Handling Errors and Constraints](#chapter15part1.6)
+      - [Chapter 15 - Part 1.7: Performance Considerations](#chapter15part1.7)
+    - [Chapter 15 - Part 2: Advanced UPDATE Statements: Updating with Joins](#chapter15part2)
+      - [Chapter 15 - Part 2.1: Understanding UPDATE with JOIN](#chapter15part2.1)
+      - [Chapter 15 - Part 2.2: Advanced Techniques and Considerations](#chapter15part2.2)
+      - [Chapter 15 - Part 2.3: Practical Examples and Demonstrations](#chapter15part2.3)
+    - [Chapter 15 - Part 3: Advanced DELETE Statements: Deleting with Subqueries](#chapter15part3)
+      - [Chapter 15 - Part 3.1: Understanding DELETE with Subqueries](#chapter15part3.1)
+      - [Chapter 15 - Part 3.2: Practical Examples of DELETE with Subqueries](#chapter15part3.2)
+    - [Chapter 15 - Part 4: Understanding Transactions: ACID Properties](#chapter15part4)
+      - [Chapter 15 - Part 4.1: Understanding the ACID Properties](#chapter15part4.1)
+    - [Chapter 15 - Part 5: Implementing Transactions: BEGIN, COMMIT, and ROLLBACK](#chapter15part5)
+      - [Chapter 15 - Part 5.1: Understanding BEGIN, COMMIT, and ROLLBACK](#chapter15part5.1)
+      - [Chapter 15 - Part 5.2: Practical Examples and Demonstrations](#chapter15part5.2)
+    - [Chapter 15 - Part 6: Concurrency Control: Locking and Isolation Levels](#chapter15part6)
+      - [Chapter 15 - Part 6.1: Understanding Concurrency Issues](#chapter15part6.1)
+      - [Chapter 15 - Part 6.2: Locking Mechanisms](#chapter15part6.2)
+      - [Chapter 15 - Part 6.3: Isolation Levels](#chapter15part6.3)
+      - [Chapter 15 - Part 6.4: Real-World Application](#chapter15part6.4)
+16. [Chapter 16: Stored Procedures and Functions](#chapter16)
+    - [Chapter 16 - Part 1: Introduction to Stored Procedures: Creating and Executing](#chapter16part1)
+      - [Chapter 16 - Part 1.1: Understanding Stored Procedures](#chapter16part1.1)
+      - [Chapter 16 - Part 1.2: Creating Stored Procedures](#chapter16part1.2)
+      - [Chapter 16 - Part 1.3: Executing Stored Procedures](#chapter16part1.3)
+      - [Chapter 16 - Part 1.4: Modifying Stored Procedures](#chapter16part1.4)
+      - [Chapter 16 - Part 1.5: Dropping Stored Procedures](#chapter16part1.5)
+    - [Chapter 16 - Part 2: Stored Procedures: Input and Output Parameters](#chapter16part2)
+      - [Chapter 16 - Part 2.1: Understanding Input Parameters](#chapter16part2.1)
+      - [Chapter 16 - Part 2.2: Understanding Output Parameters](#chapter16part2.2)
+      - [Chapter 16 - Part 2.3: Practical Examples and Demonstrations](#chapter16part2.3)
+    - [Chapter 16 - Part 3: Stored Procedures: Error Handling and Exception Handling](#chapter16part3)
+      - [Chapter 16 - Part 3.1: Understanding Error Handling in Stored Procedures](#chapter16part3.1)
+      - [Chapter 16 - Part 3.2: Techniques for Error Handling](#chapter16part3.2)
+      - [Chapter 16 - Part 3.3: Best Practices for Error Handling](#chapter16part3.3)
+      - [Chapter 16 - Part 3.4: Practical Examples and Demonstrations](#chapter16part3.4)
+    - [Chapter 16 - Part 4: User-Defined Functions (UDFs): Scalar and Table-Valued Functions](#chapter16part4)
+      - [Chapter 16 - Part 4.1: Scalar User-Defined Functions](#chapter16part4.1)
+      - [Chapter 16 - Part 4.2: Table-Valued User-Defined Functions (TVFs)](#chapter16part4.2)
+      - [Chapter 16 - Part 4.3: Best Practices for User-Defined Functions](#chapter16part4.3)
+    - [Chapter 16 - Part 5: UDFs: Best Practices and Limitations](#chapter16part5)
+      - [Chapter 16 - Part 5.1: Best Practices for UDFs](#chapter16part5.1)
+      - [Chapter 16 - Part 5.2: Limitations of UDFs](#chapter16part5.2)
+      - [Chapter 16 - Part 5.3: Optimizing UDF Performance](#chapter16part5.3)
+    - [Chapter 16 - Part 6: Debugging Stored Procedures and Functions](#chapter16part6)
+      - [Chapter 16 - Part 6.1: Common Errors in Stored Procedures and Functions](#chapter16part6.1)
+      - [Chapter 16 - Part 6.2: Debugging Techniques](#chapter16part6.2)
+      - [Chapter 16 - Part 6.3: Error Handling](#chapter16part6.3)
+      - [Chapter 16 - Part 6.4: Case Study: Debugging a Stored Procedure for Order Processing](#chapter16part6.4)
+17. [Chapter 17: Indexing and Performance Tuning](#chapter17)
+    - [Chapter 17 - Part 1: Understanding Indexing: B-Tree and Hash Indexes](#chapter17part1)
+      - [Chapter 17 - Part 1.1: Understanding Indexing](#chapter17part1.1)
+      - [Chapter 17 - Part 1.2: B-Tree Indexes](#chapter17part1.2)
+      - [Chapter 17 - Part 1.3: Hash Indexes](#chapter17part1.3)
+      - [Chapter 17 - Part 1.4: B-Tree vs. Hash Indexes: A Comparison](#chapter17part1.4)
+      - [Chapter 17 - Part 1.5: Practical Examples and Demonstrations](#chapter17part1.5)
+    - [Chapter 17 - Part 2: Creating and Managing Indexes: Best Practices](#chapter17part2)
+      - [Chapter 17 - Part 2.1: Understanding Indexing Strategies](#chapter17part2.1)
+      - [Chapter 17 - Part 2.2: Practical Considerations for Index Management](#chapter17part2.2)
+      - [Chapter 17 - Part 2.3: Indexing and Data Modification](#chapter17part2.3)
+      - [Chapter 17 - Part 2.4: Hypothetical Scenario](#chapter17part2.4)
+    - [Chapter 17 - Part 3: Analyzing Query Performance: Using EXPLAIN](#chapter17part3)
+      - [Chapter 17 - Part 3.1: Understanding the EXPLAIN Statement](#chapter17part3.1)
+      - [Chapter 17 - Part 3.2: Advanced EXPLAIN Analysis](#chapter17part3.2)
+      - [Chapter 17 - Part 3.3: Best Practices for Using EXPLAIN](#chapter17part3.3)
+    - [Chapter 17 - Part 4: Identifying and Resolving Performance Bottlenecks](#chapter17part4)
+      - [Chapter 17 - Part 4.1: Understanding Performance Bottlenecks](#chapter17part4.1)
+      - [Chapter 17 - Part 4.2: Analyzing Query Performance with EXPLAIN](#chapter17part4.2)
+      - [Chapter 17 - Part 4.3: Resolving Performance Bottlenecks: Optimization Strategies](#chapter17part4.3)
+      - [Chapter 17 - Part 4.4: Real-World Application](#chapter17part4.4)
+    - [Chapter 17 - Part 5: Database Partitioning: Horizontal and Vertical Partitioning](#chapter17part5)
+      - [Chapter 17 - Part 5.1: Understanding Database Partitioning](#chapter17part5.1)
+      - [Chapter 17 - Part 5.2: Horizontal Partitioning](#chapter17part5.2)
+      - [Chapter 17 - Part 5.3: Vertical Partitioning](#chapter17part5.3)
+      - [Chapter 17 - Part 5.4: Horizontal vs. Vertical Partitioning: A Comparison](#chapter17part5.4)
+    - [Chapter 17 - Part 6: Optimizing Database Configuration: Memory and Disk I/O](#chapter17part6)
+      - [Chapter 17 - Part 6.1: Understanding Memory Allocation](#chapter17part6.1)
+      - [Chapter 17 - Part 6.2: Optimizing Disk I/O](#chapter17part6.2)
+18. [Chapter 18: Data Warehousing and ETL with SQL](#chapter18)
+    - [Chapter 18 - Part 1: Introduction to Data Warehousing: Concepts and Architecture](#chapter18part1)
+      - [Chapter 18 - Part 1.1: Core Concepts of Data Warehousing](#chapter18part1.1)
+      - [Chapter 18 - Part 1.2: Data Warehouse Architecture](#chapter18part1.2)
+      - [Chapter 18 - Part 1.3: Real-World Examples](#chapter18part1.3)
+    - [Chapter 18 - Part 2: Extract, Transform, Load (ETL) Processes: An Overview](#chapter18part2)
+      - [Chapter 18 - Part 2.1: Core Concepts of ETL](#chapter18part2.1)
+      - [Chapter 18 - Part 2.2: ETL Architecture and Tools](#chapter18part2.2)
+      - [Chapter 18 - Part 2.3: Data Quality and Validation](#chapter18part2.3)
+      - [Chapter 18 - Part 2.4: Scheduling and Monitoring](#chapter18part2.4)
+      - [Chapter 18 - Part 2.5: Real-World Application](#chapter18part2.5)
+    - [Chapter 18 - Part 3: Using SQL for Data Extraction and Transformation](#chapter18part3)
+      - [Chapter 18 - Part 3.1: Data Extraction with SQL](#chapter18part3.1)
+      - [Chapter 18 - Part 3.2: Data Transformation with SQL](#chapter18part3.2)
+      - [Chapter 18 - Part 3.3: Practical Examples and Demonstrations](#chapter18part3.3)
+    - [Chapter 18 - Part 4: Data Cleaning and Data Quality Techniques in SQL](#chapter18part4)
+      - [Chapter 18 - Part 4.1: Understanding Data Quality Dimensions](#chapter18part4.1)
+      - [Chapter 18 - Part 4.2: Identifying Data Quality Issues](#chapter18part4.2)
+      - [Chapter 18 - Part 4.3: Data Cleaning Techniques](#chapter18part4.3)
+      - [Chapter 18 - Part 4.4: Data Validation and Constraints](#chapter18part4.4)
+      - [Chapter 18 - Part 4.5: Real-World Application](#chapter18part4.5)
+    - [Chapter 18 - Part 5: Implementing Slowly Changing Dimensions (SCDs)](#chapter18part5)
+      - [Chapter 18 - Part 5.1: Understanding Slowly Changing Dimensions (SCDs)](#chapter18part5.1)
+      - [Chapter 18 - Part 5.2: SCD Type 0: Fixed Attributes](#chapter18part5.2)
+      - [Chapter 18 - Part 5.3: SCD Type 1: Overwriting Attributes](#chapter18part5.3)
+      - [Chapter 18 - Part 5.4: SCD Type 2: Adding New Rows](#chapter18part5.4)
+      - [Chapter 18 - Part 5.5: SCD Type 3: Adding New Columns](#chapter18part5.5)
+      - [Chapter 18 - Part 5.6: Choosing the Right SCD Type](#chapter18part5.6)
+      - [Chapter 18 - Part 5.7: Real-World Application](#chapter18part5.7)
+    - [Chapter 18 - Part 6: Creating Data Marts and Reporting Tables](#chapter18part6)
+      - [Chapter 18 - Part 6.1: Understanding Data Marts](#chapter18part6.1)
+      - [Chapter 18 - Part 6.2: Creating Reporting Tables](#chapter18part6.2)
+19. [Chapter 19: Security and Auditing](#chapter19)
+    - [Chapter 19 - Part 1: SQL Injection Prevention: Parameterized Queries and Input Validation](#chapter19part1)
+      - [Chapter 19 - Part 1.1: Understanding SQL Injection](#chapter19part1.1)
+      - [Chapter 19 - Part 1.2: Parameterized Queries (Prepared Statements)](#chapter19part1.2)
+      - [Chapter 19 - Part 1.3: Input Validation](#chapter19part1.3)
+      - [Chapter 19 - Part 1.4: Real-World Application](#chapter19part1.4)
+    - [Chapter 19 - Part 2: User Authentication and Authorization: Granting and Revoking Privileges](#chapter19part2)
+      - [Chapter 19 - Part 2.1: Principles of Privilege Management](#chapter19part2.1)
+      - [Chapter 19 - Part 2.2: Practical Examples and Demonstrations](#chapter19part2.2)
+      - [Chapter 19 - Part 2.3: Exercises](#chapter19part2.3)
+      - [Chapter 19 - Part 2.4: Real-World Application](#chapter19part2.4)
+    - [Chapter 19 - Part 3: Implementing Row-Level Security (RLS)](#chapter19part3)
+      - [Chapter 19 - Part 3.1: Core Concepts of Row-Level Security](#chapter19part3.1)
+      - [Chapter 19 - Part 3.2: Implementing RLS: A Practical Example](#chapter19part3.2)
+      - [Chapter 19 - Part 3.3: Advanced RLS Techniques](#chapter19part3.3)
+    - [Chapter 19 - Part 4: Auditing Database Activity: Tracking Changes and Access](#chapter19part4)
+      - [Chapter 19 - Part 4.1: Principles of Database Auditing](#chapter19part4.1)
+      - [Chapter 19 - Part 4.2: Types of Database Auditing](#chapter19part4.2)
+      - [Chapter 19 - Part 4.3: Implementing Database Auditing](#chapter19part4.3)
+      - [Chapter 19 - Part 4.4: Best Practices for Database Auditing](#chapter19part4.4)
+    - [Chapter 19 - Part 5: Data Masking and Encryption Techniques](#chapter19part5)
+      - [Chapter 19 - Part 5.1: Data Masking Techniques](#chapter19part5.1)
+      - [Chapter 19 - Part 5.2: Encryption Techniques](#chapter19part5.2)
+      - [Chapter 19 - Part 5.3: Choosing the Right Technique](#chapter19part5.3)
+    - [Chapter 19 - Part 6: Compliance and Security Best Practices](#chapter19part6)
+      - [Chapter 19 - Part 6.1: Understanding Compliance Standards](#chapter19part6.1)
+      - [Chapter 19 - Part 6.2: Security Best Practices for Databases](#chapter19part6.2)
+      - [Chapter 19 - Part 6.3: Real-World Application](#chapter19part6.3)
+20. [Chapter 20: Advanced SQL Features and Extensions](#chapter20)
+    - [Chapter 20 - Part 1: Working with JSON Data in SQL](#chapter20part1)
+      - [Chapter 20 - Part 1.1: Introduction to JSON in SQL](#chapter20part1.1)
+      - [Chapter 20 - Part 1.2: Storing JSON Data](#chapter20part1.2)
+      - [Chapter 20 - Part 1.3: Querying JSON Data](#chapter20part1.3)
+      - [Chapter 20 - Part 1.4: Modifying JSON Data](#chapter20part1.4)
+      - [Chapter 20 - Part 1.5: Indexing JSON Data](#chapter20part1.5)
+    - [Chapter 20 - Part 2: Full-Text Search: Implementing and Optimizing](#chapter20part2)
+      - [Chapter 20 - Part 2.1: Understanding Full-Text Search Concepts](#chapter20part2.1)
+      - [Chapter 20 - Part 2.2: Implementing Full-Text Search](#chapter20part2.2)
+      - [Chapter 20 - Part 2.3: Optimizing Full-Text Search](#chapter20part2.3)
+    - [Chapter 20 - Part 3: Spatial Data Types and Queries (if supported by the database)](#chapter20part3)
+      - [Chapter 20 - Part 3.1: Introduction to Spatial Data Types](#chapter20part3.1)
+      - [Chapter 20 - Part 3.2: Common Spatial Functions](#chapter20part3.2)
+      - [Chapter 20 - Part 3.3: Spatial Indexes](#chapter20part3.3)
+      - [Chapter 20 - Part 3.4: Practical Examples and Demonstrations](#chapter20part3.4)
+    - [Chapter 20 - Part 4: Using SQL with NoSQL Databases (e.g., via Polyglot Persistence)](#chapter20part4)
+      - [Chapter 20 - Part 4.1: Understanding Polyglot Persistence](#chapter20part4.1)
+      - [Chapter 20 - Part 4.2: Practical Examples and Demonstrations](#chapter20part4.2)
+    - [Chapter 20 - Part 5: Introduction to Graph Databases and Cypher (if applicable)](#chapter20part5)
+      - [Chapter 20 - Part 5.1: Understanding Graph Database Concepts](#chapter20part5.1)
+      - [Chapter 20 - Part 5.2: Introduction to Cypher Query Language](#chapter20part5.2)
+      - [Chapter 20 - Part 5.3: Real-World Applications](#chapter20part5.3)
+    - [Chapter 20 - Part 6: Exploring Database-Specific Extensions and Features](#chapter20part6)
+      - [Chapter 20 - Part 6.1: Understanding Database-Specific Extensions](#chapter20part6.1)
+      - [Chapter 20 - Part 6.2: Exploring Specific Extension Categories](#chapter20part6.2)
+      - [Chapter 20 - Part 6.3: Practical Examples and Demonstrations](#chapter20part6.3)
 30. [Appendix A: Useful DuckDB Code Snippet](#appendixa)
     - [Appendix A - Part 1: Remove characters from VARCHARS using REGEXP_REPLACE](#appendixapart1)
     - [Appendix A - Part 2: Check if a column have different values in other column](#appendixapart2)
@@ -9247,6 +9445,402 @@ The best way to solidify your SQL skills is to work on practical projects.
 - **Contribute to the Community**: Share your knowledge and help others learn SQL.
 
 This lesson has provided a comprehensive overview of advanced SQL topics, online resources, and practical project ideas to guide your continued learning. By exploring these avenues and consistently practicing your skills, you can become a proficient SQL user and database professional. Remember to stay curious, seek feedback, and contribute to the community to accelerate your learning journey.
+
+## <a name="chapter14"></a>Chapter 14: Advanced Querying Techniques
+
+#### <a name="chapter14part1"></a>Chapter 14 - Part 1: Window Functions: Introduction and Syntax
+
+#### <a name="chapter14part1.1"></a>Chapter 14 - Part 1.1: Understanding Window Functions
+
+#### <a name="chapter14part1.2"></a>Chapter 14 - Part 1.2: Partitioning with PARTITION BY
+
+#### <a name="chapter14part1.3"></a>Chapter 14 - Part 1.3: Ordering with ORDER BY
+
+#### <a name="chapter14part1.4"></a>Chapter 14 - Part 1.4: Window Frames
+
+#### <a name="chapter14part1.5"></a>Chapter 14 - Part 1.5: Practical Examples and Demonstrations
+
+#### <a name="chapter14part2"></a>Chapter 14 - Part 2: Window Functions: Ranking and Partitioning
+
+#### <a name="chapter14part2.1"></a>Chapter 14 - Part 2.1: Ranking Functions
+
+#### <a name="chapter14part2.2"></a>Chapter 14 - Part 2.2: Partitioning with PARTITION BY
+
+#### <a name="chapter14part2.3"></a>Chapter 14 - Part 2.3: Combining Ranking and Partitioning
+
+#### <a name="chapter14part3"></a>Chapter 14 - Part 3: Window Functions: Aggregate Calculations
+
+#### <a name="chapter14part3.1"></a>Chapter 14 - Part 3.1: Aggregate Window Functions: The Basics
+
+#### <a name="chapter14part3.2"></a>Chapter 14 - Part 3.2: Common Aggregate Window Functions
+
+#### <a name="chapter14part3.3"></a>Chapter 14 - Part 3.3: Window Frames
+
+#### <a name="chapter14part3.4"></a>Chapter 14 - Part 3.4: Practical Examples and Demonstrations
+
+#### <a name="chapter14part4"></a>Chapter 14 - Part 4: Common Table Expressions (CTEs): Recursive Queries
+
+#### <a name="chapter14part4.1"></a>Chapter 14 - Part 4.1: Understanding Recursive CTEs
+
+#### <a name="chapter14part4.2"></a>Chapter 14 - Part 4.2: Practical Examples and Demonstrations
+
+#### <a name="chapter14part5"></a>Chapter 14 - Part 5: CTEs: Improving Readability and Performance
+
+#### <a name="chapter14part5.1"></a>Chapter 14 - Part 5.1: Enhancing Readability with CTEs
+
+#### <a name="chapter14part5.2"></a>Chapter 14 - Part 5.2: Improving Performance with CTEs
+
+#### <a name="chapter14part5.3"></a>Chapter 14 - Part 5.3: Practical Examples and Demonstrations
+
+#### <a name="chapter14part6"></a>Chapter 14 - Part 6: Optimizing Complex Queries: Execution Plans
+
+#### <a name="chapter14part6.1"></a>Chapter 14 - Part 6.1: Understanding Execution Plans
+
+#### <a name="chapter14part6.2"></a>Chapter 14 - Part 6.2: Common Operations and Their Implications
+
+#### <a name="chapter14part6.3"></a>Chapter 14 - Part 6.3: Practical Examples and Demonstrations
+
+## <a name="chapter15"></a>Chapter 15: Data Manipulation and Transactions
+
+#### <a name="chapter15part1"></a>Chapter 15 - Part 1: Advanced INSERT Statements: Inserting from Select Statements
+
+#### <a name="chapter15part1.1"></a>Chapter 15 - Part 1.1: Understanding INSERT INTO ... SELECT ... Syntax
+
+#### <a name="chapter15part1.2"></a>Chapter 15 - Part 1.2: Inserting Specific Columns
+
+#### <a name="chapter15part1.3"></a>Chapter 15 - Part 1.3: Data Type Considerations
+
+#### <a name="chapter15part1.4"></a>Chapter 15 - Part 1.4: Using Expressions and Functions in the SELECT Statement
+
+#### <a name="chapter15part1.5"></a>Chapter 15 - Part 1.5: Inserting Data from Multiple Tables Using Joins
+
+#### <a name="chapter15part1.6"></a>Chapter 15 - Part 1.6: Handling Errors and Constraints
+
+#### <a name="chapter15part1.7"></a>Chapter 15 - Part 1.7: Performance Considerations
+
+#### <a name="chapter15part2"></a>Chapter 15 - Part 2: Advanced UPDATE Statements: Updating with Joins
+
+#### <a name="chapter15part2.1"></a>Chapter 15 - Part 2.1: Understanding UPDATE with JOIN
+
+#### <a name="chapter15part2.2"></a>Chapter 15 - Part 2.2: Advanced Techniques and Considerations
+
+#### <a name="chapter15part2.3"></a>Chapter 15 - Part 2.3: Practical Examples and Demonstrations
+
+#### <a name="chapter15part3"></a>Chapter 15 - Part 3: Advanced DELETE Statements: Deleting with Subqueries
+
+#### <a name="chapter15part3.1"></a>Chapter 15 - Part 3.1: Understanding DELETE with Subqueries
+
+#### <a name="chapter15part3.2"></a>Chapter 15 - Part 3.2: Practical Examples of DELETE with Subqueries
+
+#### <a name="chapter15part4"></a>Chapter 15 - Part 4: Understanding Transactions: ACID Properties
+
+#### <a name="chapter15part4.1"></a>Chapter 15 - Part 4.1: Understanding the ACID Properties
+
+#### <a name="chapter15part5"></a>Chapter 15 - Part 5: Implementing Transactions: BEGIN, COMMIT, and ROLLBACK
+
+#### <a name="chapter15part5.1"></a>Chapter 15 - Part 5.1: Understanding BEGIN, COMMIT, and ROLLBACK
+
+#### <a name="chapter15part5.2"></a>Chapter 15 - Part 5.2: Practical Examples and Demonstrations
+
+#### <a name="chapter15part6"></a>Chapter 15 - Part 6: Concurrency Control: Locking and Isolation Levels
+
+#### <a name="chapter15part6.1"></a>Chapter 15 - Part 6.1: Understanding Concurrency Issues
+
+#### <a name="chapter15part6.2"></a>Chapter 15 - Part 6.2: Locking Mechanisms
+
+#### <a name="chapter15part6.3"></a>Chapter 15 - Part 6.3: Isolation Levels
+
+#### <a name="chapter15part6.4"></a>Chapter 15 - Part 6.4: Real-World Application
+
+## <a name="chapter16"></a>Chapter 16: Stored Procedures and Functions
+
+#### <a name="chapter16part1"></a>Chapter 16 - Part 1: Introduction to Stored Procedures: Creating and Executing
+
+#### <a name="chapter16part1.1"></a>Chapter 16 - Part 1.1: Understanding Stored Procedures
+
+#### <a name="chapter16part1.2"></a>Chapter 16 - Part 1.2: Creating Stored Procedures
+
+#### <a name="chapter16part1.3"></a>Chapter 16 - Part 1.3: Executing Stored Procedures
+
+#### <a name="chapter16part1.4"></a>Chapter 16 - Part 1.4: Modifying Stored Procedures
+
+#### <a name="chapter16part1.5"></a>Chapter 16 - Part 1.5: Dropping Stored Procedures
+
+#### <a name="chapter16part2"></a>Chapter 16 - Part 2: Stored Procedures: Input and Output Parameters
+
+#### <a name="chapter16part2.1"></a>Chapter 16 - Part 2.1: Understanding Input Parameters
+
+#### <a name="chapter16part2.2"></a>Chapter 16 - Part 2.2: Understanding Output Parameters
+
+#### <a name="chapter16part2.3"></a>Chapter 16 - Part 2.3: Practical Examples and Demonstrations
+
+#### <a name="chapter16part3"></a>Chapter 16 - Part 3: Stored Procedures: Error Handling and Exception Handling
+
+#### <a name="chapter16part3.1"></a>Chapter 16 - Part 3.1: Understanding Error Handling in Stored Procedures
+
+#### <a name="chapter16part3.2"></a>Chapter 16 - Part 3.2: Techniques for Error Handling
+
+#### <a name="chapter16part3.3"></a>Chapter 16 - Part 3.3: Best Practices for Error Handling
+
+#### <a name="chapter16part3.4"></a>Chapter 16 - Part 3.4: Practical Examples and Demonstrations
+
+#### <a name="chapter16part4"></a>Chapter 16 - Part 4: User-Defined Functions (UDFs): Scalar and Table-Valued Functions
+
+#### <a name="chapter16part4.1"></a>Chapter 16 - Part 4.1: Scalar User-Defined Functions
+
+#### <a name="chapter16part4.2"></a>Chapter 16 - Part 4.2: Table-Valued User-Defined Functions (TVFs)
+
+#### <a name="chapter16part4.3"></a>Chapter 16 - Part 4.3: Best Practices for User-Defined Functions
+
+#### <a name="chapter16part5"></a>Chapter 16 - Part 5: UDFs: Best Practices and Limitations
+
+#### <a name="chapter16part5.1"></a>Chapter 16 - Part 5.1: Best Practices for UDFs
+
+#### <a name="chapter16part5.2"></a>Chapter 16 - Part 5.2: Limitations of UDFs
+
+#### <a name="chapter16part5.3"></a>Chapter 16 - Part 5.3: Optimizing UDF Performance
+
+#### <a name="chapter16part6"></a>Chapter 16 - Part 6: Debugging Stored Procedures and Functions
+
+#### <a name="chapter16part6.1"></a>Chapter 16 - Part 6.1: Common Errors in Stored Procedures and Functions
+
+#### <a name="chapter16part6.2"></a>Chapter 16 - Part 6.2: Debugging Techniques
+
+#### <a name="chapter16part6.3"></a>Chapter 16 - Part 6.3: Error Handling
+
+#### <a name="chapter16part6.4"></a>Chapter 16 - Part 6.4: Case Study: Debugging a Stored Procedure for Order Processing
+
+## <a name="chapter17"></a>Chapter 17: Indexing and Performance Tuning
+
+#### <a name="chapter17part1"></a>Chapter 17 - Part 1: Understanding Indexing: B-Tree and Hash Indexes
+
+#### <a name="chapter17part1.1"></a>Chapter 17 - Part 1.1: Understanding Indexing
+
+#### <a name="chapter17part1.2"></a>Chapter 17 - Part 1.2: B-Tree Indexes
+
+#### <a name="chapter17part1.3"></a>Chapter 17 - Part 1.3: Hash Indexes
+
+#### <a name="chapter17part1.4"></a>Chapter 17 - Part 1.4: B-Tree vs. Hash Indexes: A Comparison
+
+#### <a name="chapter17part1.5"></a>Chapter 17 - Part 1.5: Practical Examples and Demonstrations
+
+#### <a name="chapter17part2"></a>Chapter 17 - Part 2: Creating and Managing Indexes: Best Practices
+
+#### <a name="chapter17part2.1"></a>Chapter 17 - Part 2.1: Understanding Indexing Strategies
+
+#### <a name="chapter17part2.2"></a>Chapter 17 - Part 2.2: Practical Considerations for Index Management
+
+#### <a name="chapter17part2.3"></a>Chapter 17 - Part 2.3: Indexing and Data Modification
+
+#### <a name="chapter17part2.4"></a>Chapter 17 - Part 2.4: Hypothetical Scenario
+
+#### <a name="chapter17part3"></a>Chapter 17 - Part 3: Analyzing Query Performance: Using EXPLAIN
+
+#### <a name="chapter17part3.1"></a>Chapter 17 - Part 3.1: Understanding the EXPLAIN Statement
+
+#### <a name="chapter17part3.2"></a>Chapter 17 - Part 3.2: Advanced EXPLAIN Analysis
+
+#### <a name="chapter17part3.3"></a>Chapter 17 - Part 3.3: Best Practices for Using EXPLAIN
+
+#### <a name="chapter17part4"></a>Chapter 17 - Part 4: Identifying and Resolving Performance Bottlenecks
+
+#### <a name="chapter17part4.1"></a>Chapter 17 - Part 4.1: Understanding Performance Bottlenecks
+
+#### <a name="chapter17part4.2"></a>Chapter 17 - Part 4.2: Analyzing Query Performance with EXPLAIN
+
+#### <a name="chapter17part4.3"></a>Chapter 17 - Part 4.3: Resolving Performance Bottlenecks: Optimization Strategies
+
+#### <a name="chapter17part4.4"></a>Chapter 17 - Part 4.4: Real-World Application
+
+#### <a name="chapter17part5"></a>Chapter 17 - Part 5: Database Partitioning: Horizontal and Vertical Partitioning
+
+#### <a name="chapter17part5.1"></a>Chapter 17 - Part 5.1: Understanding Database Partitioning
+
+#### <a name="chapter17part5.2"></a>Chapter 17 - Part 5.2: Horizontal Partitioning
+
+#### <a name="chapter17part5.3"></a>Chapter 17 - Part 5.3: Vertical Partitioning
+
+#### <a name="chapter17part5.4"></a>Chapter 17 - Part 5.4: Horizontal vs. Vertical Partitioning: A Comparison
+
+#### <a name="chapter17part6"></a>Chapter 17 - Part 6: Optimizing Database Configuration: Memory and Disk I/O
+
+#### <a name="chapter17part6.1"></a>Chapter 17 - Part 6.1: Understanding Memory Allocation
+
+#### <a name="chapter17part6.2"></a>Chapter 17 - Part 6.2: Optimizing Disk I/O
+
+## <a name="chapter18"></a>Chapter 18: Data Warehousing and ETL with SQL
+
+#### <a name="chapter18part1"></a>Chapter 18 - Part 1: Introduction to Data Warehousing: Concepts and Architecture
+
+#### <a name="chapter18part1.1"></a>Chapter 18 - Part 1.1: Core Concepts of Data Warehousing
+
+#### <a name="chapter18part1.2"></a>Chapter 18 - Part 1.2: Data Warehouse Architecture
+
+#### <a name="chapter18part1.3"></a>Chapter 18 - Part 1.3: Real-World Examples
+
+#### <a name="chapter18part2"></a>Chapter 18 - Part 2: Extract, Transform, Load (ETL) Processes: An Overview
+
+#### <a name="chapter18part2.1"></a>Chapter 18 - Part 2.1: Core Concepts of ETL
+
+#### <a name="chapter18part2.2"></a>Chapter 18 - Part 2.2: ETL Architecture and Tools
+
+#### <a name="chapter18part2.3"></a>Chapter 18 - Part 2.3: Data Quality and Validation
+
+#### <a name="chapter18part2.4"></a>Chapter 18 - Part 2.4: Scheduling and Monitoring
+
+#### <a name="chapter18part2.5"></a>Chapter 18 - Part 2.5: Real-World Application
+
+#### <a name="chapter18part3"></a>Chapter 18 - Part 3: Using SQL for Data Extraction and Transformation
+
+#### <a name="chapter18part3.1"></a>Chapter 18 - Part 3.1: Data Extraction with SQL
+
+#### <a name="chapter18part3.2"></a>Chapter 18 - Part 3.2: Data Transformation with SQL
+
+#### <a name="chapter18part3.3"></a>Chapter 18 - Part 3.3: Practical Examples and Demonstrations
+
+#### <a name="chapter18part4"></a>Chapter 18 - Part 4: Data Cleaning and Data Quality Techniques in SQL
+
+#### <a name="chapter18part4.1"></a>Chapter 18 - Part 4.1: Understanding Data Quality Dimensions
+
+#### <a name="chapter18part4.2"></a>Chapter 18 - Part 4.2: Identifying Data Quality Issues
+
+#### <a name="chapter18part4.3"></a>Chapter 18 - Part 4.3: Data Cleaning Techniques
+
+#### <a name="chapter18part4.4"></a>Chapter 18 - Part 4.4: Data Validation and Constraints
+
+#### <a name="chapter18part4.5"></a>Chapter 18 - Part 4.5: Real-World Application
+
+#### <a name="chapter18part5"></a>Chapter 18 - Part 5: Implementing Slowly Changing Dimensions (SCDs)
+
+#### <a name="chapter18part5.1"></a>Chapter 18 - Part 5.1: Understanding Slowly Changing Dimensions (SCDs)
+
+#### <a name="chapter18part5.2"></a>Chapter 18 - Part 5.2: SCD Type 0: Fixed Attributes
+
+#### <a name="chapter18part5.3"></a>Chapter 18 - Part 5.3: SCD Type 1: Overwriting Attributes
+
+#### <a name="chapter18part5.4"></a>Chapter 18 - Part 5.4: SCD Type 2: Adding New Rows
+
+#### <a name="chapter18part5.5"></a>Chapter 18 - Part 5.5: SCD Type 3: Adding New Columns
+
+#### <a name="chapter18part5.6"></a>Chapter 18 - Part 5.6: Choosing the Right SCD Type
+
+#### <a name="chapter18part5.7"></a>Chapter 18 - Part 5.7: Real-World Application
+
+#### <a name="chapter18part6"></a>Chapter 18 - Part 6: Creating Data Marts and Reporting Tables
+
+#### <a name="chapter18part6.1"></a>Chapter 18 - Part 6.1: Understanding Data Marts
+
+#### <a name="chapter18part6.2"></a>Chapter 18 - Part 6.2: Creating Reporting Tables
+
+## <a name="chapter19"></a>Chapter 19: Security and Auditing
+
+#### <a name="chapter19part1"></a>Chapter 19 - Part 1: SQL Injection Prevention: Parameterized Queries and Input Validation
+
+#### <a name="chapter19part1.1"></a>Chapter 19 - Part 1.1: Understanding SQL Injection
+
+#### <a name="chapter19part1.2"></a>Chapter 19 - Part 1.2: Parameterized Queries (Prepared Statements)
+
+#### <a name="chapter19part1.3"></a>Chapter 19 - Part 1.3: Input Validation
+
+#### <a name="chapter19part1.4"></a>Chapter 19 - Part 1.4: Real-World Application
+
+#### <a name="chapter19part2"></a>Chapter 19 - Part 2: User Authentication and Authorization: Granting and Revoking Privileges
+
+#### <a name="chapter19part2.1"></a>Chapter 19 - Part 2.1: Principles of Privilege Management
+
+#### <a name="chapter19part2.2"></a>Chapter 19 - Part 2.2: Practical Examples and Demonstrations
+
+#### <a name="chapter19part2.3"></a>Chapter 19 - Part 2.3: Exercises
+
+#### <a name="chapter19part2.4"></a>Chapter 19 - Part 2.4: Real-World Application
+
+#### <a name="chapter19part3"></a>Chapter 19 - Part 3: Implementing Row-Level Security (RLS)
+
+#### <a name="chapter19part3.1"></a>Chapter 19 - Part 3.1: Core Concepts of Row-Level Security
+
+#### <a name="chapter19part3.2"></a>Chapter 19 - Part 3.2: Implementing RLS: A Practical Example
+
+#### <a name="chapter19part3.3"></a>Chapter 19 - Part 3.3: Advanced RLS Techniques
+
+#### <a name="chapter19part4"></a>Chapter 19 - Part 4: Auditing Database Activity: Tracking Changes and Access
+
+#### <a name="chapter19part4.1"></a>Chapter 19 - Part 4.1: Principles of Database Auditing
+
+#### <a name="chapter19part4.2"></a>Chapter 19 - Part 4.2: Types of Database Auditing
+
+#### <a name="chapter19part4.3"></a>Chapter 19 - Part 4.3: Implementing Database Auditing
+
+#### <a name="chapter19part4.4"></a>Chapter 19 - Part 4.4: Best Practices for Database Auditing
+
+#### <a name="chapter19part5"></a>Chapter 19 - Part 5: Data Masking and Encryption Techniques
+
+#### <a name="chapter19part5.1"></a>Chapter 19 - Part 5.1: Data Masking Techniques
+
+#### <a name="chapter19part5.2"></a>Chapter 19 - Part 5.2: Encryption Techniques
+
+#### <a name="chapter19part5.3"></a>Chapter 19 - Part 5.3: Choosing the Right Technique
+
+#### <a name="chapter19part6"></a>Chapter 19 - Part 6: Compliance and Security Best Practices
+
+#### <a name="chapter19part6.1"></a>Chapter 19 - Part 6.1: Understanding Compliance Standards
+
+#### <a name="chapter19part6.2"></a>Chapter 19 - Part 6.2: Security Best Practices for Databases
+
+#### <a name="chapter19part6.3"></a>Chapter 19 - Part 6.3: Real-World Application
+
+## <a name="chapter20"></a>Chapter 20: Advanced SQL Features and Extensions
+
+#### <a name="chapter20part1"></a>Chapter 20 - Part 1: Working with JSON Data in SQL
+
+#### <a name="chapter20part1.1"></a>Chapter 20 - Part 1.1: Introduction to JSON in SQL
+
+#### <a name="chapter20part1.2"></a>Chapter 20 - Part 1.2: Storing JSON Data
+
+#### <a name="chapter20part1.3"></a>Chapter 20 - Part 1.3: Querying JSON Data
+
+#### <a name="chapter20part1.4"></a>Chapter 20 - Part 1.4: Modifying JSON Data
+
+#### <a name="chapter20part1.5"></a>Chapter 20 - Part 1.5: Indexing JSON Data
+
+#### <a name="chapter20part2"></a>Chapter 20 - Part 2: Full-Text Search: Implementing and Optimizing
+
+#### <a name="chapter20part2.1"></a>Chapter 20 - Part 2.1: Understanding Full-Text Search Concepts
+
+#### <a name="chapter20part2.2"></a>Chapter 20 - Part 2.2: Implementing Full-Text Search
+
+#### <a name="chapter20part2.3"></a>Chapter 20 - Part 2.3: Optimizing Full-Text Search
+
+#### <a name="chapter20part3"></a>Chapter 20 - Part 3: Spatial Data Types and Queries (if supported by the database)
+
+#### <a name="chapter20part3.1"></a>Chapter 20 - Part 3.1: Introduction to Spatial Data Types
+
+#### <a name="chapter20part3.2"></a>Chapter 20 - Part 3.2: Common Spatial Functions
+
+#### <a name="chapter20part3.3"></a>Chapter 20 - Part 3.3: Spatial Indexes
+
+#### <a name="chapter20part3.4"></a>Chapter 20 - Part 3.4: Practical Examples and Demonstrations
+
+#### <a name="chapter20part4"></a>Chapter 20 - Part 4: Using SQL with NoSQL Databases (e.g., via Polyglot Persistence)
+
+#### <a name="chapter20part4.1"></a>Chapter 20 - Part 4.1: Understanding Polyglot Persistence
+
+#### <a name="chapter20part4.2"></a>Chapter 20 - Part 4.2: Practical Examples and Demonstrations
+
+#### <a name="chapter20part5"></a>Chapter 20 - Part 5: Introduction to Graph Databases and Cypher (if applicable)
+
+#### <a name="chapter20part5.1"></a>Chapter 20 - Part 5.1: Understanding Graph Database Concepts
+
+#### <a name="chapter20part5.2"></a>Chapter 20 - Part 5.2: Introduction to Cypher Query Language
+
+#### <a name="chapter20part5.3"></a>Chapter 20 - Part 5.3: Real-World Applications
+
+#### <a name="chapter20part6"></a>Chapter 20 - Part 6: Exploring Database-Specific Extensions and Features
+
+#### <a name="chapter20part6.1"></a>Chapter 20 - Part 6.1: Understanding Database-Specific Extensions
+
+#### <a name="chapter20part6.2"></a>Chapter 20 - Part 6.2: Exploring Specific Extension Categories
+
+#### <a name="chapter20part6.3"></a>Chapter 20 - Part 6.3: Practical Examples and Demonstrations
 
 ## <a name="appendixa"></a>Appendix A: Useful DuckDB Code Snippet
 
