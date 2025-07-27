@@ -9450,33 +9450,694 @@ This lesson has provided a comprehensive overview of advanced SQL topics, online
 
 #### <a name="chapter14part1"></a>Chapter 14 - Part 1: Window Functions: Introduction and Syntax
 
+Window functions are a powerful feature in SQL that allow you to perform calculations across sets of rows that are related to the current row. Unlike aggregate functions that collapse rows into a single output row, window functions retain the individual rows while adding calculated results. This capability is essential for tasks such as ranking, calculating moving averages, and generating running totals, making them invaluable for advanced data analysis and reporting.
+
 #### <a name="chapter14part1.1"></a>Chapter 14 - Part 1.1: Understanding Window Functions
+
+Window functions operate on a "window" of rows, which is a set of rows related to the current row. This window is defined using the OVER() clause. The OVER() clause specifies how the window is partitioned and ordered. The basic syntax of a window function is as follows:
+
+```sql
+window_function(arguments) OVER (
+  [PARTITION BY column1, column2, ...]
+  [ORDER BY column1 [ASC | DESC], column2 [ASC | DESC], ...]
+  [ROWS | RANGE frame_extent]
+)
+```
+
+Let's break down each component:
+
+- ```window_function(arguments)```: This is the function you want to apply to the window. Examples include ROW_NUMBER(), RANK(), SUM(), AVG(), MIN(), MAX(), and more. The arguments depend on the specific function.
+- ```OVER()```: This clause indicates that the function is a window function.
+- ```PARTITION BY column1, column2, ...```: This divides the rows into partitions based on the specified columns. The window function is applied separately to each partition. If PARTITION BY is omitted, the entire result set is treated as a single partition.
+- ```ORDER BY column1 [ASC | DESC], column2 [ASC | DESC], ...```: This specifies the order of rows within each partition. Many window functions require an order to produce meaningful results (e.g., ranking functions).
+- ```ROWS | RANGE frame_extent```: This defines the frame, which is a subset of rows within the partition. The frame is relative to the current row. If the frame is not specified, the default frame depends on whether ORDER BY is present. If ORDER BY is present, the default frame is RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW. If ORDER BY is not present, the default frame is the entire partition.
 
 #### <a name="chapter14part1.2"></a>Chapter 14 - Part 1.2: Partitioning with PARTITION BY
 
+The PARTITION BY clause divides the result set into partitions, and the window function is applied to each partition independently. This is useful when you want to perform calculations within specific groups of data.
+
+**Example:**
+
+Consider a table called employees with the following structure:
+
+
+|employee_id	|department	|salary|
+| :---: | :---: | :---: |
+|1	|Sales	|60000|
+|2	|Sales	|75000|
+|3	|Marketing	|55000|
+|4	|Marketing	|62000|
+|5	|HR	|80000|
+|6	|HR	|70000|
+
+To calculate the average salary for each department, you can use the following query:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department) AS avg_department_salary
+FROM
+    employees;
+```
+
+This query will return the following result:
+
+|employee_id	|department	|salary	|avg_department_salary|
+| :---: | :---: | :---: | :---: |
+|5	|HR	|80000	|75000.00|
+|6	|HR	|70000	|75000.00|
+|3	|Marketing	|55000	|58500.00|
+|4	|Marketing	|62000	|58500.00|
+|1	|Sales	|60000	|67500.00|
+|2	|Sales	|75000	|67500.00|
+
+Notice that the avg_department_salary column shows the average salary for each employee's department, calculated independently for each partition defined by the department column.
+
+**Counterexample:**
+
+If you omit the PARTITION BY clause, the AVG() function will calculate the average salary for all employees:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    AVG(salary) OVER () AS overall_avg_salary
+FROM
+    employees;
+```
+
+This query will return the following result:
+
+|employee_id	|department	|salary	|overall_avg_salary|
+| :---: | :---: | :---: | :---: |
+|1	|Sales	|60000	|67000.00|
+|2	|Sales	|75000	|67000.00|
+|3	|Marketing	|55000	|67000.00|
+|4	|Marketing	|62000	|67000.00|
+|5	|HR	|80000	|67000.00|
+|6	|HR	|70000	|67000.00|
+
+In this case, overall_avg_salary is the same for all rows because the entire result set is treated as a single partition.
+
 #### <a name="chapter14part1.3"></a>Chapter 14 - Part 1.3: Ordering with ORDER BY
+
+The ORDER BY clause specifies the order of rows within each partition. This is crucial for window functions that depend on the order of rows, such as ranking functions and functions that calculate running totals or moving averages.
+
+**Example:**
+
+Using the same employees table, let's rank employees within each department based on their salary:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank
+FROM
+    employees;
+```
+
+This query will return the following result:
+
+|employee_id	|department	|salary	|salary_rank|
+| :---: | :---: | :---: | :---: |
+|5	|HR	|80000	|1|
+|6	|HR	|70000	|2|
+|4	|Marketing	|62000	|1|
+|3	|Marketing	|55000	|2|
+|2	|Sales	|75000	|1|
+|1	|Sales	|60000	|2|
+
+The salary_rank column shows the rank of each employee within their department, based on their salary in descending order.
+
+**Counterexample:**
+
+If you omit the ORDER BY clause when using a ranking function, the results may not be meaningful or predictable:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    RANK() OVER (PARTITION BY department) AS salary_rank
+FROM
+    employees;
+```
+
+The result of this query is database-dependent, but it's likely that all employees within each department will receive the same rank (typically 1), as there's no defined order within the partition.
 
 #### <a name="chapter14part1.4"></a>Chapter 14 - Part 1.4: Window Frames
 
+Window frames define the set of rows used in calculations relative to the current row within a partition. The frame is specified using the ROWS or RANGE clause within the OVER() clause.
+
+- **ROWS**: Defines the frame based on the physical row number within the partition.
+- **RANGE**: Defines the frame based on the values of the ORDER BY column(s).
+
+The frame_extent specifies the boundaries of the frame. Common options include:
+
+- **UNBOUNDED PRECEDING**: The frame starts at the first row of the partition.
+- **UNBOUNDED FOLLOWING**: The frame ends at the last row of the partition.
+- **CURRENT ROW**: The frame includes the current row.
+- **n PRECEDING**: The frame includes n rows before the current row.
+- **n FOLLOWING**: The frame includes n rows after the current row.
+- **BETWEEN start AND end**: Explicitly defines the start and end of the frame.
+
+**Example (ROWS)**:
+
+Let's calculate a 3-row moving average of salaries within each department, using the ROWS clause:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department ORDER BY salary ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS moving_avg_salary
+FROM
+    employees;
+```
+
+This query calculates the average salary for each employee, considering their salary and the salaries of the employee immediately before and after them in the sorted order within their department.
+
+**Example (RANGE):**
+
+Consider a table orders with columns order_date and order_amount. To calculate the sum of order amounts within a 7-day window around each order date, you can use the RANGE clause:
+
+```sql
+SELECT
+    order_date,
+    order_amount,
+    SUM(order_amount) OVER (ORDER BY order_date RANGE BETWEEN INTERVAL '3 days' PRECEDING AND INTERVAL '3 days' FOLLOWING) AS sum_7_day_window
+FROM
+    orders;
+```
+
+This query calculates the sum of order_amount for all orders within a 3-day range before and after each order_date.
+
+**Important Considerations:**
+
+- If ORDER BY is specified without a frame clause, the default frame is RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW. This means the window includes all rows from the beginning of the partition up to and including the current row.
+- If ORDER BY is not specified, the default frame is the entire partition.
+- The RANGE clause is only valid when an ORDER BY clause is present, and the ORDER BY clause must specify a single column.
+- The data type of the ORDER BY column must be compatible with the interval specified in the RANGE clause.
+
 #### <a name="chapter14part1.5"></a>Chapter 14 - Part 1.5: Practical Examples and Demonstrations
+
+Let's explore some more practical examples of window functions:
+
+**1. Running Total:**
+
+Calculate the running total of sales for each product category:
+
+```sql
+SELECT
+    order_date,
+    product_category,
+    sales_amount,
+    SUM(sales_amount) OVER (PARTITION BY product_category ORDER BY order_date) AS running_total
+FROM
+    sales_data;
+```
+
+This query shows the cumulative sales amount for each product category over time.
+
+**2. Percentage of Total:**
+
+Calculate the percentage of each employee's salary relative to the total salary within their department:
+
+```sql
+SELECT
+    employee_id,
+    department,
+    salary,
+    salary / SUM(salary) OVER (PARTITION BY department) AS percentage_of_total
+FROM
+    employees;
+```
+
+
+This query shows the contribution of each employee's salary to the total salary of their department.
+
+**3. Finding the Top N:**
+
+Find the top 3 customers with the highest order amounts:
+
+```sql
+SELECT
+    customer_id,
+    order_amount
+FROM (
+    SELECT
+        customer_id,
+        order_amount,
+        RANK() OVER (ORDER BY order_amount DESC) AS customer_rank
+    FROM
+        orders
+) AS ranked_customers
+WHERE
+    customer_rank <= 3;
+```
+
+This query uses a subquery with a window function to rank customers based on their order amounts and then filters the results to retrieve the top 3 customers.
 
 #### <a name="chapter14part2"></a>Chapter 14 - Part 2: Window Functions: Ranking and Partitioning
 
+Window functions are a powerful feature in SQL that allow you to perform calculations across sets of rows that are related to the current row. Unlike aggregate functions that collapse rows into a single output row, window functions retain the individual rows while adding calculated results. This lesson delves into the ranking and partitioning capabilities of window functions, enabling you to analyze data in more sophisticated ways.
+
 #### <a name="chapter14part2.1"></a>Chapter 14 - Part 2.1: Ranking Functions
+
+Ranking functions assign a rank to each row within a partition of a result set. The rank is based on the order of the rows as defined by the ORDER BY clause within the window function. Several ranking functions are available, each with slightly different behavior.
+
+**RANK()**
+
+The RANK() function assigns a rank to each row within the partition based on the specified ordering. If two or more rows have the same value for the ordering criteria, they receive the same rank. The next rank is then incremented by the number of tied rows, resulting in gaps in the ranking sequence.
+
+**Example:**
+
+Consider a table named employees with columns employee_id, employee_name, and salary. We want to rank employees within the entire company based on their salary.
+
+```sql
+SELECT
+    employee_id,
+    employee_name,
+    salary,
+    RANK() OVER (ORDER BY salary DESC) AS salary_rank
+FROM
+    employees;
+```
+
+In this example, the RANK() function is applied to the entire employees table (no partitioning). The ORDER BY salary DESC clause specifies that the ranking should be based on salary in descending order (highest salary gets rank 1). If two employees have the same salary, they will receive the same rank, and the next employee will receive a rank that skips the appropriate number.
+
+**Scenario:**
+
+|employee_id	|employee_name	|salary|	salary_rank|
+| :--: | :--: | :--: | :--: |
+|1	|Alice	|60000	|2|
+|2	|Bob	|50000	|4|
+|3	|Charlie	|70000	|1|
+|4	|David	|60000	|2|
+|5	|Eve	|40000	|5|
+
+Alice and David both have a salary of 60000, so they both get rank 2. Bob, with a salary of 50000, gets rank 4 because ranks 2 and 3 were effectively taken by Alice and David.
+
+**DENSE_RANK()**
+
+The DENSE_RANK() function is similar to RANK(), but it assigns consecutive ranks without gaps. If two or more rows have the same value for the ordering criteria, they receive the same rank, and the next rank is incremented by one, regardless of the number of tied rows.
+
+**Example:**
+
+Using the same employees table, let's use DENSE_RANK() to rank employees by salary.
+
+```sql
+SELECT
+    employee_id,
+    employee_name,
+    salary,
+    DENSE_RANK() OVER (ORDER BY salary DESC) AS salary_dense_rank
+FROM
+    employees;
+```
+
+**Scenario:**
+
+|employee_id	|employee_name	|salary	|salary_dense_rank|
+| :--: | :--: | :--: | :--: |
+|1	|Alice	|60000	|2|
+|2	|Bob	|50000	|3|
+|3	|Charlie	|70000	|1|
+|4	|David	|60000	|2|
+|5	|Eve	|40000	|4|
+
+Again, Alice and David both have a salary of 60000 and receive the same rank (2). However, Bob, with a salary of 50000, gets rank 3 because DENSE_RANK() doesn't skip any ranks.
+
+**ROW_NUMBER()**
+
+The ROW_NUMBER() function assigns a unique sequential integer to each row within the partition, regardless of the values in the ordering criteria. Even if two rows have the same value, they will receive different row numbers. The order is determined by the ORDER BY clause.
+
+**Example:**
+
+Using the employees table, let's assign a unique row number to each employee based on their salary.
+
+```sql
+SELECT
+    employee_id,
+    employee_name,
+    salary,
+    ROW_NUMBER() OVER (ORDER BY salary DESC) AS salary_row_number
+FROM
+    employees;
+```
+
+**Scenario:**
+
+|employee_id	|employee_name	|salary	|salary_row_number|
+| :--: | :--: | :--: | :--: |
+|1	|Alice	|60000	|2|
+|2	|Bob	|50000	|4|
+|3	|Charlie	|70000	|1|
+|4	|David	|60000	|3|
+|5	|Eve	|40000	|5|
+
+Charlie gets row number 1 because he has the highest salary. Alice gets row number 2. Even though Alice and David have the same salary, David gets row number 3 because the database engine assigns row numbers arbitrarily when values are the same. Bob gets row number 4, and Eve gets row number 5.
+
+**NTILE(n)**
+
+The NTILE(n) function divides the rows in a partition into n groups and assigns a bucket number to each row. The bucket numbers range from 1 to n. The goal is to make each group as equally sized as possible. If the number of rows in the partition is not divisible by n, the extra rows are distributed among the first groups.
+
+**Example:**
+
+Let's divide the employees table into 3 groups based on salary.
+
+```sql
+SELECT
+    employee_id,
+    employee_name,
+    salary,
+    NTILE(3) OVER (ORDER BY salary DESC) AS salary_ntile
+FROM
+    employees;
+```
+
+**Scenario:**
+
+|employee_id	|employee_name	|salary	|salary_ntile|
+| :--: | :--: | :--: | :--: |
+|3	|Charlie	|70000	|1|
+|1	|Alice	|60000	|1|
+|4	|David	|60000	|2|
+|2	|Bob	|50000	|2|
+|5	|Eve	|40000	|3|
+
+In this case, the employees are divided into three groups. The first two groups have two employees each, and the last group has one employee. Charlie and Alice are in the first group (bucket 1), David and Bob are in the second group (bucket 2), and Eve is in the third group (bucket 3).
 
 #### <a name="chapter14part2.2"></a>Chapter 14 - Part 2.2: Partitioning with PARTITION BY
 
+The PARTITION BY clause divides the result set into partitions. The window function is then applied to each partition independently. This allows you to perform ranking and other calculations within specific groups of rows.
+
+**Example:**
+
+Consider a table named sales with columns product_id, region, and sales_amount. We want to rank products within each region based on their sales amount.
+
+```sql
+SELECT
+    product_id,
+    region,
+    sales_amount,
+    RANK() OVER (PARTITION BY region ORDER BY sales_amount DESC) AS sales_rank
+FROM
+    sales;
+```
+
+In this example, the PARTITION BY region clause divides the sales table into partitions based on the region column. The RANK() function is then applied to each region independently. The ORDER BY sales_amount DESC clause specifies that the ranking should be based on sales amount in descending order within each region.
+
+**Scenario:**
+
+|product_id	|region	|sales_amount	|sales_rank|
+| :--: | :--: | :--: | :--: |
+|1	|North	|1000	|2|
+|2	|North	|1500	|1|
+|3	|North	|1000	|2|
+|4	|South	|2000	|1|
+|5	|South	|1500	|2|
+|6	|South	|1000	|3|
+
+Product 2 in the North region has the highest sales amount and receives rank 1 within the North region. Products 1 and 3 have the same sales amount and receive the same rank (2). Product 4 in the South region has the highest sales amount and receives rank 1 within the South region.
+
 #### <a name="chapter14part2.3"></a>Chapter 14 - Part 2.3: Combining Ranking and Partitioning
+
+You can combine ranking functions with the PARTITION BY clause to perform sophisticated analysis within specific groups of rows.
+
+**Example:**
+
+Using the employees table with columns employee_id, employee_name, salary, and department, let's find the highest-paid employee in each department.
+
+```sql
+SELECT
+    employee_id,
+    employee_name,
+    salary,
+    department,
+    RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS salary_rank_in_dept
+FROM
+    employees
+QUALIFY salary_rank_in_dept = 1;
+```
+
+In this example, the PARTITION BY department clause divides the employees table into partitions based on the department column. The RANK() function is then applied to each department independently. The ORDER BY salary DESC clause specifies that the ranking should be based on salary in descending order within each department. The QUALIFY clause filters the results to only include employees with a rank of 1 within their department, effectively selecting the highest-paid employee in each department. Note that QUALIFY is a more modern and efficient alternative to using a subquery or CTE for filtering window function results.
+
+**Scenario:**
+
+|employee_id	|employee_name	|salary	|department	|salary_rank_in_dept|
+| :--: | :--: | :--: | :--: | :--: |
+|3	|Charlie	|70000	|Sales	|1|
+|4	|David	|60000	|Marketing	|1|
+
+Charlie is the highest-paid employee in the Sales department, and David is the highest-paid employee in the Marketing department.
 
 #### <a name="chapter14part3"></a>Chapter 14 - Part 3: Window Functions: Aggregate Calculations
 
+Window functions truly shine when performing aggregate calculations. Unlike standard aggregate functions that collapse rows into a single summary row, window aggregate functions compute aggregates for each row within a defined window or frame. This allows you to see both the individual row values and the aggregate values side-by-side, providing powerful insights into your data. This lesson will explore how to use window functions for aggregate calculations, including SUM(), AVG(), MIN(), MAX(), and COUNT(), along with partitioning and ordering to define the window.
+
 #### <a name="chapter14part3.1"></a>Chapter 14 - Part 3.1: Aggregate Window Functions: The Basics
+
+Aggregate window functions allow you to perform calculations across a set of rows that are related to the current row. The key difference between regular aggregate functions and window aggregate functions is that window functions do not group the rows into a single output row. Instead, they return a value for each row in the input.
+
+The basic syntax for using aggregate window functions is as follows:
+
+```sql
+AGGREGATE_FUNCTION(expression) OVER (
+    [PARTITION BY column1, column2, ...]
+    [ORDER BY column1, column2, ...]
+    [ROWS or RANGE frame_definition]
+)
+```
+
+- ```AGGREGATE_FUNCTION```: This is the aggregate function you want to use, such as SUM(), AVG(), MIN(), MAX(), or COUNT().
+- ```OVER()```: This clause indicates that you're using a window function.
+- ```PARTITION BY```: This clause divides the rows into partitions based on the specified columns. The aggregate function is calculated separately for each partition. If omitted, the entire result set is treated as a single partition.
+- ```ORDER BY```: This clause defines the order of rows within each partition. This is crucial for cumulative calculations and when using frame definitions.
+- ```ROWS or RANGE frame_definition```: This clause defines the window frame, which is the set of rows used to calculate the aggregate function for the current row. If omitted, the default frame is RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW when ORDER BY is specified, and the entire partition when ORDER BY is not specified.
 
 #### <a name="chapter14part3.2"></a>Chapter 14 - Part 3.2: Common Aggregate Window Functions
 
+Let's explore some of the most common aggregate window functions with examples. We'll use a hypothetical table called sales with the following structure:
+
+|order_id	|customer_id	|order_date	|product_category	|sales_amount|
+| :--: | :--: | :--: | :--: | :--: |
+|1	|101	|2023-01-01	|Electronics	|500|
+|2	|101	|2023-01-15	|Clothing	|200|
+|3	|102	|2023-01-20	|Electronics	|800|
+|4	|101	|2023-02-01	|Electronics	|600|
+|5	|102	|2023-02-10	|Clothing	|150|
+|6	|103	|2023-02-15	|Furniture	|1000|
+|7	|101	|2023-03-01	|Clothing	|250|
+|8	|102	|2023-03-05	|Electronics	|700|
+|9	|103	|2023-03-10	|Furniture	|1200|
+
+**SUM()**
+
+The SUM() function calculates the sum of values in a window.
+
+**Example 1: Calculating the cumulative sales amount for each customer.**
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    sales_amount,
+    SUM(sales_amount) OVER (PARTITION BY customer_id ORDER BY order_date) AS cumulative_sales_amount
+FROM
+    sales;
+```
+
+This query calculates the cumulative sales amount for each customer, ordered by the order date. The PARTITION BY customer_id clause ensures that the sum is calculated separately for each customer. The ORDER BY order_date clause specifies the order in which the sales amounts are added.
+
+**Example 2: Calculating the total sales amount for each product category.**
+
+```sql
+SELECT
+    order_id,
+    product_category,
+    sales_amount,
+    SUM(sales_amount) OVER (PARTITION BY product_category) AS total_category_sales
+FROM
+    sales;
+```
+
+This query calculates the total sales amount for each product category. The PARTITION BY product_category clause ensures that the sum is calculated separately for each category.
+
+**AVG()**
+
+The AVG() function calculates the average of values in a window.
+
+**Example 1: Calculating the moving average sales amount for each customer over a 30-day window.**
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    sales_amount,
+    AVG(sales_amount) OVER (PARTITION BY customer_id ORDER BY order_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_average_sales
+FROM
+    sales;
+```
+
+This query calculates the moving average sales amount for each customer, considering the current row and the two preceding rows (based on order_date). The ROWS BETWEEN 2 PRECEDING AND CURRENT ROW clause defines the window frame.
+
+**Example 2: Calculating the average sales amount for each product category.**
+
+```sql
+SELECT
+    order_id,
+    product_category,
+    sales_amount,
+    AVG(sales_amount) OVER (PARTITION BY product_category) AS average_category_sales
+FROM
+    sales;
+```
+
+This query calculates the average sales amount for each product category.
+
+**MIN() and MAX()**
+
+The MIN() and MAX() functions find the minimum and maximum values in a window, respectively.
+
+**Example 1: Finding the minimum sales amount to date for each customer.**
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    sales_amount,
+    MIN(sales_amount) OVER (PARTITION BY customer_id ORDER BY order_date) AS min_sales_to_date
+FROM
+    sales;
+```
+
+This query finds the minimum sales amount for each customer up to the current order date.
+
+**Example 2: Finding the maximum sales amount within each product category.**
+
+```sql
+SELECT
+    order_id,
+    product_category,
+    sales_amount,
+    MAX(sales_amount) OVER (PARTITION BY product_category) AS max_category_sales
+FROM
+    sales;
+```
+
+This query finds the maximum sales amount within each product category.
+
+**COUNT()**
+
+The COUNT() function counts the number of rows in a window.
+
+**Example 1: Counting the number of orders placed by each customer to date.**
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    COUNT(*) OVER (PARTITION BY customer_id ORDER BY order_date) AS order_count_to_date
+FROM
+    sales;
+```
+
+This query counts the number of orders placed by each customer up to the current order date.
+
+**Example 2: Counting the number of orders in each product category.**
+
+```sql
+SELECT
+    order_id,
+    product_category,
+    COUNT(*) OVER (PARTITION BY product_category) AS category_order_count
+FROM
+    sales;
+```
+
+This query counts the number of orders in each product category.
+
 #### <a name="chapter14part3.3"></a>Chapter 14 - Part 3.3: Window Frames
 
+Window frames define the set of rows that are included in the calculation for the current row. You can specify the frame using the ROWS or RANGE clause within the OVER() clause.
+
+**ROWS**
+
+The ROWS clause defines the frame based on the physical row number within the partition.
+
+Example:
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    sales_amount,
+    SUM(sales_amount) OVER (PARTITION BY customer_id ORDER BY order_date ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS sum_of_nearby_sales
+FROM
+    sales;
+```
+
+This query calculates the sum of sales amounts for each customer, including the current row, the preceding row, and the following row.
+
+**RANGE**
+
+The RANGE clause defines the frame based on the values of the ORDER BY column. This is useful when you want to include rows within a certain range of values.
+
+Example:
+
+```sql
+SELECT
+    order_id,
+    customer_id,
+    order_date,
+    sales_amount,
+    AVG(sales_amount) OVER (PARTITION BY customer_id ORDER BY order_date RANGE BETWEEN INTERVAL '30' DAY PRECEDING AND CURRENT ROW) AS avg_sales_last_30_days
+FROM
+    sales;
+```
+
+This query calculates the average sales amount for each customer over the last 30 days, based on the order_date.
+
 #### <a name="chapter14part3.4"></a>Chapter 14 - Part 3.4: Practical Examples and Demonstrations
+
+Let's consider a more complex scenario. Suppose you want to analyze the sales performance of different product categories over time and compare each category's sales to the overall sales trend.
+
+```sql
+SELECT
+    order_date,
+    product_category,
+    SUM(sales_amount) AS category_sales,
+    SUM(SUM(sales_amount)) OVER (ORDER BY order_date) AS cumulative_sales,
+    SUM(SUM(sales_amount)) OVER (PARTITION BY product_category ORDER BY order_date) AS cumulative_category_sales,
+    SUM(sales_amount) OVER (PARTITION BY order_date) AS daily_sales
+FROM
+    sales
+GROUP BY
+    order_date,
+    product_category
+ORDER BY
+    order_date,
+    product_category;
+```
+
+This query calculates:
+
+- category_sales: The total sales for each product category on each day.
+- cumulative_sales: The cumulative sales across all categories over time.
+- cumulative_category_sales: The cumulative sales for each product category over time.
+- daily_sales: The total sales for each day across all categories.
+
+This example demonstrates how window functions can be combined with regular aggregate functions and GROUP BY clauses to perform complex data analysis.
 
 #### <a name="chapter14part4"></a>Chapter 14 - Part 4: Common Table Expressions (CTEs): Recursive Queries
 
