@@ -11364,29 +11364,509 @@ This query adds a new column is_archived to the orders table and sets its defaul
 
 #### <a name="chapter15part3"></a>Chapter 15 - Part 3: Advanced DELETE Statements: Deleting with Subqueries
 
+Deleting data is a crucial part of data management. While basic DELETE statements remove rows based on simple conditions, subqueries allow for more complex and dynamic deletion criteria. This lesson explores how to leverage subqueries within DELETE statements to target specific data based on relationships with other tables or calculated values. This builds upon the INSERT and UPDATE statements covered in previous lessons, where we also used subqueries to manipulate data. Understanding how to effectively use subqueries in DELETE statements is essential for maintaining data integrity and accuracy.
+
 #### <a name="chapter15part3.1"></a>Chapter 15 - Part 3.1: Understanding DELETE with Subqueries
+
+A subquery, also known as an inner query or nested query, is a query embedded inside another SQL query. In the context of DELETE statements, subqueries are typically used in the WHERE clause to define the conditions for which rows should be deleted. This allows you to delete rows based on data from other tables or based on the results of calculations.
+
+The basic syntax for using a subquery in a DELETE statement is as follows:
+
+```sql
+DELETE FROM table_name
+WHERE column_name IN (SELECT column_name FROM another_table WHERE condition);
+```
+
+In this syntax:
+
+- table_name is the table from which you want to delete rows.
+- column_name in the WHERE clause is the column in table_name that you want to compare with the results of the subquery.
+- SELECT column_name FROM another_table WHERE condition is the subquery that returns a set of values.
+- IN is an operator that checks if the value of column_name in table_name exists within the set of values returned by the subquery.
+
+**Types of Subqueries in DELETE Statements**
+
+There are several types of subqueries that can be used in DELETE statements, each serving a different purpose:
+
+- **Scalar Subqueries**: These subqueries return a single value. They can be used with comparison operators such as =, >, <, >=, <=, or <>.
+- **Multiple-Row Subqueries**: These subqueries return multiple rows and are typically used with operators like IN, NOT IN, ANY, or ALL.
+- **Correlated Subqueries**: These subqueries reference a column from the outer query (the DELETE statement). They are evaluated once for each row in the outer query.
+- **EXISTS and NOT EXISTS Subqueries**: These subqueries check for the existence of rows that satisfy a certain condition. They return TRUE if any rows are found and FALSE otherwise.
 
 #### <a name="chapter15part3.2"></a>Chapter 15 - Part 3.2: Practical Examples of DELETE with Subqueries
 
+Let's consider a database with two tables: employees and departments. The employees table contains information about employees, including their employee ID (employee_id), name, and department ID (department_id). The departments table contains information about departments, including their department ID (department_id) and name.
+
+**Example 1: Deleting Employees in a Specific Department (IN operator)**
+
+Suppose you want to delete all employees who belong to the 'Marketing' department. You can use a subquery with the IN operator to achieve this:
+
+```sql
+DELETE FROM employees
+WHERE department_id IN (SELECT department_id FROM departments WHERE department_name = 'Marketing');
+```
+
+**Explanation:**
+
+- The subquery SELECT department_id FROM departments WHERE department_name = 'Marketing' retrieves the department_id for the 'Marketing' department.
+- The outer query DELETE FROM employees WHERE department_id IN (...) then deletes all employees whose department_id matches the department_id returned by the subquery.
+
+**Example 2: Deleting Employees Not in Any Department (NOT IN operator)**
+
+Suppose you want to delete all employees who are not assigned to any department (i.e., their department_id does not exist in the departments table). You can use a subquery with the NOT IN operator:
+
+```sql
+DELETE FROM employees
+WHERE department_id NOT IN (SELECT department_id FROM departments);
+```
+
+**Explanation:**
+
+- The subquery SELECT department_id FROM departments retrieves all department_id values from the departments table.
+- The outer query DELETE FROM employees WHERE department_id NOT IN (...) then deletes all employees whose department_id is not found in the list of department_id values returned by the subquery.
+
+**Example 3: Deleting Employees with Salary Above Average (Scalar Subquery)**
+
+Suppose you want to delete all employees whose salary is above the average salary of all employees. You can use a scalar subquery with the > operator:
+
+```sql
+DELETE FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+```
+
+**Explanation:**
+
+- The subquery SELECT AVG(salary) FROM employees calculates the average salary of all employees.
+- The outer query DELETE FROM employees WHERE salary > (...) then deletes all employees whose salary is greater than the average salary returned by the subquery.
+
+**Example 4: Deleting Departments with No Employees (EXISTS operator)**
+
+Suppose you want to delete departments that have no employees assigned to them. You can use a subquery with the NOT EXISTS operator:
+
+```sql
+DELETE FROM departments
+WHERE NOT EXISTS (SELECT 1 FROM employees WHERE employees.department_id = departments.department_id);
+```
+
+**Explanation:**
+
+- The subquery SELECT 1 FROM employees WHERE employees.department_id = departments.department_id checks if there are any employees in the employees table with a department_id that matches the department_id of the current department in the departments table.
+- The outer query DELETE FROM departments WHERE NOT EXISTS (...) then deletes all departments for which the subquery returns no rows (i.e., departments with no employees).
+
+**Example 5: Correlated Subquery for Deletion**
+
+Let's say you have an orders table and a customers table. You want to delete customers who haven't placed any orders in the last year.
+
+```sql
+DELETE FROM customers
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM orders
+    WHERE orders.customer_id = customers.customer_id
+    AND order_date >= DATE('now', '-1 year')
+);
+```
+
+**Explanation:**
+
+- This correlated subquery checks for each customer if there are any orders in the orders table placed within the last year.
+- The outer query then deletes the customer if no such order exists.
+
 #### <a name="chapter15part4"></a>Chapter 15 - Part 4: Understanding Transactions: ACID Properties
+
+Transactions are a fundamental concept in database management, ensuring data integrity and reliability. They provide a way to group a set of operations into a single logical unit of work. This unit either completely succeeds, applying all changes to the database, or completely fails, leaving the database in its original state. Understanding transactions and their properties is crucial for building robust and dependable applications that interact with databases.
 
 #### <a name="chapter15part4.1"></a>Chapter 15 - Part 4.1: Understanding the ACID Properties
 
+The acronym ACID represents the four key properties that define a reliable database transaction: Atomicity, Consistency, Isolation, and Durability. These properties guarantee that transactions are processed reliably, even in the face of system failures or concurrent access.
+
+**Atomicity**
+
+Atomicity ensures that a transaction is treated as a single, indivisible unit of work. This means that either all the operations within the transaction are successfully completed, or none of them are. If any part of the transaction fails, the entire transaction is rolled back, and the database is left in its original state as if the transaction never occurred.
+
+Example: Consider a bank transfer where money is debited from one account and credited to another. Atomicity ensures that either both the debit and credit operations occur successfully, or neither occurs. If the debit operation succeeds but the credit operation fails (e.g., due to insufficient funds in the destination account), the transaction is rolled back, and the debit is also undone, preventing money from being lost.
+
+Hypothetical Scenario: Imagine an e-commerce platform processing an order. The transaction involves updating inventory, creating an order record, and charging the customer. If the inventory update succeeds, but the payment processing fails, the atomicity property ensures that the inventory is restored to its original state, and no order is created, preventing the system from being in an inconsistent state.
+
+**Consistency**
+
+Consistency ensures that a transaction transforms the database from one valid state to another. It maintains the integrity of the data by adhering to defined rules, constraints, and business logic. A transaction cannot violate these rules; if it attempts to do so, the transaction is rolled back.
+
+Example: In a database for a library, a consistency rule might state that the number of books borrowed by a member cannot exceed a certain limit. If a transaction attempts to lend a book to a member who has already reached their limit, the transaction will be rolled back, preventing the database from entering an inconsistent state where the borrowing limit is violated.
+
+Real-World Application: Consider a system managing airline reservations. A consistency rule might dictate that the number of passengers booked on a flight cannot exceed the aircraft's capacity. The database enforces this rule, preventing overbooking and ensuring data integrity.
+
+Hypothetical Scenario: A university database has a rule that a student's GPA must be between 0.0 and 4.0. If a transaction attempts to update a student's GPA to 4.5, the transaction will be rolled back to maintain consistency.
+
+**Isolation**
+
+Isolation controls the visibility of changes made by one transaction to other concurrent transactions. It ensures that each transaction operates as if it were the only transaction running on the database, preventing interference from other transactions. Different isolation levels provide varying degrees of protection against concurrency issues like dirty reads, non-repeatable reads, and phantom reads. We will explore isolation levels in more detail in a later lesson.
+
+Example: Two users are simultaneously trying to update the same product's price in an e-commerce database. Isolation ensures that one user's changes are not visible to the other user until the first transaction is committed. This prevents one user from making decisions based on incomplete or incorrect data.
+
+Real-World Application: In a banking system, multiple tellers might be accessing the same account simultaneously. Isolation ensures that each teller sees a consistent view of the account balance, preventing race conditions and ensuring accurate transactions.
+
+Hypothetical Scenario: Two concurrent transactions are trying to update the quantity of a product in an inventory system. Without proper isolation, one transaction might read the quantity before the other transaction has committed its changes, leading to incorrect inventory levels.
+
+**Durability**
+
+Durability guarantees that once a transaction is committed, its changes are permanent and will survive even system failures such as power outages or hardware crashes. The database system typically uses techniques like write-ahead logging and backups to ensure durability.
+
+Example: After a customer successfully completes an online purchase, the order details are stored in the database. Durability ensures that even if the server crashes immediately after the transaction is committed, the order details will still be available when the system recovers.
+
+Real-World Application: In a financial system, durability is critical for ensuring that all transactions are recorded permanently and cannot be lost due to system failures. This is essential for maintaining accurate financial records and preventing fraud.
+
+Hypothetical Scenario: A hospital database records patient information. After a doctor updates a patient's medical history, durability ensures that the changes are permanently stored and can be retrieved even if the system experiences a power outage.
+
 #### <a name="chapter15part5"></a>Chapter 15 - Part 5: Implementing Transactions: BEGIN, COMMIT, and ROLLBACK
+
+Transactions are a cornerstone of reliable database management, ensuring data integrity and consistency even in the face of unexpected errors or system failures. They provide a mechanism to group a series of operations into a single logical unit of work, guaranteeing that either all operations within the transaction succeed, or none of them do. This "all or nothing" approach is crucial for maintaining the accuracy and reliability of data, especially in complex applications where multiple tables and records may be affected by a single user action. Understanding and implementing transactions correctly is essential for any database professional.
 
 #### <a name="chapter15part5.1"></a>Chapter 15 - Part 5.1: Understanding BEGIN, COMMIT, and ROLLBACK
 
+The fundamental commands for managing transactions in SQL are BEGIN, COMMIT, and ROLLBACK. These commands define the boundaries of a transaction and control its outcome.
+
+**BEGIN**
+
+The BEGIN statement marks the start of a new transaction. It essentially tells the database system to start tracking all subsequent changes as part of a single unit. Until a COMMIT or ROLLBACK statement is issued, all modifications made within the transaction are considered tentative and are not permanently written to the database.
+
+Example:
+
+```sql
+BEGIN; -- Starts a new transaction
+```
+
+In many database systems, especially when not in autocommit mode, a BEGIN statement is implicitly issued when the first data modification statement (e.g., INSERT, UPDATE, DELETE) is executed. However, explicitly using BEGIN is a good practice for clarity and control.
+
+**COMMIT**
+
+The COMMIT statement signals the successful completion of a transaction. When a COMMIT is issued, all changes made within the transaction are permanently saved to the database. The changes become visible to other users and are guaranteed to survive system crashes or other failures.
+
+Example:
+
+```sql
+COMMIT; -- Commits the current transaction
+```
+
+After a COMMIT statement, a new transaction implicitly begins, unless autocommit is enabled.
+
+**ROLLBACK**
+
+The ROLLBACK statement is used to undo all changes made within a transaction. It effectively reverts the database to its state before the transaction began. This is useful when an error occurs during the transaction, or if the user decides to cancel the operation.
+
+Example:
+
+```sql
+ROLLBACK; -- Rolls back the current transaction
+```
+
+After a ROLLBACK statement, any changes made within the transaction are discarded, and the database remains unchanged. A new transaction implicitly begins after a ROLLBACK, unless autocommit is enabled.
+
 #### <a name="chapter15part5.2"></a>Chapter 15 - Part 5.2: Practical Examples and Demonstrations
+
+Let's illustrate the use of BEGIN, COMMIT, and ROLLBACK with practical examples using a hypothetical e-commerce database. Assume we have two tables: accounts (containing account balances) and transaction_log (recording all transactions).
+
+**Example 1: Successful Transfer**
+
+This example demonstrates a successful transfer of funds between two accounts.
+
+```sql
+BEGIN;
+
+-- Deduct $100 from account A
+UPDATE accounts SET balance = balance - 100 WHERE account_id = 'A';
+
+-- Add $100 to account B
+UPDATE accounts SET balance = balance + 100 WHERE account_id = 'B';
+
+-- Log the transaction
+INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+VALUES ('A', 'Debit', 100, NOW());
+
+INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+VALUES ('B', 'Credit', 100, NOW());
+
+COMMIT;
+```
+
+In this example, if all four statements execute successfully, the COMMIT statement ensures that the changes are permanently saved. Account A's balance is reduced, Account B's balance is increased, and the transaction log is updated.
+
+**Example 2: Failed Transfer with ROLLBACK**
+
+This example demonstrates a scenario where the transfer fails due to insufficient funds in account A.
+
+```sql
+BEGIN;
+
+-- Attempt to deduct $1000 from account A (which only has $500)
+UPDATE accounts SET balance = balance - 1000 WHERE account_id = 'A';
+
+-- Check if the update was successful (balance >= 0)
+SELECT CASE WHEN balance >= 0 THEN TRUE ELSE FALSE END AS sufficient_funds FROM accounts WHERE account_id = 'A';
+
+-- If sufficient_funds is FALSE, rollback the transaction
+ROLLBACK;
+
+-- If sufficient_funds is TRUE, continue with the transaction
+-- Add $1000 to account B (this will not be executed if the transaction is rolled back)
+UPDATE accounts SET balance = balance + 1000 WHERE account_id = 'B';
+
+-- Log the transaction (this will not be executed if the transaction is rolled back)
+INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+VALUES ('A', 'Debit', 1000, NOW());
+
+INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+VALUES ('B', 'Credit', 1000, NOW());
+
+COMMIT;
+```
+
+In this example, the UPDATE statement attempts to deduct $1000 from account A, which only has $500. After the update, the balance of account A will be negative. The SELECT statement checks if the balance is non-negative. If the balance is negative, the ROLLBACK statement is executed, undoing the changes made by the UPDATE statement. Account B's balance remains unchanged, and no entries are added to the transaction log.
+
+Note: The specific syntax for checking the balance and conditionally rolling back the transaction may vary depending on the database system. Some systems provide more sophisticated error handling mechanisms that can be used to achieve the same result.
+
+**Example 3: Handling Exceptions**
+
+This example demonstrates how to handle exceptions within a transaction using TRY...CATCH blocks (syntax may vary depending on the database system).
+
+```sql
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Deduct $100 from account A
+    UPDATE accounts SET balance = balance - 100 WHERE account_id = 'A';
+
+    -- Simulate an error (e.g., inserting a duplicate key)
+    INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+    VALUES ('A', 'Debit', 100, NOW());
+
+    -- Add $100 to account B
+    UPDATE accounts SET balance = balance + 100 WHERE account_id = 'B';
+
+    -- Log the transaction
+    INSERT INTO transaction_log (account_id, transaction_type, amount, transaction_date)
+    VALUES ('B', 'Credit', 100, NOW());
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    -- Log the error
+    INSERT INTO error_log (error_message, error_date)
+    VALUES (ERROR_MESSAGE(), GETDATE());
+
+    -- Optionally re-throw the error
+    THROW;
+END CATCH;
+```
+
+In this example, the TRY block contains the transaction logic. If an error occurs within the TRY block, the control is transferred to the CATCH block. The CATCH block checks if a transaction is active (@@TRANCOUNT > 0) and, if so, rolls back the transaction. It also logs the error and optionally re-throws the error to be handled by a higher-level error handler.
 
 #### <a name="chapter15part6"></a>Chapter 15 - Part 6: Concurrency Control: Locking and Isolation Levels
 
+Concurrency control is essential in database systems to ensure data integrity when multiple transactions access and modify the same data concurrently. Without proper control mechanisms, issues like lost updates, dirty reads, and inconsistent analysis can arise, leading to data corruption and unreliable results. This lesson delves into the mechanisms of locking and isolation levels, which are fundamental to managing concurrent access and maintaining the ACID properties of transactions, building upon the transaction concepts introduced in the previous lesson.
+
 #### <a name="chapter15part6.1"></a>Chapter 15 - Part 6.1: Understanding Concurrency Issues
+
+When multiple transactions execute concurrently, several problems can occur if proper concurrency control mechanisms are not in place. These problems can compromise data integrity and consistency.
+
+**Lost Update**
+
+The lost update anomaly occurs when two transactions read the same data, and then both attempt to update it. The second update overwrites the first, effectively losing the first transaction's update.
+
+Example: Imagine two users, Alice and Bob, are booking seats for a concert. There's one seat left.
+
+- Alice checks and sees 1 seat available.
+- Bob checks and also sees 1 seat available.
+- Alice books the seat.
+- Bob books the seat.
+
+Without proper locking, both bookings might be committed, resulting in overbooking. Bob's update overwrites Alice's, and the database incorrectly shows two bookings for one seat.
+
+**Dirty Read**
+
+A dirty read happens when a transaction reads data that has been modified by another transaction but not yet committed. If the modifying transaction rolls back, the reading transaction will have read incorrect data.
+
+Example: Consider a banking scenario where Transaction A transfers $100 from account X to account Y. Transaction B then reads the balance of account Y before Transaction A commits. If Transaction A subsequently rolls back due to insufficient funds in account X, Transaction B has read an incorrect, "dirty" value for account Y.
+
+**Non-Repeatable Read**
+
+A non-repeatable read occurs when a transaction reads the same data item multiple times, but the value changes between reads due to another transaction updating it.
+
+Example: Suppose Transaction A reads the balance of a customer's account. Before Transaction A completes, Transaction B transfers money into that account and commits the change. If Transaction A reads the customer's balance again, it will see a different value than the first time, even though Transaction A itself has not modified the data.
+
+**Phantom Read**
+
+A phantom read is similar to a non-repeatable read, but it involves the insertion or deletion of rows that satisfy a transaction's query. If a transaction executes the same query twice, it may see additional ("phantom") rows or missing rows in the second result set.
+
+Example: Transaction A selects all customers from a specific city. Before Transaction A completes, Transaction B inserts a new customer from that city and commits the change. If Transaction A executes the same select query again, it will see the newly inserted customer as a "phantom" row.
 
 #### <a name="chapter15part6.2"></a>Chapter 15 - Part 6.2: Locking Mechanisms
 
+Locking is a fundamental concurrency control technique that prevents multiple transactions from accessing the same data concurrently in a way that could lead to data inconsistencies.
+
+**Shared Locks (Read Locks)**
+
+A shared lock allows multiple transactions to read a data item concurrently. However, no transaction can modify the data item while a shared lock is held.
+
+- Purpose: To allow concurrent reads while preventing writes.
+- Compatibility: Multiple shared locks can be held on the same data item simultaneously.
+- Example: Several users viewing the details of a product in an e-commerce system.
+
+**Exclusive Locks (Write Locks)**
+
+An exclusive lock grants a transaction exclusive access to a data item. No other transaction can read or write the data item while an exclusive lock is held.
+
+- Purpose: To ensure that only one transaction can modify a data item at a time.
+- Compatibility: No other locks (shared or exclusive) can be held on the same data item simultaneously.
+- Example: Updating the inventory count of a product after a sale.
+
+**Lock Granularity**
+
+Lock granularity refers to the size of the data item that is locked. It can range from entire tables to individual rows or even fields within a row.
+
+- Table-level locking: Locks the entire table. Simple to implement but reduces concurrency.
+- Page-level locking: Locks a physical page of data on disk. A compromise between table-level and row-level locking.
+- Row-level locking: Locks individual rows. Provides the highest degree of concurrency but can be more complex to manage.
+
+Example: Consider an online bookstore. Table-level locking on the Books table would prevent any concurrent updates or reads while a transaction is modifying book details. Row-level locking would allow multiple transactions to update different books simultaneously, improving concurrency.
+
+**Two-Phase Locking (2PL)**
+
+Two-Phase Locking (2PL) is a concurrency control protocol that ensures serializability of transactions. It consists of two phases:
+
+- Growing Phase: Transactions acquire locks but cannot release them.
+- Shrinking Phase: Transactions release locks but cannot acquire new ones.
+
+Strict 2PL: A variation where exclusive locks are held until the transaction commits or rolls back. This prevents dirty reads and cascading rollbacks.
+
+Example:
+
+Transaction A:
+
+- Growing Phase: Acquires a shared lock on Books table to read book details.
+- Growing Phase: Acquires an exclusive lock on a specific row in Books to update the quantity.
+- Shrinking Phase: Releases the shared lock after reading.
+- Shrinking Phase: Releases the exclusive lock after committing the update.
+
+**Deadlocks**
+
+A deadlock occurs when two or more transactions are blocked indefinitely, waiting for each other to release locks.
+
+Example:
+
+- Transaction A acquires a lock on row X.
+- Transaction B acquires a lock on row Y.
+- Transaction A tries to acquire a lock on row Y but is blocked by Transaction B.
+- Transaction B tries to acquire a lock on row X but is blocked by Transaction A.
+
+This creates a circular dependency, and neither transaction can proceed.
+
+**Deadlock Detection and Prevention**
+
+Deadlock Detection: Databases periodically check for deadlocks by analyzing the wait-for graph. If a deadlock is detected, one of the transactions is chosen as a victim and rolled back, releasing its locks. Deadlock Prevention: Strategies to prevent deadlocks include:
+
+- Lock Ordering: Transactions acquire locks in a predefined order.
+- Timeout: Transactions wait for a limited time to acquire a lock. If the timeout expires, the transaction is rolled back.
+
 #### <a name="chapter15part6.3"></a>Chapter 15 - Part 6.3: Isolation Levels
 
+Isolation levels define the degree to which transactions are isolated from the effects of other concurrent transactions. Higher isolation levels provide greater data consistency but can reduce concurrency. SQL standard defines four isolation levels:
+
+**Read Uncommitted**
+
+The lowest isolation level. Transactions can read data that has been modified by other transactions but not yet committed (dirty reads).
+
+- Pros: Highest concurrency.
+- Cons: Can lead to dirty reads, non-repeatable reads, and phantom reads.
+- Use Case: Scenarios where approximate data is acceptable, such as preliminary data analysis.
+
+**Read Committed**
+
+Transactions can only read data that has been committed by other transactions. Prevents dirty reads.
+
+- Pros: Prevents dirty reads.
+- Cons: Can still lead to non-repeatable reads and phantom reads.
+- Use Case: Common in many applications where reading uncommitted data is unacceptable.
+
+**Repeatable Read**
+
+Transactions can read the same data multiple times within the same transaction and get the same results. Prevents dirty reads and non-repeatable reads.
+
+- Pros: Prevents dirty reads and non-repeatable reads.
+- Cons: Can still lead to phantom reads.
+- Use Case: Applications requiring consistent data reads throughout a transaction, such as generating reports.
+
+**Serializable**
+
+The highest isolation level. Transactions are completely isolated from each other. Prevents dirty reads, non-repeatable reads, and phantom reads.
+
+- Pros: Provides the highest level of data consistency.
+- Cons: Can significantly reduce concurrency.
+- Use Case: Critical applications where data integrity is paramount, such as financial transactions.
+
+**Setting Isolation Levels**
+
+Isolation levels can be set at the database level or for individual transactions. The syntax varies depending on the database system.
+
+Example (PostgreSQL):
+
+```sql
+-- Set the transaction isolation level
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Start a transaction
+BEGIN;
+
+-- Perform database operations
+SELECT * FROM accounts WHERE account_id = 123;
+
+-- Commit the transaction
+COMMIT;
+```
+
+Example (MySQL):
+
+```sql
+-- Set the transaction isolation level
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+-- Start a transaction
+START TRANSACTION;
+
+-- Perform database operations
+SELECT * FROM products WHERE category = 'Electronics';
+
+-- Commit the transaction
+COMMIT;
+```
+
+**Isolation Level Trade-offs**
+
+Choosing the appropriate isolation level involves balancing data consistency and concurrency. Higher isolation levels provide greater data consistency but can reduce concurrency, while lower isolation levels provide higher concurrency but can compromise data consistency.
+
+|Isolation Level	|Dirty Reads	|Non-Repeatable Reads	|Phantom Reads|	Concurrency|
+| :--: | :--: | :--: | :--: | :--: |
+|Read Uncommitted	|Yes	|Yes	|Yes	|Highest|
+|Read Committed	        |No	|Yes	|Yes	|High|
+|Repeatable Read	|No	|No	|Yes	|Medium|
+|Serializable	        |No	|No	|No	|Lowest|
+
 #### <a name="chapter15part6.4"></a>Chapter 15 - Part 6.4: Real-World Application
+
+Consider an e-commerce platform where multiple users are simultaneously browsing and purchasing products. The database must handle concurrent transactions to ensure accurate inventory levels, prevent over-selling, and maintain consistent order information.
+
+- Inventory Management: When a customer purchases a product, the system must decrement the inventory count. Concurrency control is crucial to prevent multiple customers from purchasing the same item when the inventory is low. Using exclusive locks on the product's inventory record during the purchase process ensures that only one transaction can update the inventory at a time, preventing over-selling.
+- Order Processing: When an order is placed, the system must create new records in the Orders and OrderItems tables. Using an appropriate isolation level (e.g., Read Committed or Repeatable Read) ensures that the order information is consistent and that other transactions do not see partially completed orders.
+- Payment Processing: Processing payments involves multiple steps, including verifying funds, transferring money, and updating transaction records. The Serializable isolation level may be necessary to ensure that payment transactions are atomic and that no inconsistencies arise due to concurrent operations.
+
+In a banking system, concurrency control is paramount to ensure the accuracy and consistency of account balances and transaction records.
+
+- Fund Transfers: When transferring funds between accounts, the system must debit one account and credit another. Using exclusive locks on both account records during the transfer process ensures that the operation is atomic and that no funds are lost or duplicated.
+- Balance Inquiries: Multiple users may simultaneously check their account balances. Shared locks allow concurrent read access to account records without interfering with ongoing transactions.
+- Reporting: Generating financial reports requires consistent data across multiple tables. Using the Repeatable Read or Serializable isolation level ensures that the reports reflect a consistent snapshot of the database, even if other transactions are modifying the data concurrently.
 
 ## <a name="chapter16"></a>Chapter 16: Stored Procedures and Functions
 
