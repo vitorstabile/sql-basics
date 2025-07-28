@@ -10928,27 +10928,439 @@ The query now runs faster because the optimizer is making better decisions.
 
 #### <a name="chapter15part1"></a>Chapter 15 - Part 1: Advanced INSERT Statements: Inserting from Select Statements
 
+Inserting data into a database is a fundamental operation, and while basic INSERT statements are straightforward, the ability to insert data derived from SELECT queries significantly expands the possibilities for data manipulation. This lesson delves into the power and flexibility of INSERT INTO ... SELECT ... statements, enabling you to populate tables with data transformed or extracted from other tables. We'll explore various use cases, syntax variations, and best practices for efficient and reliable data insertion.
+
 #### <a name="chapter15part1.1"></a>Chapter 15 - Part 1.1: Understanding INSERT INTO ... SELECT ... Syntax
+
+The INSERT INTO ... SELECT ... statement allows you to insert rows into a table by selecting data from one or more other tables. The basic syntax is as follows:
+
+```sql
+INSERT INTO target_table (column1, column2, ...)
+SELECT column_expression1, column_expression2, ...
+FROM source_table
+WHERE condition;
+```
+
+- **target_table**: The table into which you want to insert data.
+- **(column1, column2, ...)**: An optional list of columns in the target_table to which the selected data will be inserted. If omitted, the SELECT statement must return the same number of columns as the target_table, and the order and data types must be compatible.
+- **SELECT column_expression1, column_expression2, ...**: The SELECT statement that retrieves the data to be inserted. column_expression can be a simple column name, a function, or an expression.
+- **source_table**: The table(s) from which the data is being selected.
+- **WHERE condition**: An optional WHERE clause to filter the data being selected.
+
+**Example:**
+
+Let's say we have two tables: employees and employee_archive. We want to insert all employees who have left the company into the employee_archive table.
+
+```sql
+-- Create the employees table
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(50),
+    hire_date DATE,
+    termination_date DATE
+);
+
+-- Create the employee_archive table
+CREATE TABLE employee_archive (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(50),
+    hire_date DATE,
+    termination_date DATE
+);
+
+INSERT INTO employee_archive (employee_id, first_name, last_name, department, hire_date, termination_date)
+SELECT employee_id, first_name, last_name, department, hire_date, termination_date
+FROM employees
+WHERE termination_date IS NOT NULL;
+```
+
+In this example, we are inserting all columns from the employees table into the employee_archive table for employees with a termination_date (meaning they have left the company).
 
 #### <a name="chapter15part1.2"></a>Chapter 15 - Part 1.2: Inserting Specific Columns
 
+You can specify which columns to insert into the target_table. This is useful when the source_table has more columns than the target_table, or when you only want to insert a subset of the data.
+
+**Example:**
+
+Suppose we only want to store the employee_id, first_name, and last_name in the employee_archive table.
+
+```sql
+INSERT INTO employee_archive (employee_id, first_name, last_name)
+SELECT employee_id, first_name, last_name
+FROM employees
+WHERE termination_date IS NOT NULL;
+```
+
+In this case, the department, hire_date, and termination_date columns in the employee_archive table will be populated with NULL values (assuming they are nullable) or their default values (if defined).
+
 #### <a name="chapter15part1.3"></a>Chapter 15 - Part 1.3: Data Type Considerations
+
+The data types of the columns in the SELECT statement must be compatible with the corresponding columns in the target_table. If the data types are not directly compatible, you may need to use type conversion functions.
+
+**Example:**
+
+Let's say the employee_id column in employee_archive is a VARCHAR instead of an INT.
+
+```sql
+-- Assuming employee_id in employee_archive is VARCHAR
+INSERT INTO employee_archive (employee_id, first_name, last_name)
+SELECT CAST(employee_id AS VARCHAR), first_name, last_name
+FROM employees
+WHERE termination_date IS NOT NULL;
+```
+
+Here, we use the CAST function to convert the employee_id from INT to VARCHAR before inserting it into the employee_archive table. The specific casting function (CAST, CONVERT, etc.) may vary depending on the database system.
 
 #### <a name="chapter15part1.4"></a>Chapter 15 - Part 1.4: Using Expressions and Functions in the SELECT Statement
 
+The SELECT statement can include expressions and functions to transform the data before inserting it.
+
+**Example:**
+
+Suppose we want to store the full name of the employee in a single column in the employee_archive table.
+
+```sql
+-- Assuming employee_archive has a column named full_name VARCHAR(100)
+INSERT INTO employee_archive (employee_id, full_name)
+SELECT employee_id, first_name || ' ' || last_name  -- Concatenation operator (may vary by database)
+FROM employees
+WHERE termination_date IS NOT NULL;
+```
+
+In this example, we concatenate the first_name and last_name columns with a space in between to create the full_name. The concatenation operator (||) may vary depending on the database system (e.g., + in SQL Server, CONCAT() function in MySQL).
+
 #### <a name="chapter15part1.5"></a>Chapter 15 - Part 1.5: Inserting Data from Multiple Tables Using Joins
+
+The SELECT statement can include joins to retrieve data from multiple tables.
+
+**Example:**
+
+Let's say we have a departments table with department information, and we want to include the department name in the employee_archive table.
+
+```sql
+-- Create the departments table
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50)
+);
+
+-- Add a department_id column to the employees table
+ALTER TABLE employees ADD COLUMN department_id INT;
+
+-- Populate the department_id column in the employees table (example data)
+UPDATE employees SET department_id = 1 WHERE department = 'Sales';
+UPDATE employees SET department_id = 2 WHERE department = 'Marketing';
+
+-- Add a department_name column to the employee_archive table
+ALTER TABLE employee_archive ADD COLUMN department_name VARCHAR(50);
+
+INSERT INTO employee_archive (employee_id, first_name, last_name, department_name)
+SELECT e.employee_id, e.first_name, e.last_name, d.department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE e.termination_date IS NOT NULL;
+```
+
+In this example, we join the employees and departments tables on the department_id column to retrieve the department_name and insert it into the employee_archive table.
 
 #### <a name="chapter15part1.6"></a>Chapter 15 - Part 1.6: Handling Errors and Constraints
 
+When inserting data using INSERT INTO ... SELECT ..., it's important to consider potential errors and constraint violations.
+
+- **Data Type Mismatch**: Ensure that the data types of the selected columns are compatible with the target columns. Use type conversion functions if necessary.
+- **Null Values**: If the target table has columns that are not nullable, ensure that the SELECT statement does not return NULL values for those columns, or provide a default value using COALESCE or ISNULL.
+- **Unique Constraints**: If the target table has unique constraints, ensure that the SELECT statement does not return duplicate values for the columns involved in the constraint.
+- **Foreign Key Constraints**: If the target table has foreign key constraints, ensure that the values being inserted into the foreign key columns exist in the referenced table.
+
+**Example:**
+
+Let's say the employee_archive table has a NOT NULL constraint on the first_name column.
+
+```sql
+INSERT INTO employee_archive (employee_id, first_name, last_name)
+SELECT employee_id, COALESCE(first_name, 'Unknown'), last_name  -- Use COALESCE to handle NULL first_name values
+FROM employees
+WHERE termination_date IS NOT NULL;
+```
+
+Here, we use the COALESCE function to replace any NULL values in the first_name column with the string 'Unknown' before inserting them into the employee_archive table.
+
 #### <a name="chapter15part1.7"></a>Chapter 15 - Part 1.7: Performance Considerations
+
+Inserting data using INSERT INTO ... SELECT ... can be more efficient than inserting rows individually, especially when inserting a large number of rows. However, there are still some performance considerations to keep in mind:
+
+- **Indexing**: Ensure that the source_table has appropriate indexes to speed up the SELECT query.
+- **Transaction Size**: For large data sets, consider breaking the insertion into smaller batches to avoid locking issues and improve performance. This will be covered in more detail in the lesson on Transactions.
+- **Logging**: Large INSERT operations can generate a lot of log data. Consider using minimally logged operations if supported by your database system.
 
 #### <a name="chapter15part2"></a>Chapter 15 - Part 2: Advanced UPDATE Statements: Updating with Joins
 
+Updating data in a database is a fundamental operation, but sometimes the information needed to update a table resides in another table. This is where updating with joins comes in. It allows you to modify data in one table based on related data in another, ensuring data consistency and accuracy. This lesson will explore the syntax, techniques, and best practices for performing advanced UPDATE statements using JOIN clauses.
+
 #### <a name="chapter15part2.1"></a>Chapter 15 - Part 2.1: Understanding UPDATE with JOIN
+
+The basic idea behind updating with joins is to combine the UPDATE statement with a JOIN clause. This allows you to reference columns from multiple tables in the WHERE clause and, more powerfully, in the SET clause to determine the new values for the columns being updated.
+
+**Syntax Variations**
+
+The specific syntax for UPDATE with JOIN can vary slightly depending on the database system you are using (e.g., MySQL, PostgreSQL, SQL Server). However, the underlying principle remains the same.
+
+**MySQL:**
+
+```sql
+UPDATE table1
+JOIN table2 ON table1.column_name = table2.column_name
+SET table1.column_to_update = new_value
+WHERE condition;
+```
+
+**PostgreSQL:**
+
+```sql
+UPDATE table1
+SET column_to_update = new_value
+FROM table2
+WHERE table1.column_name = table2.column_name AND condition;
+```
+
+**SQL Server:**
+
+```sql
+UPDATE table1
+SET table1.column_to_update = new_value
+FROM table1
+JOIN table2 ON table1.column_name = table2.column_name
+WHERE condition;
+```
+
+While the syntax differs, the core components are consistent:
+
+- The UPDATE statement specifies the table to be updated.
+- A JOIN clause links the table being updated with another table based on a related column.
+- The SET clause specifies which columns to update and their new values, potentially referencing columns from the joined table.
+- The WHERE clause filters the rows to be updated based on conditions involving columns from both tables.
+
+**Basic Example**
+
+Let's consider two tables: employees and departments. The employees table contains information about employees, including their employee_id, name, and department_id. The departments table contains information about departments, including their department_id and location.
+
+**employees table:**
+
+|employee_id	|name	|department_id	|salary|
+| :--: | :--: | :--: | :--: |
+|1|	John|	1|	|60000|
+|2|	Jane|	2|	|70000|
+|3|	David|	1|	|55000|
+|4|	Emily|	3|	|80000|
+
+**departments table:**
+
+|department_id	|location|
+| :--: | :--: |
+|1|	|New York|
+|2|	|London|
+|3|	|Paris|
+
+Suppose we want to update the location column in an employee_locations table based on the departments table. We can do this using an UPDATE statement with a JOIN. First, let's create the employee_locations table:
+
+```sql
+CREATE TABLE employee_locations (
+    employee_id INT PRIMARY KEY,
+    location VARCHAR(255)
+);
+
+INSERT INTO employee_locations (employee_id) VALUES (1), (2), (3), (4);
+```
+
+Now, let's update the employee_locations table:
+
+**MySQL:**
+
+```sql
+UPDATE employee_locations
+JOIN employees ON employee_locations.employee_id = employees.employee_id
+JOIN departments ON employees.department_id = departments.department_id
+SET employee_locations.location = departments.location;
+```
+
+**PostgreSQL:**
+
+```sql
+UPDATE employee_locations
+SET location = departments.location
+FROM employees
+JOIN departments ON employees.department_id = departments.department_id
+WHERE employee_locations.employee_id = employees.employee_id;
+```
+
+**SQL Server:**
+
+```sql
+UPDATE employee_locations
+SET employee_locations.location = departments.location
+FROM employee_locations
+JOIN employees ON employee_locations.employee_id = employees.employee_id
+JOIN departments ON employees.department_id = departments.department_id;
+```
+
+After running this query, the employee_locations table will be updated with the correct locations:
+
+|employee_id	|location|
+| :--: | :--: |
+|1|	New York|
+|2|	London|
+|3|	New York|
+|4|	Paris|
 
 #### <a name="chapter15part2.2"></a>Chapter 15 - Part 2.2: Advanced Techniques and Considerations
 
+**Using Aliases**
+
+Using aliases can make your UPDATE statements with JOIN clauses more readable, especially when dealing with multiple tables or long table names.
+
+```sql
+UPDATE el
+SET location = d.location
+FROM employee_locations AS el
+JOIN employees AS e ON el.employee_id = e.employee_id
+JOIN departments AS d ON e.department_id = d.department_id;
+```
+
+**Updating with Aggregate Functions**
+
+You can also use aggregate functions in your UPDATE statements with JOIN clauses. For example, suppose you want to update the salary of employees in each department based on the average salary of that department.
+
+First, let's add some more data to the employees table:
+
+|employee_id	|name	|department_id	|salary|
+| :--: | :--: | :--: | :--: |
+|5|	Mike|	2|	65000|
+|6|	Sarah|	3|	85000|
+
+Now, let's update the salaries of employees who are below the average salary for their department by giving them a 10% raise.
+
+```sql
+UPDATE employees
+SET salary = salary * 1.10
+WHERE employee_id IN (SELECT e.employee_id
+                      FROM employees e
+                      JOIN (SELECT department_id, AVG(salary) AS avg_salary
+                            FROM employees
+                            GROUP BY department_id) AS dept_avg
+                      ON e.department_id = dept_avg.department_id
+                      WHERE e.salary < dept_avg.avg_salary);
+```
+
+This query first calculates the average salary for each department using a subquery. Then, it joins the employees table with the subquery result to identify employees whose salaries are below the average for their department. Finally, it updates the salaries of those employees by 10%.
+
+**Handling NULL Values**
+
+When performing UPDATE statements with JOIN clauses, it's important to consider how NULL values are handled. If the join condition involves columns that can contain NULL values, you may need to use LEFT JOIN or IS NULL conditions to ensure that all relevant rows are updated correctly.
+
+For example, suppose the employees table has a contact_id column that can be NULL. You want to update the email column in the contacts table for all employees who have a corresponding entry in the contacts table.
+
+```sql
+UPDATE contacts
+SET email = 'new_email@example.com'
+FROM contacts c
+JOIN employees e ON c.contact_id = e.contact_id
+WHERE e.contact_id IS NOT NULL;
+```
+
+This query uses a JOIN clause to link the contacts and employees tables based on the contact_id column. The WHERE clause ensures that only contacts associated with employees (i.e., where e.contact_id is not NULL) are updated.
+
+**Performance Considerations**
+
+Updating with joins can be resource-intensive, especially on large tables. To optimize performance, consider the following:
+
+- **Indexing**: Ensure that the columns used in the JOIN and WHERE clauses are properly indexed. This can significantly speed up the query execution.
+- **Filtering**: Apply filters in the WHERE clause to reduce the number of rows that need to be updated.
+- **Batching**: For very large updates, consider breaking the update into smaller batches to avoid locking issues and reduce the impact on other database operations.
+- **EXPLAIN**: Use the EXPLAIN statement (or its equivalent in your database system) to analyze the query execution plan and identify potential performance bottlenecks.
+
 #### <a name="chapter15part2.3"></a>Chapter 15 - Part 2.3: Practical Examples and Demonstrations
+
+Let's consider a scenario involving an e-commerce platform with orders, customers, and products tables.
+
+**orders table:**
+
+|order_id	|customer_id	|product_id	|quantity	|order_date|
+| :--: | :--: | :--: | :--: | :--: |
+|1	|1	|101	|2	|2023-01-15|
+|2	|2	|102	|1	|2023-02-20|
+|3	|1	|103	|3	|2023-03-10|
+|4	|3	|101	|1	|2023-04-05|
+
+**customers table:**
+
+|customer_id	|name	|email|
+| :--: | :--: | :--: |
+|1	|John	|john@example.com|
+|2	|Jane	|jane@example.com|
+|3	|David	|david@example.com|
+
+**products table:**
+
+|product_id	|name	|price|
+| :--: | :--: | :--: |
+|101	|Laptop	|1200|
+|102	|Keyboard	|75|
+|103	|Mouse	|25|
+
+**Example 1: Updating Order Quantities Based on Product Availability**
+
+Suppose you want to update the quantity of orders for a specific product based on its current availability. You can use an UPDATE statement with a JOIN to achieve this. Let's assume you have an inventory table:
+
+**inventory table:**
+
+
+|product_id	|quantity_available|
+| :--: | :--: |
+|101	|5|
+|102	|10|
+|103	|20|
+
+If the available quantity of product 101 (Laptop) is reduced to 1 due to a stock issue, you might want to update any orders with a quantity greater than 1 to be reduced to 1.
+
+```sql
+UPDATE orders
+SET quantity = 1
+FROM orders o
+JOIN inventory i ON o.product_id = i.product_id
+WHERE o.product_id = 101 AND o.quantity > i.quantity_available;
+```
+
+This query joins the orders and inventory tables on the product_id column. It then updates the quantity in the orders table to 1 for any orders where the product_id is 101 and the original quantity was greater than the quantity_available in the inventory table.
+
+**Example 2: Updating Customer Emails Based on Domain Changes**
+
+Suppose your company has decided to change its email domain from @example.com to @newexample.com. You can update the email column in the customers table using an UPDATE statement.
+
+```sql
+UPDATE customers
+SET email = REPLACE(email, '@example.com', '@newexample.com')
+WHERE email LIKE '%@example.com';
+```
+
+This query uses the REPLACE function to replace the old domain with the new domain in the email column. The WHERE clause ensures that only emails with the old domain are updated.
+
+**Example 3: Archiving Old Orders**
+
+Let's say you want to move old orders (older than one year) to an archived_orders table and then delete them from the orders table. This involves both inserting and deleting data, but we'll focus on the UPDATE aspect for now. We can add an is_archived column to the orders table and update it for old orders.
+
+```sql
+ALTER TABLE orders ADD COLUMN is_archived BOOLEAN DEFAULT FALSE;
+
+UPDATE orders
+SET is_archived = TRUE
+WHERE order_date < DATE('now', '-1 year');
+```
+
+This query adds a new column is_archived to the orders table and sets its default value to FALSE. Then, it updates the is_archived column to TRUE for all orders older than one year. While this doesn't directly involve a JOIN, it sets the stage for a subsequent DELETE operation (which will be covered in the next lesson) based on this updated flag.
 
 #### <a name="chapter15part3"></a>Chapter 15 - Part 3: Advanced DELETE Statements: Deleting with Subqueries
 
