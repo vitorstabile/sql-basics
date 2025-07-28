@@ -11152,18 +11152,18 @@ Let's consider two tables: employees and departments. The employees table contai
 
 |employee_id	|name	|department_id	|salary|
 | :--: | :--: | :--: | :--: |
-|1|	John|	1|	|60000|
-|2|	Jane|	2|	|70000|
-|3|	David|	1|	|55000|
-|4|	Emily|	3|	|80000|
+|1|	John|	1|	60000|
+|2|	Jane|	2|	70000|
+|3|	David|	1|	55000|
+|4|	Emily|	3|	80000|
 
 **departments table:**
 
 |department_id	|location|
 | :--: | :--: |
-|1|	|New York|
-|2|	|London|
-|3|	|Paris|
+|1|	New York|
+|2|	London|
+|3|	Paris|
 
 Suppose we want to update the location column in an employee_locations table based on the departments table. We can do this using an UPDATE statement with a JOIN. First, let's create the employee_locations table:
 
