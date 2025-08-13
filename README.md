@@ -18764,39 +18764,65 @@ B|1313|AnotherValu4
 
 ```
 
-```
-This is a classic "gaps and islands" problem in SQL. The best way to solve this is by using a combination of window functions, which are very powerful for these types of tasks.
+```sql
+-- This is a classic "gaps and islands" problem in SQL. The best way to solve this is by using a combination of window functions, which are very powerful for these types of tasks.
 
-Here's a breakdown of the logic and the SQL query to get your desired result.
+-- Here's a breakdown of the logic and the SQL query to get your desired result.
 
-The Strategy
-Identify the "islands": The first step is to create a way to group rows together. A new group starts whenever Column1 is not NULL.
+-- The Strategy
+-- Identify the "islands": The first step is to create a way to group rows together. A new group starts whenever Column1 is not NULL.
 
-Assign a group ID: We can use a window function to assign a unique ID to each group. A common trick is to count the non-NULL values in Column1 up to the current row. This count will only increase when Column1 has a value, effectively creating a group ID.
+-- Assign a group ID: We can use a window function to assign a unique ID to each group. A common trick is to count the non-NULL values in Column1 up to the current row. This count will only increase when Column1 has a ---- value, effectively creating a group ID.
 
-Fill down the value: Once you have these groups, you can use another window function to get the first non-NULL value within each group.
+-- Fill down the value: Once you have these groups, you can use another window function to get the first non-NULL value within each group.
 
-The SQL Query
-Assuming your table is named my_table with columns Column1, Column2, and Column3, and that the order is determined by Column2:
+-- The SQL Query
+-- Assuming your table is named my_table with columns Column1, Column2, and Column3, and that the order is determined by Column2:
 
-SQL
+CREATE TABLE 'raw_table' AS SELECT row_number() OVER () AS line_number, * FROM read_csv('C:\Users\vitor.garcia\Downloads\example.csv', all_varchar=True);
+
+┌─────────────┬─────────┬─────────┬───────────────┐
+│ line_number │ Column1 │ Column2 │    Column3    │
+│    int64    │ varchar │ varchar │    varchar    │
+├─────────────┼─────────┼─────────┼───────────────┤
+│           1 │ A       │ 123     │ Value1        │
+│           2 │         │ 234     │ Value2        │
+│           3 │         │ 345     │ Value3        │
+│           4 │         │ 456     │ Value4        │
+│           5 │ B       │ 1010    │ AnotherValue1 │
+│           6 │         │ 1111    │ AnotherValue2 │
+│           7 │         │ 1212    │ AnotherValue3 │
+│           8 │         │ 1313    │ AnotherValu4  │
+└─────────────┴─────────┴─────────┴───────────────┘
 
 SELECT
-  MAX(t1.Column1) OVER (PARTITION BY t2.group_id ORDER BY t1.Column2) AS Column1,
-  t1.Column2,
-  t1.Column3
-FROM
-  my_table AS t1
+    MAX(t1.Column1) OVER (PARTITION BY t2.group_id ORDER BY t1.line_number) AS Column1,
+    t1.Column2,
+    t1.Column3
+FROM raw_table AS t1
 JOIN (
-  SELECT
-    Column2,
-    COUNT(Column1) OVER (ORDER BY Column2) AS group_id
-  FROM
-    my_table
-) AS t2
-ON t1.Column2 = t2.Column2
-ORDER BY
-  t1.Column2;
+      SELECT
+      line_number,
+      COUNT(Column1) OVER (ORDER BY line_number) AS group_id
+FROM raw_table ) AS t2
+ON t1.line_number = t2.line_number
+ORDER BY t1.line_number;
+
+┌─────────┬─────────┬───────────────┐
+│ Column1 │ Column2 │    Column3    │
+│ varchar │ varchar │    varchar    │
+├─────────┼─────────┼───────────────┤
+│ A       │ 123     │ Value1        │
+│ A       │ 234     │ Value2        │
+│ A       │ 345     │ Value3        │
+│ A       │ 456     │ Value4        │
+│ B       │ 1010    │ AnotherValue1 │
+│ B       │ 1111    │ AnotherValue2 │
+│ B       │ 1212    │ AnotherValue3 │
+│ B       │ 1313    │ AnotherValu4  │
+└─────────┴─────────┴───────────────┘
+
+
 ```
 
 
