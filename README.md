@@ -428,6 +428,8 @@
     - [Appendix A - Part 13: Using more than One order By](#appendixapart13)
     - [Appendix A - Part 14: Calculate a Discount for Active Products](#appendixapart14)
     - [Appendix A - Part 15: Count the number of ocorrences in a String](#appendixapart15)
+    - [Appendix A - Part 16: Fill the Gaps of a Table (gaps and islands)](#appendixapart16)
+    - [Appendix A - Part 17: Get the value of a column based in another value](#appendixapart17)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -18728,5 +18730,191 @@ SELECT (LENGTH('apple banana apple orange apple') - LENGTH(REPLACE('apple banana
 ├────────┤
 │    3.0 │
 └────────┘
+
+```
+
+ #### <a name="appendixapart16"></a>Appendix A - Part 16: Fill the Gaps of a Table (gaps and islands)
+
+ ```
+--- Objective: Fill the Gaps of the Column1 until reach the next value of the Column2
+
+Input:
+
+Column1|Column2|Column3
+A|123|Value1
+|234|Value2
+|345|Value3
+|456|Value4
+B|1010|AnotherValue1
+|1111|AnotherValue2
+|1212|AnotherValue3
+|1313|AnotherValu4
+
+Output:
+
+Column1|Column2|Column3
+A|123|Value1
+A|234|Value2
+A|345|Value3
+A|456|Value4
+B|1010|AnotherValue1
+B|1111|AnotherValue2
+B|1212|AnotherValue3
+B|1313|AnotherValu4
+
+```
+
+```
+This is a classic "gaps and islands" problem in SQL. The best way to solve this is by using a combination of window functions, which are very powerful for these types of tasks.
+
+Here's a breakdown of the logic and the SQL query to get your desired result.
+
+The Strategy
+Identify the "islands": The first step is to create a way to group rows together. A new group starts whenever Column1 is not NULL.
+
+Assign a group ID: We can use a window function to assign a unique ID to each group. A common trick is to count the non-NULL values in Column1 up to the current row. This count will only increase when Column1 has a value, effectively creating a group ID.
+
+Fill down the value: Once you have these groups, you can use another window function to get the first non-NULL value within each group.
+
+The SQL Query
+Assuming your table is named my_table with columns Column1, Column2, and Column3, and that the order is determined by Column2:
+
+SQL
+
+SELECT
+  MAX(t1.Column1) OVER (PARTITION BY t2.group_id ORDER BY t1.Column2) AS Column1,
+  t1.Column2,
+  t1.Column3
+FROM
+  my_table AS t1
+JOIN (
+  SELECT
+    Column2,
+    COUNT(Column1) OVER (ORDER BY Column2) AS group_id
+  FROM
+    my_table
+) AS t2
+ON t1.Column2 = t2.Column2
+ORDER BY
+  t1.Column2;
+```
+
+
+
+#### <a name="appendixapart17"></a>Appendix A - Part 17: Get the value of a column based in another value
+
+```
+-- Objective: In a group of code, get the Max brandPrice based in the netPrice. If the NetPrice is equal, get the
+-- max brandPrice. If the NetPrice is different, get the Max Brand Price of the Max NetPrice. In the end, concat the code with the id
+
+Input:
+
+code|id|netprice|brandPrice
+code1|id1|200|320
+code1|id2|200|320
+code1|id3|200|300
+code2|id1|100|110
+code2|id2|90|110
+code2|id3|90|105
+code3|id1|10|15
+
+OutPut:
+
+┌───────────┬─────────────────┐
+│ skuValue  │ brandPriceValue │
+│  varchar  │  decimal(18,3)  │
+├───────────┼─────────────────┤
+│ code1#id1 │         320.000 │
+│ code1#id2 │         320.000 │
+│ code1#id3 │         320.000 │
+│ code2#id1 │         110.000 │
+│ code2#id2 │         110.000 │
+│ code2#id3 │         110.000 │
+│ code3#id1 │          15.000 │
+└───────────┴─────────────────┘
+
+
+```
+
+```
+-- CSV input_example.csv
+
+code|id|netprice|brandPrice
+code1|id1|200|320
+code1|id2|200|320
+code1|id3|200|300
+code2|id1|100|110
+code2|id2|90|110
+code2|id3|90|105
+code3|id1|10|15
+
+```
+
+```sql
+
+CREATE TABLE 'raw_table' AS SELECT row_number() OVER () AS line_number, * FROM read_csv('C:\Users\my.user\Downloads\input_example.csv', all_varchar=True);
+
+WITH RemoveNegativeDiscounts AS (
+    SELECT
+        code AS code,
+        id AS id,
+        TRY_CAST(netprice AS DECIMAL) AS netprice,
+        TRY_CAST(brandPrice AS DECIMAL) AS brandPrice
+    FROM raw_table
+),
+RankNetPrice AS (
+    SELECT
+        code AS code,
+        id AS id,
+        netprice AS netprice,
+        brandPrice AS brandPrice,
+        DENSE_RANK() OVER (PARTITION BY code ORDER BY netprice ASC) AS netprice_rank
+    FROM RemoveNegativeDiscounts
+),
+rank_info AS (
+    SELECT 
+        code,
+        MIN(netprice_rank) AS min_rank,
+        MAX(netprice_rank) AS max_rank
+    FROM RankNetPrice
+    GROUP BY code
+),
+GetDiscountBasedInRankAndNetPrice AS (
+	SELECT 
+		t.code AS code,
+		CASE 
+			WHEN r.min_rank = r.max_rank 
+				THEN MAX(t.brandPrice)
+			ELSE MAX(CASE WHEN t.netprice_rank != r.min_rank THEN t.brandPrice END)
+		END AS result_price
+	FROM RankNetPrice t
+	JOIN rank_info r 
+    ON t.code = r.code
+	GROUP BY t.code, r.min_rank, r.max_rank
+),
+RetrieveValues AS (
+	SELECT
+        CONCAT(gdb.code,'#',rnd.id) AS skuValue,
+        gdb.result_price AS brandPriceValue
+    FROM RemoveNegativeDiscounts rnd
+    JOIN GetDiscountBasedInRankAndNetPrice gdb
+    ON gdb.code = rnd.code
+)
+
+SELECT * FROM RetrieveValues;
+
+┌───────────┬─────────────────┐
+│ skuValue  │ brandPriceValue │
+│  varchar  │  decimal(18,3)  │
+├───────────┼─────────────────┤
+│ code1#id1 │         320.000 │
+│ code1#id2 │         320.000 │
+│ code1#id3 │         320.000 │
+│ code2#id1 │         110.000 │
+│ code2#id2 │         110.000 │
+│ code2#id3 │         110.000 │
+│ code3#id1 │          15.000 │
+└───────────┴─────────────────┘
+
 
 ```
