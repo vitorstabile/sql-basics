@@ -432,6 +432,8 @@
     - [Appendix A - Part 17: Get the value of a column based in another value](#appendixapart17)
     - [Appendix A - Part 18: Find the second highest distinct salary](#appendixapart18)
     - [Appendix A - Part 19: Return the employees who have a salary higher than a manager's.](#appendixapart19)
+    - [Appendix A - Part 20: Find the ids of products that are both low fat and recyclable](#appendixapart20)
+    - [Appendix A - Part 21: Find managers with at least five direct reports](#appendixapart21)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -19040,4 +19042,110 @@ employer_table AS (
 )
 
 SELECT * FROM employer_table;
+```
+
+#### <a name="appendixapart20"></a>Appendix A - Part 20: Find the ids of products that are both low fat and recyclable
+
+Write a solution to find the ids of products that are both low fat and recyclable.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
+```
+Input: 
+Products table:
++-------------+----------+------------+
+| product_id  | low_fats | recyclable |
++-------------+----------+------------+
+| 0           | Y        | N          |
+| 1           | Y        | Y          |
+| 2           | N        | Y          |
+| 3           | Y        | Y          |
+| 4           | N        | N          |
++-------------+----------+------------+
+Output: 
++-------------+
+| product_id  |
++-------------+
+| 1           |
+| 3           |
++-------------+
+Explanation: Only products 1 and 3 are both low fat and recyclable.
+```
+
+```
+product_id|low_fats|recyclable
+0|Y|N
+1|Y|Y
+2|N|Y
+3|Y|Y
+4|N|N
+```
+
+```sql
+SELECT product_id FROM Products WHERE low_fats = 'Y' AND recyclable = 'Y';
+```
+
+#### <a name="appendixapart21"></a>Appendix A - Part 21: Find managers with at least five direct reports
+
+Write a solution to find managers with at least five direct reports.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
+```
+Example 1:
+
+Input: 
+Employee table:
++-----+-------+------------+-----------+
+| id  | name  | department | managerId |
++-----+-------+------------+-----------+
+| 101 | John  | A          | null      |
+| 102 | Dan   | A          | 101       |
+| 103 | James | A          | 101       |
+| 104 | Amy   | A          | 101       |
+| 105 | Anne  | A          | 101       |
+| 106 | Ron   | B          | 101       |
++-----+-------+------------+-----------+
+Output: 
++------+
+| name |
++------+
+| John |
++------+
+```
+
+```
+id|name|department|managerId
+101|John|A|
+102|Dan|A|101
+103|James|A|101
+104|Amy|A|101
+105|Anne|A|101
+106|Ron|B|101
+```
+
+```sql
+WITH cast_table AS (
+	SELECT
+		CAST(id AS INTEGER) AS id,
+		name AS name,
+		department AS department,
+		CAST(managerId AS INTEGER) AS managerId
+	FROM Employee
+),
+join_table AS (
+	SELECT
+		ct1.name AS name
+	FROM cast_table ct1
+	INNER JOIN cast_table ct2
+	ON ct1.id = ct2.managerId
+	GROUP BY ct1.name, ct1.id
+	HAVING COUNT(*) >= 5
+)
+
+SELECT * FROM join_table;
 ```
