@@ -430,6 +430,7 @@
     - [Appendix A - Part 15: Count the number of ocorrences in a String](#appendixapart15)
     - [Appendix A - Part 16: Fill the Gaps of a Table (gaps and islands)](#appendixapart16)
     - [Appendix A - Part 17: Get the value of a column based in another value](#appendixapart17)
+    - [Appendix A - Part 18: Find the second highest distinct salary](#appendixapart18)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -18943,4 +18944,65 @@ SELECT * FROM RetrieveValues;
 └───────────┴─────────────────┘
 
 
+```
+
+#### <a name="appendixapart18"></a>Appendix A - Part 18: Find the second highest distinct salary
+
+Write a solution to find the second highest distinct salary from the Employee table. If there is no second highest salary, return null (return None in Pandas).
+
+The result format is in the following example.
+
+```
+Input: 
+Employee table:
++----+--------+
+| id | salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+Output: 
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| 200                 |
++---------------------+
+
+Example 2:
+
+Input: 
+Employee table:
++----+--------+
+| id | salary |
++----+--------+
+| 1  | 100    |
++----+--------+
+Output: 
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| null                |
++---------------------+
+```
+
+```sql
+-- This MAX is necessary to return a NULL value case there is no rows return
+SELECT MAX(salary) AS SecondHighestSalary
+FROM (
+	WITH cast_cte AS (
+		SELECT
+			CAST(id AS INTEGER) AS id,
+			CAST(salary AS INTEGER) AS salary
+	FROM raw_table
+	),
+	rank_salary AS (
+		SELECT
+			id,
+			salary,
+			DENSE_RANK() OVER (ORDER BY salary DESC) AS salary_rank
+		FROM cast_cte
+)
+SELECT salary FROM rank_salary WHERE salary_rank = 2
+) AS subquery_result;
 ```
