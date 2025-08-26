@@ -431,6 +431,7 @@
     - [Appendix A - Part 16: Fill the Gaps of a Table (gaps and islands)](#appendixapart16)
     - [Appendix A - Part 17: Get the value of a column based in another value](#appendixapart17)
     - [Appendix A - Part 18: Find the second highest distinct salary](#appendixapart18)
+    - [Appendix A - Part 19: Return the employees who have a salary higher than a manager's.](#appendixapart19)
 
      
 <div align="center"><img src="img/example-w1054-h609.png" width=1054 height=609><br><sub>Example - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
@@ -19005,4 +19006,38 @@ FROM (
 )
 SELECT salary FROM rank_salary WHERE salary_rank = 2
 ) AS subquery_result;
+```
+
+#### <a name="appendixapart19"></a>Appendix A - Part 19: Return the employees who have a salary higher than a manager's.
+
+Employees that not have manager_id, is not a manager
+
+```
+employe_id|name|salary|department|manager_id
+111|John|10000|IT|
+222|Maria|20000|Sales|
+333|Mike|30000|Maketing|4040
+444|Ana|5000|IT|
+555|Jason|7000|HR|1010
+666|July|8000|Marketing|
+```
+
+```sql
+WITH manager_salary AS (
+	SELECT
+		MIN(TRY_CAST(salary AS INTEGER)) AS min_manager_salary
+	FROM raw_table
+	WHERE manager_id NOT NULL AND manager_id != ''
+),
+employer_table AS (
+	SELECT
+		rt.employe_id,
+		rt.name,
+		rt.salary,
+		rt.department
+	FROM raw_table rt
+	WHERE (rt.manager_id IS NULL OR rt.manager_id = '') AND TRY_CAST(rt.salary AS INTEGER) > (SELECT ms.min_manager_salary FROM manager_salary ms)
+)
+
+SELECT * FROM employer_table;
 ```
