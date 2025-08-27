@@ -18898,7 +18898,7 @@ RankNetPrice AS (
         id AS id,
         netprice AS netprice,
         brandPrice AS brandPrice,
-        DENSE_RANK() OVER (PARTITION BY code ORDER BY netprice ASC) AS netprice_rank
+        DENSE_RANK() OVER (PARTITION BY code ORDER BY netprice DESC) AS netprice_rank
     FROM RemoveNegativeDiscounts
 ),
 rank_info AS (
@@ -18915,12 +18915,12 @@ GetDiscountBasedInRankAndNetPrice AS (
 		CASE 
 			WHEN r.min_rank = r.max_rank 
 				THEN MAX(t.brandPrice)
-			ELSE MAX(CASE WHEN t.netprice_rank != r.min_rank THEN t.brandPrice END)
+			ELSE (SELECT MAX(t.brandPrice) FROM RankNetPrice t WHERE t.code = r.code AND t.netprice_rank = 1)
 		END AS result_price
 	FROM RankNetPrice t
 	JOIN rank_info r 
     ON t.code = r.code
-	GROUP BY t.code, r.min_rank, r.max_rank
+	GROUP BY t.code, r.code, r.min_rank, r.max_rank
 ),
 RetrieveValues AS (
 	SELECT
